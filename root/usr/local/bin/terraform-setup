@@ -97,7 +97,7 @@ for variables_file in ${variables_files[@]}; do
 
         # try $WORKDIR/terraform.tfvars
         tfvar_value=$(jq -r ".$variable" <<<$tfvars_data)
-        if [ "$tfvar_value" != null ]; then
+        if [ -n "$tfvar_value" ]; then
           value="$tfvar_value"
         fi
 

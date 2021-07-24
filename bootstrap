@@ -142,8 +142,10 @@ select_cluster_type()
     fi
 
     local types=( templates/*/ )
-    local types=( ${types[@]#*/} )
-    local types=( ${types[@]%/} )
+    types=( ${types[@]#*/} )
+    types=( ${types[@]%/} )
+    types=( "${types[@]/manifests}" ) ## remove manifests from types
+
     local PS3=$(prompt "Select cluster type")
 
     select type in ${types[@]}; do
