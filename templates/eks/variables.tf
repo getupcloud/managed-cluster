@@ -78,3 +78,9 @@ variable "auth_iam_users" {
   description = "List of IAM users to allow kubernetes access. Example: [\"eks-admin\"]"
   type        = list(string)
 }
+
+variable "flux_git_repo" {
+  description = "GitRepository URL"
+  type        = string
+  default     = ""
+}

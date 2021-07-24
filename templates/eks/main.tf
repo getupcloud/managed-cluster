@@ -8,5 +8,5 @@ module "eks" {
   subnet_ids            = var.subnet_ids
   node_groups           = var.node_groups
   node_groups_defaults  = var.node_groups_defaults
+  flux_git_repo         = var.flux_git_repo
 }
-
