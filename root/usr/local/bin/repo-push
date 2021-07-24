@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+info Switching to $REPODIR
+cd $REPODIR
+
+if ! has_remote upstream 2>/dev/null; then
+    ask_execute_command repo-setup
+fi
+
+ask_execute_command git add clusters/
+ask_execute_command git commit clusters/ -m "Automatic commit"
+ask_execute_command git push origin main

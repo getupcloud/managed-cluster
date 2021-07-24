@@ -1,0 +1,76 @@
+#!/bin/bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+info Switching to $REPODIR
+cd $REPODIR
+
+# having an upstream is considered as already configured
+if has_remote upstream; then
+    warn "Refusing to continue: repository already has remote \`upstream\`"
+    exit 1
+fi
+
+# must have origin
+if ! has_remote origin; then
+    warn "Refusing to continue: repository has no remote \`origin\`"
+    exit 1
+fi
+
+if ! gh auth status; then
+    gh auth login
+fi
+
+gh_owner=$(git_owner $https_git_repo)
+gh_name=$(git_name $https_git_repo)
+: ${gh_description:="Getupcloud Managed Cluster: $customer"}
+: ${gh_team:=developers}
+: ${gh_enable_wiki:=false}
+: ${gh_enable_issues:=false}
+
+https_git_repo_upstream=https://github.com/$(git_owner $upstream_git_repo)/$(git_name $upstream_git_repo)
+
+echo
+info --- Current Git remotes ---
+git remote -v
+info ----- New Git remotes -----
+echo "origin   $https_git_repo"
+echo "upstream $https_git_repo_upstream"
+info ---------------------------
+
+if ask "Update remotes now? [Y/n]"; then
+    git remote remove origin 2>/dev/null || true
+    git remote add upstream $https_git_repo_upstream
+    git remote set-url --push upstream FORBIDEN
+fi
+
+if PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
+    # repo already exists just add origin
+    git remote add origin $https_git_repo
+elif ask "Create repository $https_git_repo now? [Y/n]"; then
+    # repo doesn't exists, create now
+    # origin will be added by `gh`
+    gh repo create $https_git_repo \
+        --confirm \
+        --private=true \
+        --team=${gh_team} \
+        --description="${gh_description}" \
+        --enable-issues=${gh_enable_issues} \
+        --enable-wiki=${gh_enable_wiki}
+fi
+
+echo
+info --- Current Git remotes ---
+git remote -v
+info ---------------------------
+
+# upload flux ssh deploy key
+info "Uploading ssh key: $WORKDIR/identity.pub"
+ssh-keygen -l -E sha256 -f $WORKDIR/identity.pub
+
+if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
+        -f "key=$(<$WORKDIR/identity.pub)" -f read_only=true -f title="managed-cluster"; then
+    warn "Failed adding key"
+fi

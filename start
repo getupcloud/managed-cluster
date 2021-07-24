@@ -1,0 +1,90 @@
+#!/bin/bash
+
+export ROOTDIR=$(dirname $(realpath $0))
+source ${ROOTDIR}/root/etc/profile.d/getup.sh
+
+devel=false
+cluster_dir=""
+while [ $# -gt 0 ]; do
+    case $1 in
+        --devel|-d)
+            devel=true
+        ;;
+        --) shift
+            break
+        ;;
+        *)
+            cluster_dir=$1
+    esac
+    shift
+done
+
+if [ $# -gt 0 ]; then
+  docker_command="$*"
+  shift $#
+fi
+
+if [ -d "$cluster_dir" ]; then
+    config_file=${cluster_dir}/cluster.conf
+    if ! has_valid_config $config_file; then
+        exit 1
+    fi
+else
+    clusters=( clusters/*/*/ )
+    clusters=( ${clusters[*]%/} )
+
+    if ! [ -d "${clusters[0]}" ]; then
+        warn No clusters found. Please run \`./configure\` to create one.
+        exit 1
+    fi
+
+    if [ ${#clusters[*]} -eq 1 ]; then
+        cluster_dir=${clusters[0]}
+        config_file=${cluster_dir}/cluster.conf
+    else
+        PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
+        select cluster_dir in ${clusters[*]}; do
+            config_file=$cluster_dir/cluster.conf
+            if has_valid_config $config_file; then
+                break
+            else
+                warn Config not found: $config_file
+            fi
+        done
+    fi
+fi
+
+source $config_file
+cluster_dir=$(realpath ${cluster_dir})
+
+docker_image_repo=${docker_image_repo:-getupcloud/cluster}
+docker_image_tag=${docker_image_tag:-$(cat version.txt)}
+docker_image=${docker_image_repo}:${docker_image_tag}
+docker_command=${docker_command:-/bin/bash -l}
+docker_run_options_defaults=(
+    -it
+    -e "GH_TOKEN=$GH_TOKEN"
+    -v $cluster_dir:/work
+    -v $ROOTDIR:/repo
+    -v $HOME/.gitconfig:/root/.gitconfig.host
+)
+
+if [ "$type" == kind ]; then
+    docker_run_options_defaults+=(
+        --network host
+        -v /var/run/docker.sock:/var/run/docker.sock
+    )
+fi
+
+if $devel; then
+    docker_run_options_defaults+=(
+        -v $ROOTDIR/root/usr/local/bin:/root/bin
+        -v $ROOTDIR/root/etc/profile.d/getup.sh:/etc/profile.d/getup.sh
+    )
+fi
+
+info Starting cluster: $cluster_dir with docker image ${docker_image}
+
+echo
+set -x
+docker run --rm ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} -- ${docker_command}

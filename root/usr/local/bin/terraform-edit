@@ -1,0 +1,3 @@
+#!/bin/bash
+
+vim $TF_VARS_FILE

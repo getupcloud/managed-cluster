@@ -1,0 +1,27 @@
+#!/bin/bash
+
+export PATH="~/bin/:$PATH"
+
+set -a
+source /etc/profile.d/getup.sh
+source $WORKDIR/cluster.conf
+set +a
+
+if ! [ -d "${KUBECONFIG%/*}" ]; then
+    mkdir -p "${KUBECONFIG%/*}"
+fi
+
+if [ -n "$GH_TOKEN" ]; then
+    gh auth login --with-token <<<$GH_TOKEN
+fi
+
+if [ -r $HOME/.gitconfig.host ]; then
+    cp -f $HOME/.gitconfig.host $HOME/.gitconfig
+fi
+
+if ! [ -r "$TF_VARS_FILE" ]; then
+    debug Terraform variables file not found: $TF_VARS_FILE
+    ask_execute_command /usr/local/bin/terraform-setup
+fi
+
+exec "$@"

@@ -1,0 +1,233 @@
+#!/bin/bash
+
+ROOTDIR=$(dirname $0)
+source $ROOTDIR/root/etc/profile.d/getup.sh
+
+if [ -t 0 ]; then
+    COLOR_RED="$(tput setaf 1)"
+    COLOR_GREEN="$(tput setaf 2)"
+    COLOR_YELLOW="$(tput setaf 3)"
+    COLOR_BOLD="$(tput bold)"
+    COLOR_RESET="$(tput sgr0)"
+fi
+
+copy_from_template()
+{
+    if [ $# -ne 2 ]; then
+      warn "Invalid or missing parameters: $0 [src-dir] [dest-dir]"
+      return 1
+    fi
+
+    local src=$1
+    local dest=$2
+
+    if ! [ -d "$src" ]; then
+      warn "Source dir not found: $src"
+      return 1
+    fi
+
+    if ! [ -d "$dest" ]; then
+      mkdir -p "$dest"
+    fi
+
+    rsync -va $src/ templates/manifests templates/*.* $dest
+}
+
+sync_from_template()
+{
+    if [ $# -ne 1 ]; then
+      warn "Invalid or missing parameters: $0 [cluster-dir]"
+      return 1
+    fi
+
+    local dest=$1
+
+    if ! [ -d "$dest" ]; then
+      warn "Cluster dir not found: $dest"
+      return 1
+    fi
+
+    if ! [ -e "$dest/cluster.conf" ]; then
+      warn "Missing $dest/cluster.conf"
+      return 1
+    fi
+
+    source $dest/cluster.conf || return 1
+
+    if [ -z "$customer" ] || [ -z "$name" ] || [ -z "$type" ]; then
+      warn "Invalid cluster.conf: customer=$customer name=$name type=$type"
+      return 1
+    fi
+
+    local src=templates/$type
+
+    if ! [ -d "$src" ]; then
+      warn "Template dir not found: $src"
+      return 1
+    fi
+
+    if ! ask "Copy from $src to $dest? [Y/n]"; then
+      return 0
+    fi
+
+    copy_from_template $src $dest
+}
+
+set_config()
+{
+    local _name=${1%%=*}
+    local _description="$2"
+
+    export "$1"
+
+    if grep -q "^\s*${_name}=.*" $config_file; then
+        sed -i -e "s|^\s${_name}=.*|$1|" $config_file
+    else
+        {
+            echo "# $_description"
+            echo "$1"
+            echo
+        } >>$config_file
+    fi
+}
+
+read_config()
+{
+    local _name="${1}"
+    local _value="${!_name}"
+    shift
+    local prompt="$@"
+
+    if [ ! -v "$_name" ] || [ -z "$_value" ]; then
+        read -p "$(prompt "$prompt")" $_name
+    fi
+
+    local _value="${!_name}"
+    if [ -n "$_value" ]; then
+        export $_name
+    else
+        return 1
+    fi
+}
+
+require_config()
+{
+    local _name="${1}"
+    local _description="$2"
+
+    # use value if already exists
+    if [ -n "${!_name}" ]; then
+        set_config ${_name}="${!_name}" "$_description"
+        return 0
+    fi
+
+    until read_config "$@"; do
+        warn "Value can't be empty"
+    done
+
+    local _value="${!_name}"
+    if grep -q "\s" <<<$_value; then
+        set_config "$_name='$_value'" "$_description"
+    else
+        set_config "$_name=$_value" "$_description"
+    fi
+}
+
+select_cluster_type()
+{
+    # use value if already exists
+    if [ -n "$type" ]; then
+        set_config type=$type "Cluster type. One of dir names from ./templates/"
+        return 0
+    fi
+
+    local types=( templates/*/ )
+    local types=( ${types[@]#*/} )
+    local types=( ${types[@]%/} )
+    local PS3=$(prompt "Select cluster type")
+
+    select type in ${types[@]}; do
+        break;
+    done
+
+    export template=templates/$type
+    set_config type=$type "Cluster type. One of dir names from ./templates/"
+}
+
+###########
+## Start ##
+###########
+
+ssh_key_type=rsa
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        --help|-h)
+            echo "Usage:"
+            echo "  $0 [--customer NAME] [--name NAME] [--type NAME] [--ssh-key-type=$ssh_key_type]"
+            echo "  $0 [--sync-template|-s]"
+            exit 0
+        ;;
+        --sync-template|-s)
+            sync_from_template $2
+            exit
+        ;;
+        --customer)
+            shift
+            customer=$1
+        ;;
+        --name)
+            shift
+            name=$1
+        ;;
+        --type)
+            shift
+            type=$1
+        ;;
+        --ssh-key-type)
+            shift
+            ssh_key_type=$1
+    esac
+    shift
+done
+
+config_file=${1:-$ROOTDIR/cluster.conf}
+
+if [ -e $config_file ]; then
+    debug Reading config from $config_file
+    source $config_file
+else
+    echo Creating empty config: $config_file
+    touch $config_file
+fi
+
+set -e
+
+require_config customer "Customer name"
+require_config name "Cluster name"
+select_cluster_type
+
+set_config upstream_git_repo=$(git remote get-url origin) "Original git repo for templates"
+set_config ssh_git_repo=git@github.com:getupcloud/managed-cluster-$customer "Cluster git repo ssh url"
+set_config https_git_repo=https://github.com/getupcloud/managed-cluster-$customer "Cluster git repo https url"
+set_config flux_git_repo=ssh://git@github.com/getupcloud/managed-cluster-$customer "Git repo for default flux GitRepository"
+
+cluster_root_dir=clusters/$name
+cluster_dir=$cluster_root_dir/$type
+
+if [ -d $cluster_dir ]; then
+    warn "Cluster already exists: $cluster_dir"
+    exit 1
+fi
+
+mkdir -p ${cluster_root_dir}
+copy_from_template templates/$type $cluster_dir
+
+debug Moving $config_file to $cluster_dir
+mv -v $config_file $cluster_dir
+
+info Generating $cluster_dir/identity
+ssh-keygen -t $ssh_key_type -b 2048 -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
+
+info Generating $cluster_dir/known_hosts
+ssh-keyscan -t $ssh_key_type github.com > $cluster_dir/known_hosts

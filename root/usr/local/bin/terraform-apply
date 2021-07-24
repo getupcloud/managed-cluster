@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source /etc/profile.d/getup.sh
+
+ask_execute_command terraform init
+ask_execute_command terraform validate
+ask_execute_command terraform plan -out=$TF_PLAN_FILE
+ask_execute_command terraform apply $TF_PLAN_FILE
+
+if ! has_remote upstream; then
+    info "Local repository has no upstream remote"
+    ask_execute_command repo-setup
+else
+    ask_execute_command repo-push
+fi
