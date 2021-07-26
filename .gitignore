@@ -1,6 +1,7 @@
 # local files
 **/.kube/*
 **/.setup_history
+cluster.conf
 
 # vim swap files
 **/*.sw[a-z]
