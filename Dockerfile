@@ -18,11 +18,16 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
 
 ENV INSTALL_PACKAGES="bash curl procps vim jq docker \
         ncurses aws-cli coreutils httpie bind-tools \
-        git iproute2 net-tools nmap openssl less tar"
+        git iproute2 net-tools nmap openssl less tar \
+        build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev"
 
-RUN apk add --no-cache $INSTALL_PACKAGES && \
-    apk upgrade --no-cache && \
-    cd /usr/local/bin && \
+RUN apk update && \
+    apk add --no-cache $INSTALL_PACKAGES && \
+    apk upgrade --no-cache
+
+SHELL ["/bin/bash", "-x", "-c"]
+
+RUN cd /usr/local/bin && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 > kind && \
     curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.3/hcl2json_linux_amd64 > hcl2json && \
     curl -skL https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.3/aws-iam-authenticator_0.5.3_linux_amd64 > \
@@ -35,7 +40,15 @@ RUN apk add --no-cache $INSTALL_PACKAGES && \
     curl -skL https://run.linkerd.io/install | INSTALLROOT=/usr/local bash && \
     curl -skL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash && \
     curl -skL https://github.com/cli/cli/releases/download/v1.13.1/gh_1.13.1_linux_amd64.tar.gz | \
-        tar xzvf - gh_1.13.1_linux_amd64/bin/gh --strip-components 2
+        tar xzvf - gh_1.13.1_linux_amd64/bin/gh --strip-components 2 && \
+    curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > oci-install.sh && \
+        chmod +x oci-install.sh && \
+        ./oci-install.sh --accept-all-defaults \
+            --install-dir /opt/oci \
+            --exec-dir /usr/local/bin/ \
+            --script-dir /usr/local/bin/ \
+            --rc-file-path /etc/profile.d/oci.sh && \
+        rm -f oci-install.sh
 
 #RUN libuser addgroup -g 1001 getup && \
 #    adduser getup -h /home/getup -g "" -s /bin/bash -G getup -D -u 1001
