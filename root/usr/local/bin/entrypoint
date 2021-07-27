@@ -4,7 +4,17 @@ export PATH="~/bin/:$PATH"
 
 set -a
 source /etc/profile.d/getup.sh
-source $WORKDIR/cluster.conf
+if [ -e $WORKDIR/cluster.conf ]; then
+    source $WORKDIR/cluster.conf
+else
+    info Entering standalone mode
+    export customer=${customer:-standalone} type=${type:-standalone} name=${name:-standalone}
+    exec "$@"
+fi
+
+if [ -e $WORKDIR/provider.env ]; then
+    source $WORKDIR/provider.env
+fi
 set +a
 
 if ! [ -d "${KUBECONFIG%/*}" ]; then

@@ -80,6 +80,29 @@ warnn()
   echo -ne "${COLOR_RED}$@${COLOR_RESET}"
 }
 
+read_config()
+{
+    local _name="${1}"
+    if [ -v "$_name" ]; then
+        local _value="${!_name}"
+    else
+        local _value=""
+    fi
+    shift
+    local prompt="$@"
+
+    if [ ! -v "$_name" ] || [ -z "$_value" ]; then
+        read -p "$(prompt "$prompt")" $_name
+    fi
+
+    local _value="${!_name}"
+    if [ -n "$_value" ]; then
+        export $_name
+    else
+        return 1
+    fi
+}
+
 ask()
 {
   local res

@@ -3,10 +3,49 @@
 export ROOTDIR=$(dirname $(realpath $0))
 source ${ROOTDIR}/root/etc/profile.d/getup.sh
 
+start_container()
+{
+    docker_image_repo=${docker_image_repo:-getupcloud/cluster}
+    docker_image_tag=${docker_image_tag:-$(cat version.txt)}
+    docker_image=${docker_image_repo}:${docker_image_tag}
+    docker_command=${docker_command:-/bin/bash -l}
+    docker_run_options_defaults=(
+        -it
+        -e "GH_TOKEN=$GH_TOKEN"
+        -v $cluster_dir:/work
+        -v $ROOTDIR:/repo
+        -v $HOME/.gitconfig:/root/.gitconfig.host
+    )
+
+    if [ "$type" == kind ]; then
+        docker_run_options_defaults+=(
+            --network host
+            -v /var/run/docker.sock:/var/run/docker.sock
+        )
+    fi
+
+    if $devel; then
+        docker_run_options_defaults+=(
+            -v $ROOTDIR/root/usr/local/bin:/root/bin
+            -v $ROOTDIR/root/etc/profile.d/getup.sh:/etc/profile.d/getup.sh
+        )
+    fi
+
+    info Starting cluster: $cluster_dir with docker image ${docker_image}
+
+    echo
+    set -x
+    docker run --rm ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} -- ${docker_command}
+}
+
 devel=false
+standalone=false
 cluster_dir=""
 while [ $# -gt 0 ]; do
     case $1 in
+        --standalone|-s)
+            standalone=true
+        ;;
         --devel|-d)
             devel=true
         ;;
@@ -22,6 +61,21 @@ done
 if [ $# -gt 0 ]; then
   docker_command="$*"
   shift $#
+fi
+
+if $standalone; then
+    cluster_dir="$PWD/standalone"
+    mkdir -p $cluster_dir
+    #if ! [ -e $cluster_dir/cluster.conf ]; then
+    #    (
+    #        customer=standalone
+    #        type=standalone
+    #        name=standalone
+    #    ) > $cluster_dir/cluster.conf
+    #fi
+    start_container
+    echo NEVER REACHED
+    exit 1
 fi
 
 if [ -d "$cluster_dir" ]; then
@@ -57,34 +111,5 @@ fi
 source $config_file
 cluster_dir=$(realpath ${cluster_dir})
 
-docker_image_repo=${docker_image_repo:-getupcloud/cluster}
-docker_image_tag=${docker_image_tag:-$(cat version.txt)}
-docker_image=${docker_image_repo}:${docker_image_tag}
-docker_command=${docker_command:-/bin/bash -l}
-docker_run_options_defaults=(
-    -it
-    -e "GH_TOKEN=$GH_TOKEN"
-    -v $cluster_dir:/work
-    -v $ROOTDIR:/repo
-    -v $HOME/.gitconfig:/root/.gitconfig.host
-)
+start_container $cluster_dir
 
-if [ "$type" == kind ]; then
-    docker_run_options_defaults+=(
-        --network host
-        -v /var/run/docker.sock:/var/run/docker.sock
-    )
-fi
-
-if $devel; then
-    docker_run_options_defaults+=(
-        -v $ROOTDIR/root/usr/local/bin:/root/bin
-        -v $ROOTDIR/root/etc/profile.d/getup.sh:/etc/profile.d/getup.sh
-    )
-fi
-
-info Starting cluster: $cluster_dir with docker image ${docker_image}
-
-echo
-set -x
-docker run --rm ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} -- ${docker_command}
