@@ -1,21 +1,30 @@
 #!/bin/bash
 
-set -a
+source_env()
+{
+    # salve `set -a` state
+    [ ${-//a/} != $- ] && on=true || on=false
+    set -a
+    source $1
+    # restore `set -a` if was set before
+    $on || set +a
+}
+
 
 if [ -v WORKDIR ] && [ -r $WORKDIR/cluster.conf ]; then
-    source $WORKDIR/cluster.conf
+    source_env $WORKDIR/cluster.conf
 fi
 
 if [ -e /etc/profile.d/kubectl_aliases.sh ]; then
-    source /etc/profile.d/kubectl_aliases.sh
+    source_env /etc/profile.d/kubectl_aliases.sh
 fi
 
 if [ -t 0 ]; then
-    COLOR_RED="$(tput setaf 1)"
-    COLOR_GREEN="$(tput setaf 2)"
-    COLOR_YELLOW="$(tput setaf 3)"
-    COLOR_BOLD="$(tput bold)"
-    COLOR_RESET="$(tput sgr0)"
+    export COLOR_RED="$(tput setaf 1)"
+    export COLOR_GREEN="$(tput setaf 2)"
+    export COLOR_YELLOW="$(tput setaf 3)"
+    export COLOR_BOLD="$(tput bold)"
+    export COLOR_RESET="$(tput sgr0)"
 
     alias l='ls -la --color'
     alias t='terraform'
@@ -30,14 +39,12 @@ if [ -t 0 ]; then
     alias tgu='terraform get'
     alias tgu='terraform get -update'
 else
-    COLOR_RED=''
-    COLOR_GREEN=''
-    COLOR_YELLOW=''
-    COLOR_BOLD=''
-    COLOR_RESET=''
+    export COLOR_RED=''
+    export COLOR_GREEN=''
+    export COLOR_YELLOW=''
+    export COLOR_BOLD=''
+    export COLOR_RESET=''
 fi
-
-set +a
 
 prompt()
 {

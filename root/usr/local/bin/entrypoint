@@ -2,20 +2,15 @@
 
 export PATH="~/bin/:$PATH"
 
-set -a
 source /etc/profile.d/getup.sh
+
 if [ -e $WORKDIR/cluster.conf ]; then
-    source $WORKDIR/cluster.conf
-else
-    info Entering standalone mode
-    export customer=${customer:-standalone} type=${type:-standalone} name=${name:-standalone}
-    exec "$@"
+    source_env $WORKDIR/cluster.conf
 fi
 
 if [ -e $WORKDIR/provider.env ]; then
-    source $WORKDIR/provider.env
+    source_env $WORKDIR/provider.env
 fi
-set +a
 
 if ! [ -d "${KUBECONFIG%/*}" ]; then
     mkdir -p "${KUBECONFIG%/*}"
@@ -27,6 +22,22 @@ fi
 
 if [ -r $HOME/.gitconfig.host ]; then
     cp -f $HOME/.gitconfig.host $HOME/.gitconfig
+fi
+
+if [ "$type" == standalone ] || [ -z "$type" ]; then
+    info Entering standalone mode
+    export customer=${customer:-standalone}
+    export type=${type:-standalone}
+    export name=${name:-standalone}
+
+    for env in $REPODIR/templates/*/provider.env; do
+        #info Sourcing $env
+        source_env $env
+    done
+
+    exec "$@"
+    warn Never reached...
+    exit 1
 fi
 
 if ! [ -r "$TF_VARS_FILE" ]; then

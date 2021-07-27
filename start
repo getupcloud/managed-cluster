@@ -66,6 +66,8 @@ fi
 if $standalone; then
     cluster_dir="$PWD/standalone"
     mkdir -p $cluster_dir
+    touch $cluster_dir/cluster.conf
+    touch $cluster_dir/terraform.tfvars
     #if ! [ -e $cluster_dir/cluster.conf ]; then
     #    (
     #        customer=standalone
@@ -108,8 +110,7 @@ else
     fi
 fi
 
-source $config_file
+source_env $config_file
 cluster_dir=$(realpath ${cluster_dir})
 
 start_container $cluster_dir
-
