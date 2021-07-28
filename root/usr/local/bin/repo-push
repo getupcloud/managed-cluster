@@ -11,6 +11,15 @@ if ! has_remote upstream 2>/dev/null; then
     ask_execute_command repo-setup
 fi
 
+if ask_execute_command git status --short; then
+info "$(cat <<.
+
+M = modified  A = added   D = deleted
+R = renamed   C = copied  U = updated but unmerged
+.
+)"
+fi
+
 ask_execute_command git add clusters/
 ask_execute_command git commit clusters/ -m "Automatic commit"
 ask_execute_command git push origin main
