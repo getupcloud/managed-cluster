@@ -19,6 +19,7 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
 ENV INSTALL_PACKAGES="bash curl procps vim jq docker \
         ncurses aws-cli coreutils httpie bind-tools \
         git iproute2 net-tools nmap openssl less tar \
+        gettext \
         build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev"
 
 RUN apk update && \

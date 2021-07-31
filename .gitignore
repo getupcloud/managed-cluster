@@ -2,6 +2,7 @@
 **/.kube/*
 **/.setup_history
 cluster.conf
+standalone
 
 # vim swap files
 **/*.sw[a-z]
