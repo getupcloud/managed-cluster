@@ -17,11 +17,7 @@ fi
 
 if [ -e /etc/profile.d/kubectl_aliases.sh ]; then
     source_env /etc/profile.d/kubectl_aliases.sh
-    kubectl()
-    {
-        echo "+ kubectl $@" 1>&2;
-        command kubectl "$@"
-    }
+    source_env /etc/profile.d/bashrc_aliases.sh
 fi
 
 if [ -t 0 ]; then
