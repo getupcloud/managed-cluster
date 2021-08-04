@@ -40,7 +40,7 @@ if [ "$type" == standalone ] || [ -z "$type" ]; then
     exit 1
 fi
 
-if ! [ -r "$TF_VARS_FILE" ]; then
+if [ $WORKDIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then
     debug Terraform variables file not found: $TF_VARS_FILE
     ask_execute_command /usr/local/bin/terraform-setup
 fi
