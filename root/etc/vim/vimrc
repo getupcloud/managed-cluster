@@ -1,0 +1,27 @@
+set number
+set scroll=1
+set so=1 "context lines
+set autowrite
+set nobackup
+set hls
+set ignorecase
+set incsearch
+set nowrap
+set history=1000
+set nocompatible
+set ruler
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set nodigraph
+set encoding=utf-8
+set listchars=tab:»·,trail:·
+set list
+set backspace=indent,eol,start
+set noautoindent
+set nocindent
+set expandtab
+
+colors koehler
+syn on
+

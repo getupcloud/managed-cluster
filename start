@@ -32,10 +32,10 @@ start_container()
     fi
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
-
+    docker_run="docker run --rm ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} -- ${docker_command}"
+    info \$ $docker_run
     echo
-    set -x
-    docker run --rm ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} -- ${docker_command}
+    eval $docker_run
 }
 
 devel=false
