@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: ${ name }
+  name: ${ git_repository_name }
   namespace: ${ namespace }
 spec:
   interval: ${ reconcile_interval }
