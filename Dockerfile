@@ -16,10 +16,10 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
     TF_PLAN_FILE=${WORKDIR}/terraform.tfplan \
     KUBECONFIG=${WORKDIR}/.kube/config
 
-ENV INSTALL_PACKAGES="bash curl procps vim jq docker \
+ENV INSTALL_PACKAGES="bash curl procps vim docker \
         ncurses aws-cli coreutils httpie bind-tools \
         git iproute2 net-tools nmap openssl less tar \
-        gettext \
+        gettext yq jq\
         build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev"
 
 RUN apk update && \
