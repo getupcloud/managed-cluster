@@ -16,7 +16,7 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
     TF_PLAN_FILE=${WORKDIR}/terraform.tfplan \
     KUBECONFIG=${WORKDIR}/.kube/config
 
-ENV INSTALL_PACKAGES="bash curl procps vim docker \
+ENV INSTALL_PACKAGES="bash curl procps vim vimdiff docker \
         ncurses aws-cli coreutils httpie bind-tools \
         git iproute2 net-tools nmap openssl less tar \
         gettext yq jq\
