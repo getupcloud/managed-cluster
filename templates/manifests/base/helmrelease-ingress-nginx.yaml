@@ -43,7 +43,7 @@ spec:
           cpu: 100m
           memory: 128Mi
 
-      priorityClassName: high-priority
+      #priorityClassName: high-priority
 
       dnsPolicy: ClusterFirstWithHostNet
 

@@ -61,11 +61,11 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
     #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     #      nginx.ingress.kubernetes.io/auth-type: basic
-    #    hosts:
-    #      - prometheus.staging.example.com
+        hosts:
+          - prometheus.example.com
     #    tls:
     #    - hosts:
-    #      - prometheus.staging.example.com
+    #      - prometheus.example.com
     #      secretName: prometheus-ingress-tls
 
       prometheusSpec:
@@ -83,7 +83,7 @@ spec:
             memory: 1Gi
 
         externalLabels:
-          cluster: rdp-staging
+          cluster: cluster
         prometheusExternalLabelName: cluster
 
         ruleNamespaceSelector: {}
@@ -150,11 +150,11 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
     #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     #      nginx.ingress.kubernetes.io/auth-type: basic
-    #    hosts:
-    #      - alertmanager.staging.example.com
+        hosts:
+          - alertmanager.example.com
     #    tls:
     #    - hosts:
-    #      - alertmanager.staging.example.com
+    #      - alertmanager.example.com
     #      secretName: ${ try(helm_releases.monitoring.monitoring.template_vars.alertmanager_ingress_tls, "alertmanager-ingress-tls") }
 
 
@@ -393,11 +393,11 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
     #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     #      nginx.ingress.kubernetes.io/auth-type: basic
-    #    hosts:
-    #      - grafana.staging.example.com
+        hosts:
+          - grafana.example.com
     #    tls:
     #    - hosts:
-    #      - grafana.staging.example.com
+    #      - grafana.example.com
     #      secretName: grafana-ingress-tls
 
     kubeApiServer:
@@ -425,7 +425,7 @@ spec:
           memory: 40Mi
 
     prometheus-node-exporter:
-      priorityClassName: high-priority
+      #priorityClassName: high-priority
 
       # This only appends `processes` subsystem
       extraArgs:
