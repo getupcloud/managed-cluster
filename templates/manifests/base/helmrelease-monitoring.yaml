@@ -131,7 +131,7 @@ spec:
           role: infra
 
         resources:
-          limit:
+          limits:
             cpu: 50m
             memory: 256Mi
           requests:
