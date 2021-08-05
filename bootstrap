@@ -72,7 +72,7 @@ sync_from_template()
       return 0
     fi
 
-    copy_from_template $src $dest --exclude=templates/$type/manifests/cluster
+    copy_from_template $src $dest --exclude=manifests/cluster/
 }
 
 set_config()
