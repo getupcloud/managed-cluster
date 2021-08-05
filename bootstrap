@@ -32,7 +32,7 @@ copy_from_template()
       mkdir -p "$dest"
     fi
 
-    rsync -va "$rsync_params" $src/ templates/manifests templates/*.* "$dest"
+    rsync -va $rsync_params $src/ templates/manifests templates/*.* "$dest"
 }
 
 sync_from_template()
