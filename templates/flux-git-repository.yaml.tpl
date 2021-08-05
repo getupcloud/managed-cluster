@@ -10,12 +10,12 @@ spec:
   ref:
     branch: main
   secretRef:
-    name: ${ name }-ssh-credentials
+    name: ${ git_repository_name }
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${ name }-ssh-credentials
+  name: ${ git_repository_name }
   namespace: ${ namespace }
 type: Opaque
 data:
@@ -26,7 +26,7 @@ data:
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: ${ name }
+  name: ${ git_repository_name }
   namespace: ${ namespace }
 spec:
   interval: ${ reconcile_interval }
@@ -34,4 +34,4 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: ${ name }
+    name: ${ git_repository_name }
