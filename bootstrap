@@ -13,7 +13,7 @@ fi
 
 copy_from_template()
 {
-    if [ $# -ne 2 ]; then
+    if [ $# -lt 2 ]; then
       warn "Invalid or missing parameters: $0 [src-dir] [dest-dir] [rsync-params]"
       return 1
     fi
