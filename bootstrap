@@ -14,12 +14,14 @@ fi
 copy_from_template()
 {
     if [ $# -ne 2 ]; then
-      warn "Invalid or missing parameters: $0 [src-dir] [dest-dir]"
+      warn "Invalid or missing parameters: $0 [src-dir] [dest-dir] [rsync-params]"
       return 1
     fi
 
     local src=$1
     local dest=$2
+    shift 2
+    local rsync_params="$@"
 
     if ! [ -d "$src" ]; then
       warn "Source dir not found: $src"
@@ -30,7 +32,7 @@ copy_from_template()
       mkdir -p "$dest"
     fi
 
-    rsync -va $src/ templates/manifests templates/*.* $dest
+    rsync -va $src/ templates/manifests templates/*.* "$rsync_params"
 }
 
 sync_from_template()
@@ -70,7 +72,7 @@ sync_from_template()
       return 0
     fi
 
-    copy_from_template $src $dest
+    copy_from_template $src $dest --exclude=templates/$type/manifests/cluster
 }
 
 set_config()
