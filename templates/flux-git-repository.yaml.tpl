@@ -30,7 +30,7 @@ metadata:
   namespace: ${ namespace }
 spec:
   interval: ${ reconcile_interval }
-  path: ${ manifests_path }
+  path: ${ manifests_path }/cluster
   prune: true
   sourceRef:
     kind: GitRepository
