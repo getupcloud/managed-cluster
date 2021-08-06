@@ -7,11 +7,11 @@ source /etc/profile.d/getup.sh
 info Switching to $REPODIR
 cd $REPODIR
 
-git_cache_config=$(git config --global credential.https://github.com.helper)
-if [ "$git_cache_config" != "cache --timeout=3600" ]; then
-    info "Configuring git credentials cache (1h)"
-    git config --global credential.https://github.com.helper "cache --timeout=3600"
-fi
+#git_cache_config=$(git config --global credential.https://github.com.helper)
+#if [ "$git_cache_config" != "cache --timeout=3600" ]; then
+#    info "Configuring git credentials cache (1h)"
+#    git config --global credential.https://github.com.helper "cache --timeout=3600"
+#fi
 
 if ! has_remote upstream 2>/dev/null; then
     ask_execute_command repo-setup
