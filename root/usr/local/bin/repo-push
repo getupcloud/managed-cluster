@@ -14,6 +14,7 @@ cd $REPODIR
 #fi
 
 if ! has_remote upstream 2>/dev/null; then
+    info "Local repository has no upstream remote"
     ask_execute_command repo-setup
 fi
 

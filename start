@@ -90,7 +90,7 @@ else
     clusters=( ${clusters[*]%/} )
 
     if ! [ -d "${clusters[0]}" ]; then
-        warn No clusters found. Please run \`./configure\` to create one.
+        warn No clusters found. Please run \`./bootstrap\` to create one.
         exit 1
     fi
 
