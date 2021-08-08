@@ -5,16 +5,37 @@ source ${ROOTDIR}/root/etc/profile.d/getup.sh
 
 start_container()
 {
+    if $run_as_root; then
+        CONTAINER_USER=root
+        CONTAINER_GROUP=root
+        CONTAINER_USER_ID=0
+        CONTAINER_GROUP_ID=0
+        CONTAINER_HOME=/root
+    else
+        CONTAINER_USER=$(id -un)
+        CONTAINER_GROUP=$(id -gn)
+        CONTAINER_USER_ID=$(id -u)
+        CONTAINER_GROUP_ID=$(id -g)
+        CONTAINER_HOME=/home/$CONTAINER_USER
+    fi
+
     docker_image_repo=${docker_image_repo:-getupcloud/cluster}
     docker_image_tag=${docker_image_tag:-$(cat version.txt)}
     docker_image=${docker_image_repo}:${docker_image_tag}
-    docker_command=${docker_command:-/bin/bash -l}
+    docker_command=${docker_command:-/bin/bash --login}
     docker_run_options_defaults=(
+        --rm
         -it
-        -e "GH_TOKEN=$GH_TOKEN"
+        -e CONTAINER_USER=$CONTAINER_USER
+        -e CONTAINER_GROUP=$CONTAINER_GROUP
+        -e CONTAINER_USER_ID=$CONTAINER_USER_ID
+        -e CONTAINER_GROUP_ID=$CONTAINER_GROUP_ID
+        -e CONTAINER_HOME=$CONTAINER_HOME
+        -e GH_TOKEN="$GH_TOKEN"
         -v $cluster_dir:/work
         -v $ROOTDIR:/repo
-        -v $HOME/.gitconfig:/root/.gitconfig.host
+        -v $HOME/.gitconfig:$CONTAINER_HOME/.gitconfig.host
+        -v $HOME/.ssh:/root/.ssh:ro ## TODO: allow run as non-root
     )
 
     if [ "$type" == kind ]; then
@@ -26,13 +47,13 @@ start_container()
 
     if $devel; then
         docker_run_options_defaults+=(
-            -v $ROOTDIR/root/usr/local/bin:/root/bin
+            -v $ROOTDIR/root/usr/local/bin:$CONTAINER_HOME/bin
             -v $ROOTDIR/root/etc/profile.d/getup.sh:/etc/profile.d/getup.sh
         )
     fi
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
-    docker_run="docker run --rm ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} -- ${docker_command}"
+    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
     info \$ $docker_run
     echo
     eval $docker_run
@@ -41,10 +62,19 @@ start_container()
 devel=false
 standalone=false
 cluster_dir=""
+run_as_root=false
+
 while [ $# -gt 0 ]; do
     case $1 in
+        --help|-h)
+            echo "Usage: $p [-s|--standaalone] [-d|--devel] [--run-as-root] -- [command...] "
+            exit 0
+        ;;
         --standalone|-s)
             standalone=true
+        ;;
+        --run-as-root)
+            run_as_root=true
         ;;
         --devel|-d)
             devel=true
@@ -76,8 +106,7 @@ if $standalone; then
     #    ) > $cluster_dir/cluster.conf
     #fi
     start_container
-    echo NEVER REACHED
-    exit 1
+    exit
 fi
 
 if [ -d "$cluster_dir" ]; then

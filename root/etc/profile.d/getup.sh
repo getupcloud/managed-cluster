@@ -39,6 +39,15 @@ if [ -t 0 ]; then
     alias tiva='ti && tv && ta'
     alias tgu='terraform get'
     alias tgu='terraform get -update'
+
+    export GIT_PS1_SHOWCOLORHINTS=true
+    export GIT_PS1_SHOWDIRTYSTATE=true
+    export GIT_PS1_SHOWSTASHSTATE=true
+    export GIT_PS1_SHOWUNTRACKEDFILES=true
+    export GIT_PS1_SHOWUPSTREAM=auto
+    export KUBE_PS1_SYMBOL_USE_IMG=true
+
+    export PROMPT_COMMAND='export PS1="$COLOR_BOLD[\u@\h \w$(__git_ps1 " git(%s)") k8s$(kube_ps1)]\$${COLOR_RESET} "'
 else
     export COLOR_RED=''
     export COLOR_GREEN=''
@@ -46,6 +55,27 @@ else
     export COLOR_BOLD=''
     export COLOR_RESET=''
 fi
+
+run_as_user()
+{
+    if [ $CONTAINER_USER_ID -eq $(id -u) ]; then
+        if [ $CONTAINER_USER_ID -ne 0 ]; then
+            warn "Already running as $CONTAINER_USER ($CONTAINER_USER_ID)"
+        fi
+        return 0
+    fi
+
+    addgroup $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
+    adduser $CONTAINER_USER -G $CONTAINER_GROUP -h /home/$CONTAINER_USER -D -u $CONTAINER_USER_ID -s /bin/bash
+
+    # from oh-my-bash installer
+    #sed -e "s|^export OSH=.*|export OSH=$OSH|" $OSH/templates/bashrc.osh-template >> /home/$CONTAINER_USER/.bashrc
+    #echo DISABLE_AUTO_UPDATE=true >> /home/$CONTAINER_USER/.bashrc
+    #ln -s /home/$CONTAINER_USER/.bashrc /home/$CONTAINER_USER/.bash_profile
+    #chown -R $CONTAINER_USER. /home/$CONTAINER_USER
+
+    exec su $CONTAINER_USER $ENTRYPOINT -c "$*"
+}
 
 prompt()
 {

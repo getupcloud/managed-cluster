@@ -4,6 +4,8 @@ export PATH="~/bin/:$PATH"
 
 source /etc/profile.d/getup.sh
 
+run_as_user "$@"
+
 if [ -e $WORKDIR/cluster.conf ]; then
     source_env $WORKDIR/cluster.conf
 fi

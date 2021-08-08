@@ -14,19 +14,29 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
     TF_LOG_PATH=${WORKDIR}/terraform.log \
     TF_VARS_FILE=${WORKDIR}/terraform.tfvars \
     TF_PLAN_FILE=${WORKDIR}/terraform.tfplan \
-    KUBECONFIG=${WORKDIR}/.kube/config
+    KUBECONFIG=${WORKDIR}/.kube/config \
+    OSH=/etc/oh-my-bash
 
-ENV INSTALL_PACKAGES="bash curl procps vim vimdiff docker \
+
+RUN apk update && \
+    INSTALL_PACKAGES="bash curl procps vim vimdiff docker \
         ncurses aws-cli coreutils httpie bind-tools \
         git iproute2 net-tools nmap openssl less tar \
         gettext yq jq\
-        build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev"
-
-RUN apk update && \
+        build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev" && \
     apk add --no-cache $INSTALL_PACKAGES && \
     apk upgrade --no-cache
 
 SHELL ["/bin/bash", "-x", "-c"]
+
+# it takes too long so we do it before
+RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
+    chmod +x /etc/oci-install.sh && \
+    /etc/oci-install.sh --accept-all-defaults \
+        --install-dir /opt/oci \
+        --exec-dir /usr/local/bin/ \
+        --script-dir /usr/local/bin/ \
+        --rc-file-path /etc/profile.d/oci.sh
 
 RUN cd /usr/local/bin && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 > kind && \
@@ -39,22 +49,15 @@ RUN cd /usr/local/bin && \
     curl -sKl https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases > /etc/profile.d/kubectl_aliases.sh && \
     curl -skL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
     curl -skL https://run.linkerd.io/install | INSTALLROOT=/usr/local bash && \
-    curl -skL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash && \
     curl -skL https://github.com/cli/cli/releases/download/v1.13.1/gh_1.13.1_linux_amd64.tar.gz | \
         tar xzvf - gh_1.13.1_linux_amd64/bin/gh --strip-components 2 && \
-    curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > oci-install.sh && \
-        chmod +x oci-install.sh && \
-        ./oci-install.sh --accept-all-defaults \
-            --install-dir /opt/oci \
-            --exec-dir /usr/local/bin/ \
-            --script-dir /usr/local/bin/ \
-            --rc-file-path /etc/profile.d/oci.sh && \
-        rm -f oci-install.sh
-
-#RUN libuser addgroup -g 1001 getup && \
-#    adduser getup -h /home/getup -g "" -s /bin/bash -G getup -D -u 1001
-
-RUN cd /usr/local/bin && \
+    curl -skL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh > oh-my-bash.install && \
+        chmod +x oh-my-bash.install && \
+        echo "Execute 'oh-my-bash.install' to install OH-MY-BASH" && \
+    curl -skL https://raw.githubusercontent.com/jonmosco/kube-ps1/master/kube-ps1.sh > /etc/profile.d/bash_ps1_kubernetes.sh && \
+    chmod +x /etc/profile.d/bash_ps1_kubernetes.sh && \
+    curl -skL https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh > /etc/profile.d/bash_ps1_git.sh && \
+    chmod +x /etc/profile.d/bash_ps1_git.sh && \
     for KUBECTL_VERSION in $KUBECTL_VERSIONS; do \
       curl -skL https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl > \
         kubectl-${KUBECTL_VERSION}; \
