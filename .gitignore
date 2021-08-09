@@ -1,4 +1,5 @@
 # local files
+**/.aws/*
 **/.kube/*
 **/.setup_history
 #cluster.conf
