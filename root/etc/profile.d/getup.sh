@@ -74,7 +74,7 @@ run_as_user()
     #ln -s /home/$CONTAINER_USER/.bashrc /home/$CONTAINER_USER/.bash_profile
     #chown -R $CONTAINER_USER. /home/$CONTAINER_USER
 
-    exec su $CONTAINER_USER $ENTRYPOINT -c "$*"
+    exec su $CONTAINER_USER $ENTRYPOINT -c "$*" || exit 1
 }
 
 prompt()

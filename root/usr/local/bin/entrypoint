@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export ENTRYPOINT=$0
 export PATH="~/bin/:$PATH"
 
 source /etc/profile.d/getup.sh

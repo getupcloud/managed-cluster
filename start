@@ -73,8 +73,8 @@ while [ $# -gt 0 ]; do
         --standalone|-s)
             standalone=true
         ;;
-        --run-as-user)
-            run_as_user=false
+        --run-as-user|-u)
+            run_as_user=true
         ;;
         --devel|-d)
             devel=true
