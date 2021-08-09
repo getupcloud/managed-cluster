@@ -5,6 +5,7 @@ export PATH="~/bin/:$PATH"
 
 source /etc/profile.d/getup.sh
 
+update_ca_certificates
 run_as_user "$@"
 
 if ! [ -d "${KUBECONFIG%/*}" ]; then

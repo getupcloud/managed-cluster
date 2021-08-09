@@ -17,16 +17,18 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
     KUBECONFIG=${WORKDIR}/.kube/config \
     OSH=/etc/oh-my-bash
 
-SHELL ["/bin/bash", "-x", "-c"]
+SHELL ["/bin/sh", "-x", "-c"]
 
 RUN apk update && \
     INSTALL_PACKAGES="bash curl procps vim vimdiff docker \
         ncurses aws-cli coreutils httpie bind-tools \
         git iproute2 net-tools nmap openssl less tar \
-        gettext yq jq rsync \
+        gettext yq jq rsync strace ca-certificates\
         build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev" && \
     apk add --no-cache $INSTALL_PACKAGES && \
     apk upgrade --no-cache
+
+SHELL ["/bin/bash", "-x", "-c"]
 
 # it takes too long so we do it before
 RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \

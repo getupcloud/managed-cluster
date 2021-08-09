@@ -215,3 +215,12 @@ repo_match()
 
     [ "$repo1_owner_name" == "$repo2_owner_name" ]
 }
+
+update_ca_certificates()
+{
+    if [ -e $WORKDIR/cacerts.crt ]; then
+        cp -f $WORKDIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
+    fi
+
+    update-ca-certificates
+}
