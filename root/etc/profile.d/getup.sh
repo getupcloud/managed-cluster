@@ -15,10 +15,10 @@ if [ -v WORKDIR ] && [ -r $WORKDIR/cluster.conf ]; then
     source_env $WORKDIR/cluster.conf
 fi
 
-if [ -e /etc/profile.d/kubectl_aliases.sh ]; then
-    source_env /etc/profile.d/kubectl_aliases.sh
-    source_env /etc/profile.d/bashrc_aliases.sh
-fi
+#if [ -e /etc/profile.d/kubectl_aliases.sh ]; then
+#    source_env /etc/profile.d/kubectl_aliases.sh
+#    source_env /etc/profile.d/bashrc_aliases.sh
+#fi
 
 if [ -t 0 ]; then
     export COLOR_RED="$(tput setaf 1)"

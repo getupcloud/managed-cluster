@@ -5,7 +5,7 @@ source ${ROOTDIR}/root/etc/profile.d/getup.sh
 
 start_container()
 {
-    if $run_as_root; then
+    if ! $run_as_user; then
         CONTAINER_USER=root
         CONTAINER_GROUP=root
         CONTAINER_USER_ID=0
@@ -62,19 +62,19 @@ start_container()
 devel=false
 standalone=false
 cluster_dir=""
-run_as_root=false
+run_as_user=false
 
 while [ $# -gt 0 ]; do
     case $1 in
         --help|-h)
-            echo "Usage: $p [-s|--standaalone] [-d|--devel] [--run-as-root] -- [command...] "
+            echo "Usage: $p [-s|--standaalone] [-d|--devel] [--run-as-user] -- [command...] "
             exit 0
         ;;
         --standalone|-s)
             standalone=true
         ;;
-        --run-as-root)
-            run_as_root=true
+        --run-as-user)
+            run_as_user=false
         ;;
         --devel|-d)
             devel=true

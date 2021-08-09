@@ -77,7 +77,8 @@ ARG VERSION
 RUN chmod -R +x /usr/local/bin && \
     echo $VERSION > /.version && \
     echo $GIT_COMMIT > /.gitcommit && \
-    ln -s /root/.bashrc /root/.bash_profile
+    ln -s /root/.bashrc /root/.bash_profile && \
+    chmod +x /etc/profile.d/*.sh
 
 WORKDIR $WORKDIR
 
