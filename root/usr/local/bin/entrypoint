@@ -7,14 +7,6 @@ source /etc/profile.d/getup.sh
 
 run_as_user "$@"
 
-if [ -e $WORKDIR/cluster.conf ]; then
-    source_env $WORKDIR/cluster.conf
-fi
-
-if [ -e $WORKDIR/provider.env ]; then
-    source_env $WORKDIR/provider.env
-fi
-
 if ! [ -d "${KUBECONFIG%/*}" ]; then
     mkdir -p "${KUBECONFIG%/*}"
 fi
@@ -23,7 +15,7 @@ if [ -n "$GH_TOKEN" ]; then
     gh auth login --with-token <<<$GH_TOKEN
 fi
 
-if [ -r $HOME/.gitconfig.host ]; then
+if [ -r $HOME/.gitconfig.host ] && ! [ -e $HOME/.gitconfig ]; then
     cp -f $HOME/.gitconfig.host $HOME/.gitconfig
 fi
 
@@ -37,10 +29,6 @@ if [ "$type" == standalone ] || [ -z "$type" ]; then
         #info Sourcing $env
         source_env $env
     done
-
-    exec "$@"
-    warn Never reached...
-    exit 1
 fi
 
 if [ -e $WORKDIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then

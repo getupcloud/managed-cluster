@@ -26,16 +26,11 @@ start_container()
     docker_run_options_defaults=(
         --rm
         -it
-        -e CONTAINER_USER=$CONTAINER_USER
-        -e CONTAINER_GROUP=$CONTAINER_GROUP
-        -e CONTAINER_USER_ID=$CONTAINER_USER_ID
-        -e CONTAINER_GROUP_ID=$CONTAINER_GROUP_ID
-        -e CONTAINER_HOME=$CONTAINER_HOME
-        -e GH_TOKEN="$GH_TOKEN"
+        --env-file $ROOTDIR/.dockerenv
         -v $cluster_dir:/work
         -v $ROOTDIR:/repo
         -v $HOME/.gitconfig:$CONTAINER_HOME/.gitconfig.host
-        -v $HOME/.ssh:/root/.ssh:ro ## TODO: allow run as non-root
+        -v $HOME/.ssh:$CONTAINER_HOME/.ssh:ro ## TODO: allow run as non-root
     )
 
     if [ "$type" == kind ]; then
@@ -51,6 +46,15 @@ start_container()
             -v $ROOTDIR/root/etc/profile.d/getup.sh:/etc/profile.d/getup.sh
         )
     fi
+
+    {
+        echo CONTAINER_USER=$CONTAINER_USER
+        echo CONTAINER_GROUP=$CONTAINER_GROUP
+        echo CONTAINER_USER_ID=$CONTAINER_USER_ID
+        echo CONTAINER_GROUP_ID=$CONTAINER_GROUP_ID
+        echo CONTAINER_HOME=$CONTAINER_HOME
+        echo GH_TOKEN=$GH_TOKEN
+    } > .dockerenv
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
     docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} ${docker_command}"

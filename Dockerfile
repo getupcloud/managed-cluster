@@ -17,12 +17,11 @@ ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
     KUBECONFIG=${WORKDIR}/.kube/config \
     OSH=/etc/oh-my-bash
 
-
 RUN apk update && \
     INSTALL_PACKAGES="bash curl procps vim vimdiff docker \
         ncurses aws-cli coreutils httpie bind-tools \
         git iproute2 net-tools nmap openssl less tar \
-        gettext yq jq\
+        gettext yq jq rsync \
         build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev" && \
     apk add --no-cache $INSTALL_PACKAGES && \
     apk upgrade --no-cache
@@ -77,8 +76,8 @@ ARG VERSION
 RUN chmod -R +x /usr/local/bin && \
     echo $VERSION > /.version && \
     echo $GIT_COMMIT > /.gitcommit && \
-    ln -s /root/.bashrc /root/.bash_profile && \
-    chmod +x /etc/profile.d/*.sh
+    rsync /etc/skel/ /root/ && \
+    chmod -R +x /etc/profile.d/
 
 WORKDIR $WORKDIR
 

@@ -10,15 +10,19 @@ source_env()
     $on || set +a
 }
 
+if [ -v WORKDIR ]; then
+    if [ -r $WORKDIR/cluster.conf ]; then
+        source_env $WORKDIR/cluster.conf
+    fi
 
-if [ -v WORKDIR ] && [ -r $WORKDIR/cluster.conf ]; then
-    source_env $WORKDIR/cluster.conf
+    if [ -e $WORKDIR/provider.env ]; then
+        source_env $WORKDIR/provider.env
+    fi
 fi
 
-#if [ -e /etc/profile.d/kubectl_aliases.sh ]; then
-#    source_env /etc/profile.d/kubectl_aliases.sh
-#    source_env /etc/profile.d/bashrc_aliases.sh
-#fi
+if [ -v REPODIR ] && [ -r $REPODIR/.dockerenv ]; then
+    source_env $REPODIR/.dockerenv
+fi
 
 if [ -t 0 ]; then
     export COLOR_RED="$(tput setaf 1)"
@@ -65,8 +69,12 @@ run_as_user()
         return 0
     fi
 
+    info Creating user $CONTAINER_USER
     addgroup $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
-    adduser $CONTAINER_USER -G $CONTAINER_GROUP -h /home/$CONTAINER_USER -D -u $CONTAINER_USER_ID -s /bin/bash
+    adduser $CONTAINER_USER -G $CONTAINER_GROUP -h /home/$CONTAINER_USER -u $CONTAINER_USER_ID -s /bin/bash -k /etc/skel -D
+    shopt -s dotglob
+    install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 755 /etc/skel/* /home/$CONTAINER_USER/
+    shopt -u dotglob
 
     # from oh-my-bash installer
     #sed -e "s|^export OSH=.*|export OSH=$OSH|" $OSH/templates/bashrc.osh-template >> /home/$CONTAINER_USER/.bashrc
@@ -74,7 +82,7 @@ run_as_user()
     #ln -s /home/$CONTAINER_USER/.bashrc /home/$CONTAINER_USER/.bash_profile
     #chown -R $CONTAINER_USER. /home/$CONTAINER_USER
 
-    exec su $CONTAINER_USER $ENTRYPOINT -c "$*" || exit 1
+    exec su $CONTAINER_USER /usr/local/bin/entrypoint -c "$*" || exit 1
 }
 
 prompt()
