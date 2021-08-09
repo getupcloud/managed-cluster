@@ -5,7 +5,7 @@ source ${ROOTDIR}/root/etc/profile.d/getup.sh
 
 start_container()
 {
-    if ! $run_as_user; then
+    if $run_as_root; then
         CONTAINER_USER=root
         CONTAINER_GROUP=root
         CONTAINER_USER_ID=0
@@ -30,7 +30,7 @@ start_container()
         -v $cluster_dir:/work
         -v $ROOTDIR:/repo
         -v $HOME/.gitconfig:$CONTAINER_HOME/.gitconfig.host
-        -v $HOME/.ssh:$CONTAINER_HOME/.ssh:ro ## TODO: allow run as non-root
+        -v $HOME/.ssh:$CONTAINER_HOME/.ssh:ro
     )
 
     if [ "$type" == kind ]; then
@@ -66,19 +66,19 @@ start_container()
 devel=false
 standalone=false
 cluster_dir=""
-run_as_user=false
+run_as_root=false
 
 while [ $# -gt 0 ]; do
     case $1 in
         --help|-h)
-            echo "Usage: $p [-s|--standaalone] [-d|--devel] [--run-as-user] -- [command...] "
+            echo "Usage: $p [-s|--standaalone] [-d|--devel] [--run-as-root] -- [command...] "
             exit 0
         ;;
         --standalone|-s)
             standalone=true
         ;;
-        --run-as-user|-u)
-            run_as_user=true
+        --run-as-root|-r)
+            run_as_root=true
         ;;
         --devel|-d)
             devel=true
