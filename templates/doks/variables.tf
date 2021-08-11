@@ -24,6 +24,7 @@ variable "vpc_uuid" {
 
 variable "node_pool" {
   description = "Default node pool config"
+  type        = any
   default = {
     name       = "infra"
     size       = "s-4vcpu-8gb"
@@ -45,6 +46,7 @@ variable "node_pool" {
 
 variable "node_pools" {
   description = "List of node pools"
+  type        = any
   default = [
     {
       name       = "app"
