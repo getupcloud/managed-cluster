@@ -6,6 +6,7 @@ ENV WORKDIR=/work \
     HCL2JSON_VERSION=v0.3.3 \
     KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
     FLUX_VERSIONS="v0.15.3 v0.16.1" \
+    DOCTL_VERSION="1.63.1" \
     TERM=xterm-256color
 
 ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
@@ -39,6 +40,8 @@ RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/in
         --script-dir /usr/local/bin/ \
         --rc-file-path /etc/profile.d/oci.sh
 
+
+
 RUN cd /usr/local/bin && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 > kind && \
     curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.3/hcl2json_linux_amd64 > hcl2json && \
@@ -68,7 +71,9 @@ RUN cd /usr/local/bin && \
         curl -skL https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION:1}_linux_amd64.tar.gz \
             | tar xzv --transform="s,.*,flux-$FLUX_VERSION,"; \
     done && \
-    ln -s flux-$FLUX_VERSION flux
+    ln -s flux-$FLUX_VERSION flux && \
+    curl -skL https://github.com/digitalocean/doctl/releases/download/v$DOCTL_VERSION/doctl-$DOCTL_VERSION-linux-amd64.tar.gz \
+        | tar xzv doctl
 
 COPY root/ /
 
