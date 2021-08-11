@@ -33,7 +33,7 @@ variable "node_pool" {
     min_nodes  = 2
     max_nodes  = 2
     labels = {
-      role = "app"
+      role = "infra"
     }
     taint = {
       key    = "dedicated"
