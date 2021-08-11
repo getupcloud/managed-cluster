@@ -64,7 +64,7 @@ run_as_user()
 {
     if [ $CONTAINER_USER_ID -eq $(id -u) ]; then
         if [ $CONTAINER_USER_ID -ne 0 ]; then
-            warn "Already running as $CONTAINER_USER ($CONTAINER_USER_ID)"
+            : warn "Already running as $CONTAINER_USER ($CONTAINER_USER_ID)"
         fi
         return 0
     fi
