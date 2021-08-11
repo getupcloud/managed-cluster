@@ -4,6 +4,8 @@
 **/.setup_history
 #cluster.conf
 standalone
+.dockerenv
+.cluster.conf
 
 # vim swap files
 **/*.sw[a-z]

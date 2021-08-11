@@ -93,7 +93,6 @@ set_config()
     fi
 }
 
-
 require_config()
 {
     local _name="${1}"
@@ -177,13 +176,13 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-config_file=${1:-$ROOTDIR/cluster.conf}
+config_file=${1:-$ROOTDIR/.cluster.conf}
 
 if [ -e $config_file ]; then
-    debug Reading config from $config_file
+    debug Reading config from temporary file: $config_file
     source $config_file
 else
-    echo Creating empty config: $config_file
+    echo Creating temporary config: $config_file
     touch $config_file
 fi
 
@@ -209,8 +208,8 @@ fi
 mkdir -p ${cluster_root_dir}
 copy_from_template templates/$type $cluster_dir
 
-debug Moving $config_file to $cluster_dir
-mv -v $config_file $cluster_dir
+info Moving $config_file to $cluster_dir/cluster.conf
+mv $config_file $cluster_dir/cluster.conf
 
 info Generating $cluster_dir/identity
 ssh-keygen -t $ssh_key_type -b 2048 -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
