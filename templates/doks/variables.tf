@@ -5,7 +5,7 @@ variable "name" {
   type        = string
 }
 
-variable "to_token" {
+variable "do_token" {
   description = "AWS Access Key ID"
   type        = string
   default     = null
