@@ -82,7 +82,7 @@ run_as_user()
     #ln -s /home/$CONTAINER_USER/.bashrc /home/$CONTAINER_USER/.bash_profile
     #chown -R $CONTAINER_USER. /home/$CONTAINER_USER
 
-    exec su $CONTAINER_USER /usr/local/bin/entrypoint -c "$*" || exit 1
+    exec su $CONTAINER_USER -c "/usr/local/bin/entrypoint $*" || exit 1
 }
 
 prompt()
@@ -220,7 +220,6 @@ update_ca_certificates()
 {
     if [ -e $WORKDIR/cacerts.crt ]; then
         cp -f $WORKDIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
+        update-ca-certificates
     fi
-
-    update-ca-certificates
 }
