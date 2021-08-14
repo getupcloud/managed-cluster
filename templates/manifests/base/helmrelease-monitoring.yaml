@@ -360,7 +360,7 @@ spec:
           access: proxy
           isDefault: false
           jsonData:
-            maxLines: 500000
+            maxLines: 100000
         - name: prometheus
           type: prometheus
           url: http://monitoring-prometheus:9090/
