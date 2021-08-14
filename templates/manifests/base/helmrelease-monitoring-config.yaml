@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
-      version: 0.2.0
+      version: 1.0.0
   install:
     createNamespace: true
     disableWait: false
@@ -34,17 +34,3 @@ spec:
         basic_username: "monitoring"
         basic_password: "monitoring"
 
-    loki:
-      namespace: logging
-      canary:
-        tolerations:
-        - key: dedicated
-          value: infra
-          effect: NoSchedule
-        nodeSelector:
-          role: infra
-      ingress:
-        enabled: false
-        #auth:
-        #  basic_username: "logging"
-        #  basic_password: "logging"
