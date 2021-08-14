@@ -17,7 +17,6 @@ spec:
     remediation:
       retries: -1
   interval: 5m
-  releaseName: monitoring
   storageNamespace: monitoring
   targetNamespace: monitoring
   values:
