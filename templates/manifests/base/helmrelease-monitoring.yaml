@@ -1,7 +1,24 @@
+---
+# Default username: admin
+# Default password: admin
+#
+# Run to create a new secret:
+#
+#   $ AUTH=$(htpasswd -n $USERNAME)
+#   $ kubectl create secret generic monitoring-basic-auth --from-literal=auth=${AUTH} -oyaml --dry-run
+#
+apiVersion: v1
+data:
+  auth: YWRtaW46JGFwcjEkYTlLS3NqUW4kRGRSWTlSTWo1OXRvb3RpNlIxV25XLw==
+kind: Secret
+metadata:
+  name: monitoring-basic-auth
+  namespace: monitoring
+
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  annotations: {}
   name: monitoring
   namespace: flux-system
 spec:
@@ -57,10 +74,10 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-    #      cert-manager.io/cluster-issuer: ${helm_releases.cert-manager.cert-manager-config.values.default_cluster_issuer}
-    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
-    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
-    #      nginx.ingress.kubernetes.io/auth-type: basic
+          nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+          nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+          nginx.ingress.kubernetes.io/auth-type: basic
+    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - prometheus.example.com
     #    tls:
@@ -146,10 +163,10 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-    #      cert-manager.io/cluster-issuer: ${helm_releases.cert-manager.cert-manager-config.values.default_cluster_issuer}
-    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
-    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
-    #      nginx.ingress.kubernetes.io/auth-type: basic
+          nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+          nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+          nginx.ingress.kubernetes.io/auth-type: basic
+          #cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - alertmanager.example.com
     #    tls:
@@ -389,10 +406,10 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-    #      cert-manager.io/cluster-issuer: staging
-    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
-    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
-    #      nginx.ingress.kubernetes.io/auth-type: basic
+          nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+          nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+          nginx.ingress.kubernetes.io/auth-type: basic
+    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - grafana.example.com
     #    tls:
