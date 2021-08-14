@@ -165,7 +165,7 @@ spec:
   storageNamespace: logging
   targetNamespace: logging
   values:
-    lokiAddress: loki:3000
+    lokiAddress: loki:3100
 
     serviceMonitor:
       enabled: true
