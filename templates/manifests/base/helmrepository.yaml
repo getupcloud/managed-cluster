@@ -56,11 +56,11 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
-  name: loki
+  name: grafana
   namespace: flux-system
 spec:
   interval: 5m0s
-  url: https://grafana.github.io/loki/charts
+  url: https://grafana.github.io/helm-charts
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
