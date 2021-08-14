@@ -22,7 +22,7 @@ SHELL ["/bin/sh", "-x", "-c"]
 
 RUN apk update && \
     INSTALL_PACKAGES="bash curl procps vim vimdiff docker \
-        ncurses aws-cli coreutils httpie bind-tools \
+        ncurses aws-cli coreutils httpie bind-tools apache2-utils \
         git iproute2 net-tools nmap openssl less tar \
         gettext yq jq rsync strace ca-certificates\
         build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev" && \
