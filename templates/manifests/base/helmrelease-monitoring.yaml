@@ -4,7 +4,9 @@
 #
 # Run to create a new secret:
 #
-#   $ AUTH=$(htpasswd -n admin)
+#   $ PASSWORD=$(openssl rand -hex 12)
+#   $ echo New Pasword: $PASSWORD
+#   $ AUTH=$(htpasswd -nb admin $PASSWORD)
 #   $ kubectl create secret generic monitoring-basic-auth --from-literal=auth=${AUTH} -oyaml --dry-run
 #
 apiVersion: v1
