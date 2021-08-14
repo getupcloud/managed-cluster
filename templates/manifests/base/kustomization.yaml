@@ -5,5 +5,6 @@ resources:
 - helmrelease-cert-manager.yaml
 - helmrelease-cert-manager-config.yaml
 - helmrelease-ingress-nginx.yaml
+- helmrelease-loki.yaml
 - helmrelease-monitoring.yaml
 - helmrepository.yaml
