@@ -7,4 +7,5 @@ resources:
 - helmrelease-ingress-nginx.yaml
 - helmrelease-loki.yaml
 - helmrelease-monitoring.yaml
+- helmrelease-monitoring-config.yaml
 - helmrepository.yaml
