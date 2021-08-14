@@ -76,6 +76,7 @@ RUN cd /usr/local/bin && \
         | tar xzv doctl
 
 COPY root/ /
+COPY Dockerfile /
 
 ARG GIT_COMMIT
 ARG VERSION
