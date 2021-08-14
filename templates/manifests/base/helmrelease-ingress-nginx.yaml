@@ -25,6 +25,10 @@ spec:
   targetNamespace: ingress-nginx
   values:
     controller:
+      admissionWebhooks:
+        # enable after install in order to avoid ingress deadlock
+        enabled: false
+
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
