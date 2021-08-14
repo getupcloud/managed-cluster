@@ -167,6 +167,11 @@ spec:
   values:
     lokiAddress: loki:3100
 
+    extraArgs:
+    - -labelname=pod
+    - -labelvalue=$(POD_NAME)
+    - -wait=5m0s
+
     serviceMonitor:
       enabled: true
 
