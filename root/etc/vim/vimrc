@@ -1,3 +1,5 @@
+set mouse=
+set ttymouse=
 set number
 set scroll=1
 set so=1 "context lines
