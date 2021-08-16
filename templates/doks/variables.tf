@@ -6,13 +6,25 @@ variable "name" {
 }
 
 variable "do_token" {
-  description = "AWS Access Key ID"
+  description = "Digital Ocean Token"
   type        = string
   default     = null
 }
 
 variable "region" {
   description = "Region where to create cluster"
+  type        = string
+  default     = null
+}
+
+variable "spaces_access_id" {
+  description = "Spaces Access Key ID for Backups"
+  type        = string
+  default     = null
+}
+
+variable "spaces_secret_key" {
+  description = "Spaces Access Key ID for Backups"
   type        = string
   default     = null
 }
