@@ -29,10 +29,27 @@ variable "spaces_secret_key" {
   default     = null
 }
 
-variable "spaces_region" {
-  description = "Spaces Region for Backups"
-  type        = string
-  default     = null
+variable "spaces_buckets" {
+  description = "List of Space Buckets (See spaces.tf for defaults)"
+  type        = any
+  default     = []
+
+  # See spaces.tf for defaults
+  # Example:
+  # [
+  #   {
+  #     name: "mybucket",
+  #     region: "nyc3",
+  #     acl: "public",
+  #     force_destroy: true
+  #   },
+  #   {
+  #     name_prefix: "velero",
+  #     region: "nyc3",
+  #     acl: "private",
+  #     force_destroy: false
+  #   }
+  # ]
 }
 
 variable "vpc_uuid" {
