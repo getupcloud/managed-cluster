@@ -30,6 +30,7 @@ spec:
           region: ### TODO: UPDATE HERE ###
 
       volumeSnapshotLocation:
+        provider: digitalocean.com/velero
         config:
           region: ### TODO: UPDATE HERE ###
 
