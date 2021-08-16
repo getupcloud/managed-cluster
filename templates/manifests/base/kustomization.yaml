@@ -8,4 +8,5 @@ resources:
 - helmrelease-loki.yaml
 - helmrelease-monitoring.yaml
 - helmrelease-monitoring-config.yaml
+- helmrelease-velero.yaml
 - helmrepository.yaml
