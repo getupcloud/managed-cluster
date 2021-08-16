@@ -26,15 +26,12 @@ spec:
         prefix: velero/
         bucket: ### TODO: UPDATE HERE ###
         config:
+          s3Url: ### TODO: UPDATE HERE ###
           region: ### TODO: UPDATE HERE ###
 
       volumeSnapshotLocation:
         config:
           region: ### TODO: UPDATE HERE ###
-
-      config:
-        s3Url: ### TODO: UPDATE HERE ###
-        region: ### TODO: UPDATE HERE ###
 
     credentials:
       useSecret: true
