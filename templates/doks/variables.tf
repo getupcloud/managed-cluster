@@ -29,6 +29,12 @@ variable "spaces_secret_key" {
   default     = null
 }
 
+variable "spaces_region" {
+  description = "Spaces Region for Backups"
+  type        = string
+  default     = null
+}
+
 variable "vpc_uuid" {
   description = "VPC UUID where to create cluster"
   type        = string
