@@ -63,18 +63,18 @@ variable "node_pool" {
   default = {
     name       = "infra"
     size       = "s-4vcpu-8gb"
-    node_count = 2
-    auto_scale = false
     min_nodes  = 2
     max_nodes  = 2
+    node_count = 2
+    auto_scale = true
     labels = {
       role = "infra"
     }
-    taint = {
+    taints = [{
       key    = "dedicated"
       value  = "infra"
       effect = "NoSchedule"
-    }
+    }]
     tags = []
   }
 }
@@ -86,15 +86,15 @@ variable "node_pools" {
     {
       name       = "app"
       size       = "s-4vcpu-8gb"
-      node_count = 2
-      auto_scale = true
       min_nodes  = 2
       max_nodes  = 4
+      node_count = 2
+      auto_scale = true
       labels = {
         role = "app"
       }
       tags  = []
-      taint = {}
+      taints = []
     }
   ]
 }
