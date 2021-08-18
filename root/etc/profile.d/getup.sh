@@ -10,13 +10,13 @@ source_env()
     $on || set +a
 }
 
-if [ -v WORKDIR ]; then
-    if [ -r $WORKDIR/cluster.conf ]; then
-        source_env $WORKDIR/cluster.conf
+if [ -v CLUSTERDIR ]; then
+    if [ -r $CLUSTERDIR/cluster.conf ]; then
+        source_env $CLUSTERDIR/cluster.conf
     fi
 
-    if [ -e $WORKDIR/provider.env ]; then
-        source_env $WORKDIR/provider.env
+    if [ -e $CLUSTERDIR/provider.env ]; then
+        source_env $CLUSTERDIR/provider.env
     fi
 fi
 
@@ -59,31 +59,6 @@ else
     export COLOR_BOLD=''
     export COLOR_RESET=''
 fi
-
-run_as_user()
-{
-    if [ $CONTAINER_USER_ID -eq $(id -u) ]; then
-        if [ $CONTAINER_USER_ID -ne 0 ]; then
-            : warn "Already running as $CONTAINER_USER ($CONTAINER_USER_ID)"
-        fi
-        return 0
-    fi
-
-    info Creating user $CONTAINER_USER
-    addgroup $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
-    adduser $CONTAINER_USER -G $CONTAINER_GROUP -h /home/$CONTAINER_USER -u $CONTAINER_USER_ID -s /bin/bash -k /etc/skel -D
-    shopt -s dotglob
-    install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 755 /etc/skel/* /home/$CONTAINER_USER/
-    shopt -u dotglob
-
-    # from oh-my-bash installer
-    #sed -e "s|^export OSH=.*|export OSH=$OSH|" $OSH/templates/bashrc.osh-template >> /home/$CONTAINER_USER/.bashrc
-    #echo DISABLE_AUTO_UPDATE=true >> /home/$CONTAINER_USER/.bashrc
-    #ln -s /home/$CONTAINER_USER/.bashrc /home/$CONTAINER_USER/.bash_profile
-    #chown -R $CONTAINER_USER. /home/$CONTAINER_USER
-
-    exec su $CONTAINER_USER -c "/usr/local/bin/entrypoint $*" || exit 1
-}
 
 prompt()
 {
@@ -181,16 +156,12 @@ has_valid_config()
 
 git_owner()
 {
-    local res=${1//\// }
-    res=( ${res//:/ } )
-    echo ${res[-2]}
+    git-url "$1" owner
 }
 
 git_name()
 {
-    local res=( ${1//\// } )
-    res=${res[-1]}
-    echo ${res%.git}
+    git-url "$1" repo
 }
 
 git_owner_name()
@@ -218,8 +189,8 @@ repo_match()
 
 update_ca_certificates()
 {
-    if [ -e $WORKDIR/cacerts.crt ]; then
-        cp -f $WORKDIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
+    if [ -e $CLUSTERDIR/cacerts.crt ]; then
+        cp -f $CLUSTERDIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
         update-ca-certificates
     fi
 }

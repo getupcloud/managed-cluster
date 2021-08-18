@@ -1,6 +1,6 @@
 FROM hashicorp/terraform:1.0.2
 
-ENV WORKDIR=/work \
+ENV CLUSTERDIR=/cluster \
     REPODIR=/repo \
     KIND_VERSION=v0.11.1 \
     HCL2JSON_VERSION=v0.3.3 \
@@ -9,13 +9,13 @@ ENV WORKDIR=/work \
     DOCTL_VERSION="1.63.1" \
     TERM=xterm-256color
 
-ENV TF_DATA_DIR=${WORKDIR}/.terraform.d \
+ENV TF_DATA_DIR=${CLUSTERDIR}/.terraform.d \
     TF_IN_AUTOMATION=true \
     TF_LOG=INFO \
-    TF_LOG_PATH=${WORKDIR}/terraform.log \
-    TF_VARS_FILE=${WORKDIR}/terraform.tfvars \
-    TF_PLAN_FILE=${WORKDIR}/terraform.tfplan \
-    KUBECONFIG=${WORKDIR}/.kube/config \
+    TF_LOG_PATH=${CLUSTERDIR}/terraform.log \
+    TF_VARS_FILE=${CLUSTERDIR}/terraform.tfvars \
+    TF_PLAN_FILE=${CLUSTERDIR}/terraform.tfplan \
+    KUBECONFIG=${CLUSTERDIR}/.kube/config \
     OSH=/etc/oh-my-bash
 
 SHELL ["/bin/sh", "-x", "-c"]
@@ -27,7 +27,8 @@ RUN apk update && \
         gettext yq jq rsync strace ca-certificates\
         build-base py3-pip python3-dev libffi-dev rust cargo py3-wheel openssl-dev" && \
     apk add --no-cache $INSTALL_PACKAGES && \
-    apk upgrade --no-cache
+    apk upgrade --no-cache && \
+    pip install giturlparse.py
 
 SHELL ["/bin/bash", "-x", "-c"]
 
@@ -39,8 +40,6 @@ RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/in
         --exec-dir /usr/local/bin/ \
         --script-dir /usr/local/bin/ \
         --rc-file-path /etc/profile.d/oci.sh
-
-
 
 RUN cd /usr/local/bin && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 > kind && \
@@ -87,6 +86,6 @@ RUN chmod -R +x /usr/local/bin && \
     rsync /etc/skel/ /root/ && \
     chmod -R +x /etc/profile.d/
 
-WORKDIR $WORKDIR
+WORKDIR $CLUSTERDIR
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]

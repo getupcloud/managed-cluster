@@ -5,31 +5,22 @@ source ${ROOTDIR}/root/etc/profile.d/getup.sh
 
 start_container()
 {
-    if $run_as_root; then
-        CONTAINER_USER=root
-        CONTAINER_GROUP=root
-        CONTAINER_USER_ID=0
-        CONTAINER_GROUP_ID=0
-        CONTAINER_HOME=/root
-    else
-        CONTAINER_USER=$(id -un)
-        CONTAINER_GROUP=$(id -gn)
-        CONTAINER_USER_ID=$(id -u)
-        CONTAINER_GROUP_ID=$(id -g)
-        CONTAINER_HOME=/home/$CONTAINER_USER
-    fi
+    : ${CONTAINER_USER:=root}
+    : ${CONTAINER_GROUP:=root}
+    : ${CONTAINER_USER_ID:=0}
+    : ${CONTAINER_GROUP_ID:=0}
+    : ${CONTAINER_HOME:=/root}
 
     docker_image_repo=${docker_image_repo:-getupcloud/cluster}
     docker_image_tag=${docker_image_tag:-$(cat version.txt)}
     docker_image=${docker_image_repo}:${docker_image_tag}
     docker_command=${docker_command:-/bin/bash --login}
     docker_run_options_defaults=(
-        --privileged
         --cap-add=SYS_PTRACE
         --rm
         -it
         --env-file $ROOTDIR/.dockerenv
-        -v $cluster_dir:/work
+        -v $cluster_dir:/cluster
         -v $ROOTDIR:/repo
         -v $HOME/.gitconfig:$CONTAINER_HOME/.gitconfig.host
         -v $HOME/.ssh:$CONTAINER_HOME/.ssh:ro
@@ -58,6 +49,18 @@ start_container()
         echo GH_TOKEN=$GH_TOKEN
     } > .dockerenv
 
+    if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
+        local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
+        local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r .[].Created)
+        local image_created_ts=$(date --date="$image_created" +%s)
+
+        if (( dockerfile_modified_ts > image_created_ts )); then
+            if ask "Docker image ${docker_image_repo}:${docker_image_tag} is outdated. Build now? [Y/n]"; then
+                make
+            fi
+        fi
+    fi
+
     info Starting cluster: $cluster_dir with docker image ${docker_image}
     docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
     info \$ $docker_run
@@ -68,7 +71,6 @@ start_container()
 devel=false
 standalone=false
 cluster_dir=""
-run_as_root=false
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -78,9 +80,6 @@ while [ $# -gt 0 ]; do
         ;;
         --standalone|-s)
             standalone=true
-        ;;
-        --run-as-root|-r)
-            run_as_root=true
         ;;
         --devel|-d)
             devel=true

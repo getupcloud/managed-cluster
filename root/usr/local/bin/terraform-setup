@@ -21,14 +21,14 @@ if [ -r "$TF_VARS_FILE" ]; then
   info $TF_VARS_FILE alreadyt exists. Overwriting with existing values.
 fi
 
-variables_files=( $WORKDIR/variables*.tf )
+variables_files=( $CLUSTERDIR/variables*.tf )
 
 ## reorder variables_files so that `variables.tf` is the first item
 let i=0
 for v in ${variables_files[@]}; do
     if [ "${v##*/}" == variables.tf ]; then
         unset variables_files[$i]
-        variables_files=( $WORKDIR/variables.tf ${variables_files[@]} )
+        variables_files=( $CLUSTERDIR/variables.tf ${variables_files[@]} )
         break
     fi
     let i+=1
@@ -70,7 +70,7 @@ temp_file=$(mktemp -u)
 debug "Creating temporary file: $temp_file"
 exec 3>$temp_file
 
-export HISTFILE=$WORKDIR/.setup_history
+export HISTFILE=$CLUSTERDIR/.setup_history
 history -r
 
 #
@@ -89,13 +89,13 @@ for variables_file in ${variables_files[@]}; do
         # Precedency is: variables.tf:default -> terraform.tfvars -> $TF_VAR_${name} -> $name
         value=""
 
-        # try default from $WORKDIR/variables*.tf file
+        # try default from $CLUSTERDIR/variables*.tf file
         variable_default=$(jq -r ".variable.${variable}[0].default" <<<$variables_file_data)
         if [ "$variable_default" != null ]; then
           value="$variable_default"
         fi
 
-        # try $WORKDIR/terraform.tfvars
+        # try $CLUSTERDIR/terraform.tfvars
         tfvar_value=$(jq -r ".$variable" <<<$tfvars_data)
         if [ -n "$tfvar_value" ]; then
           value="$tfvar_value"

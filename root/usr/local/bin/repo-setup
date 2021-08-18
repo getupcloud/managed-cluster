@@ -23,26 +23,25 @@ if ! gh auth status; then
     gh auth login
 fi
 
-gh_owner=$(git_owner $https_git_repo)
-gh_name=$(git_name $https_git_repo)
+gh_owner=$(git_owner $origin_git_repo)
+gh_name=$(git_name $origin_git_repo)
 : ${gh_description:="Getupcloud Managed Cluster: $customer"}
 : ${gh_team:=developers}
 : ${gh_enable_wiki:=false}
 : ${gh_enable_issues:=false}
 
-https_git_repo_upstream=https://github.com/$(git_owner $upstream_git_repo)/$(git_name $upstream_git_repo)
 
 echo
 info --- Current Git remotes ---
 git remote -v
 info ----- New Git remotes -----
-echo "origin   $https_git_repo"
-echo "upstream $https_git_repo_upstream"
+echo "origin   $origin_git_repo"
+echo "upstream $https_upstream_git_repo"
 info ---------------------------
 
 if ask "Update remotes now? [Y/n]"; then
     git remote remove origin 2>/dev/null || true
-    git remote add upstream $https_git_repo_upstream
+    git remote add upstream $upstream_git_repo
     git remote set-url --push upstream FORBIDEN
 fi
 
@@ -67,10 +66,10 @@ git remote -v
 info ---------------------------
 
 # upload flux ssh deploy key
-info "Uploading ssh key: $WORKDIR/identity.pub"
-ssh-keygen -l -E sha256 -f $WORKDIR/identity.pub
+info "Uploading ssh key: $CLUSTERDIR/identity.pub"
+ssh-keygen -l -E sha256 -f $CLUSTERDIR/identity.pub
 
 if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
-        -f "key=$(<$WORKDIR/identity.pub)" -f read_only=true -f title="managed-cluster"; then
+        -f "key=$(<$CLUSTERDIR/identity.pub)" -f read_only=true -f title="managed-cluster"; then
     warn "Failed adding key"
 fi

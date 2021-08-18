@@ -2,6 +2,7 @@
 
 ROOTDIR=$(dirname $0)
 source $ROOTDIR/root/etc/profile.d/getup.sh
+export PATH="$PATH:$PWD/root/usr/local/bin/"
 
 if [ -t 0 ]; then
     COLOR_RED="$(tput setaf 1)"
@@ -192,10 +193,15 @@ require_config customer "Customer name"
 require_config name "Cluster name"
 select_cluster_type
 
-set_config upstream_git_repo=$(git remote get-url origin) "Original git repo for templates"
-set_config ssh_git_repo=git@github.com:getupcloud/managed-cluster-$customer "Cluster git repo ssh url"
-set_config https_git_repo=https://github.com/getupcloud/managed-cluster-$customer "Cluster git repo https url"
-set_config flux_git_repo=ssh://git@github.com/getupcloud/managed-cluster-$customer "Git repo for default flux GitRepository"
+set_config upstream_git_repo=$(git remote get-url origin) "Upstream SSH git repo"
+set_config https_upstream_git_repo=$(git-url $upstream_git_repo url2https) "Upstream HTTPS git repo"
+
+_origin_git_repo=$(git-url $upstream_git_repo url2ssh)
+set_config origin_git_repo=${_origin_git_repo%.git}-$customer.git "Origin SSH git repo"
+
+_git_repo=${origin_git_repo#git://}
+_git_repo=ssh://${origin_git_repo/:/\/}
+set_config flux_git_repo=${_git_repo} "Git repo for default flux GitRepository"
 
 cluster_root_dir=clusters/$name
 cluster_dir=$cluster_root_dir/$type

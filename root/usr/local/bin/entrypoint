@@ -6,7 +6,6 @@ export PATH="~/bin/:$PATH"
 source /etc/profile.d/getup.sh
 
 update_ca_certificates
-run_as_user "$@"
 
 if ! [ -d "${KUBECONFIG%/*}" ]; then
     mkdir -p "${KUBECONFIG%/*}"
@@ -32,7 +31,7 @@ if [ "$type" == standalone ] || [ -z "$type" ]; then
     done
 fi
 
-if [ -e $WORKDIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then
+if [ -e $CLUSTERDIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then
     debug Terraform variables file not found: $TF_VARS_FILE
     ask_execute_command /usr/local/bin/terraform-setup
 fi
