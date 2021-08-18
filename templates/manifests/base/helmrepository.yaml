@@ -5,7 +5,7 @@ metadata:
   name: getupcloud
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://charts.getup.io/getupcloud/
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -14,7 +14,7 @@ metadata:
   name: bitnami
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://charts.bitnami.com/bitnami
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -23,7 +23,7 @@ metadata:
   name: autoscaler
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://kubernetes.github.io/autoscaler
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -32,7 +32,7 @@ metadata:
   name: jetstack
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://charts.jetstack.io
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -41,7 +41,7 @@ metadata:
   name: velero
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://vmware-tanzu.github.io/helm-charts
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -50,7 +50,7 @@ metadata:
   name: ingress-nginx
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://kubernetes.github.io/ingress-nginx
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -59,7 +59,7 @@ metadata:
   name: grafana
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://grafana.github.io/helm-charts
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -68,7 +68,7 @@ metadata:
   name: prometheus-community
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://prometheus-community.github.io/helm-charts
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -77,7 +77,7 @@ metadata:
   name: prometheus-msteams
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://prometheus-msteams.github.io/prometheus-msteams/
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -86,7 +86,7 @@ metadata:
   name: elastic
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://helm.elastic.co
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -95,5 +95,5 @@ metadata:
   name: harbor
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1h
   url: https://helm.goharbor.io
