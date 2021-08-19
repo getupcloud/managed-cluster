@@ -51,7 +51,7 @@ if [ -t 0 ]; then
     export GIT_PS1_SHOWUPSTREAM=auto
     export KUBE_PS1_SYMBOL_USE_IMG=true
 
-    export PROMPT_COMMAND='export PS1="$COLOR_BOLD[\u@\h \w$(__git_ps1 " git(%s)") k8s$(kube_ps1)]\$${COLOR_RESET} "'
+    export PROMPT_COMMAND='export PS1="\[$COLOR_BOLD\][\u@\h \w$(__git_ps1 " git(%s)") k8s$(kube_ps1)]\$\[${COLOR_RESET}\] "'
 else
     export COLOR_RED=''
     export COLOR_GREEN=''
