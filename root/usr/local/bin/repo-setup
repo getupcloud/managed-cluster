@@ -30,7 +30,6 @@ gh_name=$(git_name $origin_git_repo)
 : ${gh_enable_wiki:=false}
 : ${gh_enable_issues:=false}
 
-
 echo
 info --- Current Git remotes ---
 git remote -v
@@ -47,11 +46,11 @@ fi
 
 if PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     # repo already exists just add origin
-    git remote add origin $https_git_repo
-elif ask "Create repository $https_git_repo now? [Y/n]"; then
+    git remote add origin $origin_git_repo
+elif ask "Create repository $origin_git_repo now? [Y/n]"; then
     # repo doesn't exists, create now
     # origin will be added by `gh`
-    gh repo create $https_git_repo \
+    gh repo create $https_upstream_git_repo \
         --confirm \
         --private=true \
         --team=${gh_team} \
