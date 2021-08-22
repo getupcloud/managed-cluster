@@ -3,8 +3,65 @@
 export ROOTDIR=$(dirname $(realpath $0))
 source ${ROOTDIR}/root/etc/profile.d/getup.sh
 
+select_cluster()
+{
+    if [ $# -eq 0 ]; then
+        local clusters=( clusters/*/*/ )
+    else
+        clusters=( $@ )
+    fi
+
+    clusters=( ${clusters[*]%/} )
+
+    if [ ${#clusters[*]} -le 1 ]; then
+        config_file=$clusters/cluster.conf
+        if ! has_valid_config $config_file; then
+            warn Config not found: $config_file
+            return 1
+        fi
+
+        echo -n ${clusters}
+        return
+    fi
+
+    if type dialog &>/dev/null; then
+        exec 3>.tmp
+        dialog --output-fd 3 --menu 'Select cluster' 0 0 0 \
+            $(for i in $(seq 0 $(( ${#clusters[*]} - 1 )) ); do echo $i ${clusters[$i]}; done) \
+            '---' '---' \
+            c 'Create cluster' >&2
+            #s 'Sync from template' >&2
+        idx=$(<.tmp)
+        rm -f .tmp
+        case "$idx" in
+            [0-9]*)
+                cluster_dir=${clusters[$idx]}
+            ;;
+            *) cluster_dir=$idx
+        esac
+    else
+        local PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
+
+        select cluster_dir in ${clusters[*]}; do
+            config_file=$cluster_dir/cluster.conf
+            if has_valid_config $cluster_dir; then
+                break
+            else
+                warn Config not found: $config_file
+            fi
+        done
+    fi
+
+    echo $cluster_dir
+}
+
 start_container()
 {
+    if [ $# -ne 1 ]; then
+        warn Missing arg: cluster-dir
+        return 1
+    fi
+
     : ${CONTAINER_USER:=root}
     : ${CONTAINER_GROUP:=root}
     : ${CONTAINER_USER_ID:=0}
@@ -51,7 +108,7 @@ start_container()
 
     if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
         local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
-        local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r .[].Created)
+        local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r '.[].Created')
         local image_created_ts=$(date --date="$image_created" +%s)
 
         if (( dockerfile_modified_ts > image_created_ts )); then
@@ -110,41 +167,30 @@ if $standalone; then
     #        name=standalone
     #    ) > $cluster_dir/cluster.conf
     #fi
-    start_container
+    start_container $cluster_dir
     exit
 fi
 
+
+cluster_dir=$(select_cluster ${clusters})
+
 if [ -d "$cluster_dir" ]; then
-    config_file=${cluster_dir}/cluster.conf
-    if ! has_valid_config $config_file; then
-        exit 1
-    fi
+    :
+#elif [ "$cluster_dir" == s ]; then
+#    echo TODO: ./bootstrap -s 
+elif [ "$cluster_dir" == c ]; then
+    ./bootstrap
 else
-    clusters=( clusters/*/*/ )
-    clusters=( ${clusters[*]%/} )
-
-    if ! [ -d "${clusters[0]}" ]; then
-        warn No clusters found. Please run \`./bootstrap\` to create one.
-        exit 1
-    fi
-
-    if [ ${#clusters[*]} -eq 1 ]; then
-        cluster_dir=${clusters[0]}
-        config_file=${cluster_dir}/cluster.conf
-    else
-        PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
-        select cluster_dir in ${clusters[*]}; do
-            config_file=$cluster_dir/cluster.conf
-            if has_valid_config $config_file; then
-                break
-            else
-                warn Config not found: $config_file
-            fi
-        done
-    fi
+    exit
 fi
 
-source_env $config_file
+if [ -z "$cluster_dir" ] || ! [ -d "$cluster_dir" ]; then
+    warn No clusters found. Please run \`./bootstrap\` to create one.
+    exit
+fi
+
 cluster_dir=$(realpath ${cluster_dir})
+config_file=${cluster_dir}/cluster.conf
+source_env $config_file
 
 start_container $cluster_dir

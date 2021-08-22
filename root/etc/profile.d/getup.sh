@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s nullglob
+
 source_env()
 {
     # salve `set -a` state
@@ -28,6 +30,7 @@ if [ -t 0 ]; then
     export COLOR_RED="$(tput setaf 1)"
     export COLOR_GREEN="$(tput setaf 2)"
     export COLOR_YELLOW="$(tput setaf 3)"
+    export COLOR_BLUE="$(tput setaf 4)"
     export COLOR_BOLD="$(tput bold)"
     export COLOR_RESET="$(tput sgr0)"
 
@@ -51,7 +54,40 @@ if [ -t 0 ]; then
     export GIT_PS1_SHOWUPSTREAM=auto
     export KUBE_PS1_SYMBOL_USE_IMG=true
 
-    export PROMPT_COMMAND='export PS1="\[$COLOR_BOLD\][\u@\h \w$(__git_ps1 " git(%s)") k8s$(kube_ps1)]\$\[${COLOR_RESET}\] "'
+    : ${ps1_color:=true}
+    export ps1_color
+    color() {
+        case $1 in
+            1|on|true|y|yes) ps1_color=true;;
+            *) ps1_color=false
+        esac
+    }
+    do_ps1()
+    {
+        local git_ps1="$(__git_ps1 "git(%s)")"
+        local k8s_ps1="\[$COLOR_BLUE\]k8s\[$COLOR_RESET\]$(kube_ps1)"
+        local ps1=""
+        $ps1_color && ps1+="\[$COLOR_BOLD\]"
+        ps1+="[\w "
+        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
+        ps1+="$customer"
+        $ps1_color && ps1+="\[$COLOR_RESET\]"
+        ps1+=:
+        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
+        ps1+="$name"
+        $ps1_color && ps1+="\[$COLOR_RESET\]"
+        ps1+=@
+        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
+        ps1+="$type"
+        ps1+="${git_ps1:+ $git_ps1}"
+        ps1+="${k8s_ps1:+ $k8s_ps1}"
+        ps1+="]\\\$ "
+        $ps1_color && ps1+="\[$COLOR_RESET\]"
+
+        PS1="$ps1"
+    }
+    export PROMPT_COMMAND=do_ps1
+
 else
     export COLOR_RED=''
     export COLOR_GREEN=''

@@ -75,6 +75,7 @@ RUN cd /usr/local/bin && \
         | tar xzv doctl
 
 COPY root/ /
+COPY root/etc/skel/ /root/
 COPY Dockerfile /
 
 ARG GIT_COMMIT
