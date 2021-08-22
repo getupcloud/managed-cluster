@@ -198,6 +198,7 @@ set_config https_upstream_git_repo=$(git-url $upstream_git_repo url2https) "Upst
 
 _origin_git_repo=$(git-url $upstream_git_repo url2ssh)
 set_config origin_git_repo=${_origin_git_repo%.git}-$customer.git "Origin SSH git repo"
+set_config https_origin_git_repo=$(git-url $origin_git_repo url2https) "Origin HTTPS git repo"
 
 _git_repo=${origin_git_repo#git://}
 _git_repo=ssh://${origin_git_repo/:/\/}

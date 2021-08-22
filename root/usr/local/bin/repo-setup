@@ -34,8 +34,8 @@ echo
 info --- Current Git remotes ---
 git remote -v
 info ----- New Git remotes -----
-echo "origin   $origin_git_repo"
-echo "upstream $https_upstream_git_repo"
+echo "origin   $origin_git_repo (push, pull)"
+echo "upstream $https_upstream_git_repo (pull)"
 info ---------------------------
 
 if ask "Update remotes now? [Y/n]"; then
@@ -44,13 +44,18 @@ if ask "Update remotes now? [Y/n]"; then
     git remote set-url --push upstream FORBIDEN
 fi
 
+if ! [ -v https_origin_git_repo ]; then
+    https_origin_git_repo=$(git-url $origin_git_repo url2https)
+    set_config https_origin_git_repo=$https_origin_git_repo "Origin HTTPS git repo"
+fi
+
 if PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     # repo already exists just add origin
     git remote add origin $origin_git_repo
-elif ask "Create repository $origin_git_repo now? [Y/n]"; then
+elif ask "Create repository $https_origin_git_repo now? [Y/n]"; then
     # repo doesn't exists, create now
     # origin will be added by `gh`
-    gh repo create $https_upstream_git_repo \
+    gh repo create $https_origin_git_repo \
         --confirm \
         --private=true \
         --team=${gh_team} \
