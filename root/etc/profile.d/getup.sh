@@ -12,89 +12,24 @@ source_env()
     $on || set +a
 }
 
-if [ -v CLUSTERDIR ]; then
-    if [ -r $CLUSTERDIR/cluster.conf ]; then
-        source_env $CLUSTERDIR/cluster.conf
+set_config()
+{
+    local _name=${1%%=*}
+    local _description="$2"
+    local _config_file="${3:-$config_file}"
+
+    export "$1"
+
+    if grep -q "^\s*${_name}=.*" $_config_file; then
+        sed -i -e "s|^\s${_name}=.*|$1|" $_config_file
+    else
+        {
+            echo "# $_description"
+            echo "$1"
+            echo
+        } >>$_config_file
     fi
-
-    if [ -e $CLUSTERDIR/provider.env ]; then
-        source_env $CLUSTERDIR/provider.env
-    fi
-fi
-
-if [ -v REPODIR ] && [ -r $REPODIR/.dockerenv ]; then
-    source_env $REPODIR/.dockerenv
-fi
-
-if [ -t 0 ]; then
-    export COLOR_RED="$(tput setaf 1)"
-    export COLOR_GREEN="$(tput setaf 2)"
-    export COLOR_YELLOW="$(tput setaf 3)"
-    export COLOR_BLUE="$(tput setaf 4)"
-    export COLOR_BOLD="$(tput bold)"
-    export COLOR_RESET="$(tput sgr0)"
-
-    alias l='ls -la --color'
-    alias t='terraform'
-    alias ti='terraform init'
-    alias tv='terraform validate'
-    alias tp='terraform plan'
-    alias ta='terraform apply'
-    alias tay='terraform apply -auto-approve'
-    alias tf='terraform fmt'
-    alias tva='tv && ta'
-    alias tiva='ti && tv && ta'
-    alias tgu='terraform get'
-    alias tgu='terraform get -update'
-
-    export GIT_PS1_SHOWCOLORHINTS=true
-    export GIT_PS1_SHOWDIRTYSTATE=true
-    export GIT_PS1_SHOWSTASHSTATE=true
-    export GIT_PS1_SHOWUNTRACKEDFILES=true
-    export GIT_PS1_SHOWUPSTREAM=auto
-    export KUBE_PS1_SYMBOL_USE_IMG=true
-
-    : ${ps1_color:=true}
-    export ps1_color
-    color() {
-        case $1 in
-            1|on|true|y|yes) ps1_color=true;;
-            *) ps1_color=false
-        esac
-    }
-    do_ps1()
-    {
-        local git_ps1="$(__git_ps1 "git(%s)")"
-        local k8s_ps1="\[$COLOR_BLUE\]k8s\[$COLOR_RESET\]$(kube_ps1)"
-        local ps1=""
-        $ps1_color && ps1+="\[$COLOR_BOLD\]"
-        ps1+="[\w "
-        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
-        ps1+="$customer"
-        $ps1_color && ps1+="\[$COLOR_RESET\]"
-        ps1+=:
-        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
-        ps1+="$name"
-        $ps1_color && ps1+="\[$COLOR_RESET\]"
-        ps1+=@
-        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
-        ps1+="$type"
-        ps1+="${git_ps1:+ $git_ps1}"
-        ps1+="${k8s_ps1:+ $k8s_ps1}"
-        ps1+="]\\\$ "
-        $ps1_color && ps1+="\[$COLOR_RESET\]"
-
-        PS1="$ps1"
-    }
-    export PROMPT_COMMAND=do_ps1
-
-else
-    export COLOR_RED=''
-    export COLOR_GREEN=''
-    export COLOR_YELLOW=''
-    export COLOR_BOLD=''
-    export COLOR_RESET=''
-fi
+}
 
 prompt()
 {
@@ -230,3 +165,87 @@ update_ca_certificates()
         update-ca-certificates
     fi
 }
+
+if [ -v CLUSTERDIR ]; then
+    if [ -r $CLUSTERDIR/cluster.conf ]; then
+        source_env $CLUSTERDIR/cluster.conf
+    fi
+
+    if [ -e $CLUSTERDIR/provider.env ]; then
+        source_env $CLUSTERDIR/provider.env
+    fi
+fi
+
+if [ -v REPODIR ] && [ -r $REPODIR/.dockerenv ]; then
+    source_env $REPODIR/.dockerenv
+fi
+
+if [ -t 0 ]; then
+    export COLOR_RED="$(tput setaf 1)"
+    export COLOR_GREEN="$(tput setaf 2)"
+    export COLOR_YELLOW="$(tput setaf 3)"
+    export COLOR_BLUE="$(tput setaf 4)"
+    export COLOR_BOLD="$(tput bold)"
+    export COLOR_RESET="$(tput sgr0)"
+
+    alias l='ls -la --color'
+    alias t='terraform'
+    alias ti='terraform init'
+    alias tv='terraform validate'
+    alias tp='terraform plan'
+    alias ta='terraform apply'
+    alias tay='terraform apply -auto-approve'
+    alias tf='terraform fmt'
+    alias tva='tv && ta'
+    alias tiva='ti && tv && ta'
+    alias tgu='terraform get'
+    alias tgu='terraform get -update'
+
+    export GIT_PS1_SHOWCOLORHINTS=true
+    export GIT_PS1_SHOWDIRTYSTATE=true
+    export GIT_PS1_SHOWSTASHSTATE=true
+    export GIT_PS1_SHOWUNTRACKEDFILES=true
+    export GIT_PS1_SHOWUPSTREAM=auto
+    export KUBE_PS1_SYMBOL_USE_IMG=true
+
+    : ${ps1_color:=true}
+    export ps1_color
+    color() {
+        case $1 in
+            1|on|true|y|yes) ps1_color=true;;
+            *) ps1_color=false
+        esac
+    }
+    do_ps1()
+    {
+        local git_ps1="$(__git_ps1 "git(%s)")"
+        local k8s_ps1="\[$COLOR_BLUE\]k8s\[$COLOR_RESET\]$(kube_ps1)"
+        local ps1=""
+        $ps1_color && ps1+="\[$COLOR_BOLD\]"
+        ps1+="[\w "
+        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
+        ps1+="$customer"
+        $ps1_color && ps1+="\[$COLOR_RESET\]"
+        ps1+=:
+        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
+        ps1+="$name"
+        $ps1_color && ps1+="\[$COLOR_RESET\]"
+        ps1+=@
+        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
+        ps1+="$type"
+        ps1+="${git_ps1:+ $git_ps1}"
+        ps1+="${k8s_ps1:+ $k8s_ps1}"
+        ps1+="]\\\$ "
+        $ps1_color && ps1+="\[$COLOR_RESET\]"
+
+        PS1="$ps1"
+    }
+    export PROMPT_COMMAND=do_ps1
+
+else
+    export COLOR_RED=''
+    export COLOR_GREEN=''
+    export COLOR_YELLOW=''
+    export COLOR_BOLD=''
+    export COLOR_RESET=''
+fi

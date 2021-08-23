@@ -76,23 +76,6 @@ sync_from_template()
     copy_from_template $src $dest --exclude=manifests/cluster/ --exclude=\*.swp
 }
 
-set_config()
-{
-    local _name=${1%%=*}
-    local _description="$2"
-
-    export "$1"
-
-    if grep -q "^\s*${_name}=.*" $config_file; then
-        sed -i -e "s|^\s${_name}=.*|$1|" $config_file
-    else
-        {
-            echo "# $_description"
-            echo "$1"
-            echo
-        } >>$config_file
-    fi
-}
 
 require_config()
 {

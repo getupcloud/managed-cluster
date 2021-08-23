@@ -45,8 +45,8 @@ if ask "Update remotes now? [Y/n]"; then
 fi
 
 if ! [ -v https_origin_git_repo ]; then
-    https_origin_git_repo=$(git-url $origin_git_repo url2https)
-    set_config https_origin_git_repo=$https_origin_git_repo "Origin HTTPS git repo"
+    export https_origin_git_repo=$(git-url $origin_git_repo url2https)
+    set_config https_origin_git_repo=$https_origin_git_repo "Origin HTTPS git repo" $CLUSTERDIR/cluster.conf
 fi
 
 if PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
