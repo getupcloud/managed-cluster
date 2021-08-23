@@ -180,14 +180,18 @@ if [ -v REPODIR ] && [ -r $REPODIR/.dockerenv ]; then
     source_env $REPODIR/.dockerenv
 fi
 
-if [ -t 0 ]; then
-    export COLOR_RED="$(tput setaf 1)"
-    export COLOR_GREEN="$(tput setaf 2)"
-    export COLOR_YELLOW="$(tput setaf 3)"
-    export COLOR_BLUE="$(tput setaf 4)"
-    export COLOR_BOLD="$(tput bold)"
-    export COLOR_RESET="$(tput sgr0)"
+export COLOR_BLACK="$(tput setaf 1)"
+export COLOR_RED="$(tput setaf 1)"
+export COLOR_GREEN="$(tput setaf 2)"
+export COLOR_YELLOW="$(tput setaf 3)"
+export COLOR_BLUE="$(tput setaf 4)"
+export COLOR_MAGENTA="$(tput setaf 5)"
+export COLOR_CYAN="$(tput setaf 6)"
+export COLOR_WHITE="$(tput setaf 7)"
+export COLOR_BOLD="$(tput bold)"
+export COLOR_RESET="$(tput sgr0)"
 
+if [ -t 0 ]; then
     alias l='ls -la --color'
     alias t='terraform'
     alias ti='terraform init'
@@ -210,42 +214,49 @@ if [ -t 0 ]; then
 
     : ${ps1_color:=true}
     export ps1_color
-    color() {
+    ps1_color()
+    {
         case $1 in
             1|on|true|y|yes) ps1_color=true;;
             *) ps1_color=false
         esac
     }
+
+    ps1_envelope()
+    {
+        local n="$1"
+        local v="$2"
+        $ps1_color &&
+            echo -e "\[$COLOR_CYAN\]${n}\[$COLOR_RESET\]($v\[$COLOR_RESET\])" ||
+            echo -e "${n}($v)"
+    }
+
     do_ps1()
     {
-        local git_ps1="$(__git_ps1 "git(%s)")"
-        local k8s_ps1="\[$COLOR_BLUE\]k8s\[$COLOR_RESET\]$(kube_ps1)"
+        local git_ps1="$(__git_ps1 %s)"
+        local k8s_ps1="$(kube_ps1)"
         local ps1=""
         $ps1_color && ps1+="\[$COLOR_BOLD\]"
         ps1+="[\w "
-        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
-        ps1+="$customer"
         $ps1_color && ps1+="\[$COLOR_RESET\]"
-        ps1+=:
-        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
-        ps1+="$name"
-        $ps1_color && ps1+="\[$COLOR_RESET\]"
-        ps1+=@
-        $ps1_color && ps1+="\[$COLOR_BOLD\]\[$COLOR_YELLOW\]"
-        ps1+="$type"
-        ps1+="${git_ps1:+ $git_ps1}"
-        ps1+="${k8s_ps1:+ $k8s_ps1}"
+        if [ -v customer ]; then
+            case "$customer$name$type" in
+                standalonestandalonestandalone)
+                   ps1+="$(ps1_envelope cluster standalone)"
+                ;;
+                *)
+                   ps1+="$(ps1_envelope cluster "$customer|$name|$type")"
+            esac
+        else
+           ps1+="$(ps1_envelope cluster '???')"
+        fi
+        [ -v git_ps1 ] && ps1+=" $(ps1_envelope git $git_ps1)"
+        [ -v k8s_ps1 ] && ps1+=" $(ps1_envelope k8s $k8s_ps1)"
+        $ps1_color && ps1+="\[$COLOR_BOLD\]"
         ps1+="]\\\$ "
         $ps1_color && ps1+="\[$COLOR_RESET\]"
 
         PS1="$ps1"
     }
     export PROMPT_COMMAND=do_ps1
-
-else
-    export COLOR_RED=''
-    export COLOR_GREEN=''
-    export COLOR_YELLOW=''
-    export COLOR_BOLD=''
-    export COLOR_RESET=''
 fi
