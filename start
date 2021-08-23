@@ -24,12 +24,17 @@ select_cluster()
         return
     fi
 
+    cluster_names=( ${clusters[*]#*/} )
+    cluster_names=( ${cluster_names[*]%/*} )
+    cluster_types=( ${clusters[*]##*/} )
+
+set -x
     if type dialog &>/dev/null; then
         exec 3>.tmp
-        dialog --output-fd 3 --menu 'Select cluster' 0 0 0 \
-            $(for i in $(seq 0 $(( ${#clusters[*]} - 1 )) ); do echo $i ${clusters[$i]}; done) \
+        eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
+            "$(for i in $(seq 0 $(( ${#clusters[*]} - 1 )) ); do echo -n " $i '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
             '---' '---' \
-            c 'Create cluster' >&2
+            b "'Bootstrap cluster'"  >&2
             #s 'Sync from template' >&2
         idx=$(<.tmp)
         rm -f .tmp
@@ -178,7 +183,7 @@ if [ -d "$cluster_dir" ]; then
     :
 #elif [ "$cluster_dir" == s ]; then
 #    echo TODO: ./bootstrap -s 
-elif [ "$cluster_dir" == c ]; then
+elif [ "$cluster_dir" == b ]; then
     ./bootstrap
 else
     exit

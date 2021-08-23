@@ -2,15 +2,6 @@
 
 kubectl()
 {
-    export GIT_PS1_SHOWCOLORHINTS=true
-    export GIT_PS1_SHOWDIRTYSTATE=true
-    export GIT_PS1_SHOWSTASHSTATE=true
-    export GIT_PS1_SHOWUNTRACKEDFILES=true
-    export GIT_PS1_SHOWUPSTREAM=auto
-    export KUBE_PS1_SYMBOL_USE_IMG=true
-
-    export PROMPT_COMMAND='export PS1="$COLOR_BOLD[\u@\h \w$(__git_ps1 " git(%s)") k8s$(kube_ps1)]\$${COLOR_RESET} "'
-
     echo "+ kubectl $@" 1>&2;
     command kubectl "$@"
 }
