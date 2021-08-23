@@ -25,6 +25,12 @@ fi
 
 gh_owner=$(git_owner $origin_git_repo)
 gh_name=$(git_name $origin_git_repo)
+
+if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
+    warn Invalid git url: $origin_git_repo
+    exit 1
+fi
+
 : ${gh_description:="Getupcloud Managed Cluster: $customer"}
 : ${gh_team:=developers}
 : ${gh_enable_wiki:=false}
@@ -35,7 +41,7 @@ info --- Current Git remotes ---
 git remote -v
 info ----- New Git remotes -----
 echo "origin   $origin_git_repo (push, pull)"
-echo "upstream $https_upstream_git_repo (pull)"
+echo "upstream $upstream_git_repo (pull)"
 info ---------------------------
 
 if ask "Update remotes now? [Y/n]"; then
@@ -44,18 +50,13 @@ if ask "Update remotes now? [Y/n]"; then
     git remote set-url --push upstream FORBIDEN
 fi
 
-if ! [ -v https_origin_git_repo ]; then
-    export https_origin_git_repo=$(git-url $origin_git_repo url2https)
-    set_config https_origin_git_repo=$https_origin_git_repo "Origin HTTPS git repo" $CLUSTERDIR/cluster.conf
-fi
-
 if PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     # repo already exists just add origin
     git remote add origin $origin_git_repo
-elif ask "Create repository $https_origin_git_repo now? [Y/n]"; then
+elif ask "Create repository $gh_owner/$gh_name now? [Y/n]"; then
     # repo doesn't exists, create now
     # origin will be added by `gh`
-    gh repo create $https_origin_git_repo \
+    gh repo create $gh_owner/$gh_name \
         --confirm \
         --private=true \
         --team=${gh_team} \
