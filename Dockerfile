@@ -42,6 +42,7 @@ RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/in
         --rc-file-path /etc/profile.d/oci.sh
 
 RUN cd /usr/local/bin && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 > kind && \
     curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.3/hcl2json_linux_amd64 > hcl2json && \
     curl -skL https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.3/aws-iam-authenticator_0.5.3_linux_amd64 > \

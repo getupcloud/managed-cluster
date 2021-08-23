@@ -210,7 +210,10 @@ if [ -t 0 ]; then
     export GIT_PS1_SHOWSTASHSTATE=true
     export GIT_PS1_SHOWUNTRACKEDFILES=true
     export GIT_PS1_SHOWUPSTREAM=auto
-    export KUBE_PS1_SYMBOL_USE_IMG=true
+    export KUBE_PS1_SYMBOL_ENABLE=false
+    #export KUBE_PS1_SYMBOL_USE_IMG=true
+    unset KUBE_PS1_PREFIX
+    unset KUBE_PS1_SUFFIX
 
     : ${ps1_color:=true}
     export ps1_color
@@ -224,11 +227,27 @@ if [ -t 0 ]; then
 
     ps1_envelope()
     {
+        [ -n "$2" ] || return
         local n="$1"
         local v="$2"
         $ps1_color &&
-            echo -e "\[$COLOR_CYAN\]${n}\[$COLOR_RESET\]($v\[$COLOR_RESET\])" ||
+            echo -e "\[$COLOR_GREEN\]${n}\[$COLOR_RESET\]($v\[$COLOR_RESET\])" ||
             echo -e "${n}($v)"
+    }
+
+    ps1_cluster()
+    {
+        if [ -v customer ]; then
+            case "$customer_$name_$type" in
+                standalone_standalone_standalone)
+                  ps1_envelope "\[$COLOR_BLUE\]standalone"
+                ;;
+                *)
+                   ps1_envelope cluster "\[$COLOR_YELLOW\]$customer\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$name\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$type"
+            esac
+        else
+           ps1_envelope cluster '???'
+        fi
     }
 
     do_ps1()
@@ -236,22 +255,13 @@ if [ -t 0 ]; then
         local git_ps1="$(__git_ps1 %s)"
         local k8s_ps1="$(kube_ps1)"
         local ps1=""
+
         $ps1_color && ps1+="\[$COLOR_BOLD\]"
         ps1+="[\w "
         $ps1_color && ps1+="\[$COLOR_RESET\]"
-        if [ -v customer ]; then
-            case "$customer$name$type" in
-                standalonestandalonestandalone)
-                   ps1+="$(ps1_envelope cluster standalone)"
-                ;;
-                *)
-                   ps1+="$(ps1_envelope cluster "$customer|$name|$type")"
-            esac
-        else
-           ps1+="$(ps1_envelope cluster '???')"
-        fi
-        [ -v git_ps1 ] && ps1+=" $(ps1_envelope git $git_ps1)"
-        [ -v k8s_ps1 ] && ps1+=" $(ps1_envelope k8s $k8s_ps1)"
+        ps1+="$(ps1_cluster)"
+        [ -n "$git_ps1" ] && ps1+=" $(ps1_envelope git $git_ps1)"
+        [ -n "$k8s_ps1" ] && ps1+=" $(ps1_envelope k8s $k8s_ps1)"
         $ps1_color && ps1+="\[$COLOR_BOLD\]"
         ps1+="]\\\$ "
         $ps1_color && ps1+="\[$COLOR_RESET\]"
