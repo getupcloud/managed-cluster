@@ -84,37 +84,9 @@ variable "flux_git_repo" {
   type        = string
   default     = ""
 }
-variable "s3_access_id" {
-  description = "s3 Access Key ID for Backups"
-  type        = string
-  default     = null
-}
-
-variable "s3_secret_key" {
-  description = "s3 Access Key ID for Backups"
-  type        = string
-  default     = null
-}
 
 variable "s3_buckets" {
   description = "List of Space Buckets (See s3.tf for defaults)"
   type        = any
   default     = []
-
-  # See s3.tf for defaults
-  # Example:
-  # [
-  #   {
-  #     name: "mybucket",
-  #     region: "nyc3",
-  #     acl: "public",
-  #     force_destroy: true
-  #   },
-  #   {
-  #     name_prefix: "velero",
-  #     region: "nyc3",
-  #     acl: "private",
-  #     force_destroy: false
-  #   }
-  # ]
 }
