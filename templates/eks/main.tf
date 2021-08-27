@@ -9,7 +9,5 @@ module "eks" {
   node_groups           = var.node_groups
   node_groups_defaults  = var.node_groups_defaults
   flux_git_repo         = var.flux_git_repo
-  s3_access_id          = var.s3_access_id
-  s3_secret_key         = var.s3_secret_key
   s3_buckets            = var.s3_buckets
 }
