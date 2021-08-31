@@ -79,6 +79,12 @@ variable "auth_iam_users" {
   type        = list(string)
 }
 
+variable "auth_iam_roles" {
+  description = "List of IAM roles to allow kubernetes access."
+  type        = list(string)
+  default     = ["getupcloud"]
+}
+
 variable "flux_git_repo" {
   description = "GitRepository URL"
   type        = string
@@ -89,4 +95,10 @@ variable "s3_buckets" {
   description = "List of Space Buckets (See s3.tf for defaults)"
   type        = any
   default     = []
+}
+
+variable "tags" {
+  description = "AWS tags to apply to resources"
+  type        = any
+  default     = {}
 }
