@@ -1,22 +1,8 @@
 FROM hashicorp/terraform:1.0.2
 
-ENV CLUSTERDIR=/cluster \
-    REPODIR=/repo \
-    KIND_VERSION=v0.11.1 \
-    HCL2JSON_VERSION=v0.3.3 \
-    KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
-    FLUX_VERSIONS="v0.15.3 v0.16.1" \
-    DOCTL_VERSION="1.63.1" \
-    TERM=xterm-256color
-
-ENV TF_DATA_DIR=${CLUSTERDIR}/.terraform.d \
-    TF_IN_AUTOMATION=true \
-    TF_LOG=INFO \
-    TF_LOG_PATH=${CLUSTERDIR}/terraform.log \
-    TF_VARS_FILE=${CLUSTERDIR}/terraform.tfvars \
-    TF_PLAN_FILE=${CLUSTERDIR}/terraform.tfplan \
-    KUBECONFIG=${CLUSTERDIR}/.kube/config \
-    OSH=/etc/oh-my-bash
+ENV CLUSTERDIR="/cluster" \
+    REPODIR="/repo" \
+    TERM="xterm-256color"
 
 SHELL ["/bin/sh", "-x", "-c"]
 
@@ -31,6 +17,24 @@ RUN apk update && \
     pip install giturlparse.py
 
 SHELL ["/bin/bash", "-x", "-c"]
+
+ENV \
+    DOCTL_VERSION="1.63.1" \
+    FLUX_VERSIONS="v0.15.3 v0.16.1" \
+    HCL2JSON_VERSION="v0.3.3" \
+    KIND_VERSION="v0.11.1" \
+    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff" \
+    KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
+    KREW_VERSION="v0.4.1" \
+    KUBECONFIG="${CLUSTERDIR}/.kube/config" \
+    KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
+    OSH="/etc/oh-my-bash" \
+    TF_DATA_DIR="${CLUSTERDIR}/.terraform.d" \
+    TF_IN_AUTOMATION="true" \
+    TF_LOG="INFO" \
+    TF_LOG_PATH="${CLUSTERDIR}/terraform.log" \
+    TF_PLAN_FILE="${CLUSTERDIR}/terraform.tfplan" \
+    TF_VARS_FILE="${CLUSTERDIR}/terraform.tfvars"
 
 # it takes too long so we do it before
 RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
@@ -64,9 +68,10 @@ RUN cd /usr/local/bin && \
     chmod +x /etc/profile.d/bash_ps1_git.sh && \
     for KUBECTL_VERSION in $KUBECTL_VERSIONS; do \
       curl -skL https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl > \
-        kubectl-${KUBECTL_VERSION}; \
+        kubectl_${KUBECTL_VERSION} && \
+        chmod +x kubectl_${KUBECTL_VERSION}; \
     done && \
-    ln -s kubectl-$KUBECTL_VERSION kubectl && \
+    ln -s kubectl_$KUBECTL_VERSION kubectl && \
     for FLUX_VERSION in $FLUX_VERSIONS; do \
         curl -skL https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION:1}_linux_amd64.tar.gz \
             | tar xzv --transform="s,.*,flux-$FLUX_VERSION,"; \
@@ -74,6 +79,20 @@ RUN cd /usr/local/bin && \
     ln -s flux-$FLUX_VERSION flux && \
     curl -skL https://github.com/digitalocean/doctl/releases/download/v$DOCTL_VERSION/doctl-$DOCTL_VERSION-linux-amd64.tar.gz \
         | tar xzv doctl
+
+RUN \
+    export PATH=$PATH:$HOME/.krew/bin && \
+    KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" && \
+    curl -skL https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew.tar.gz \
+        | tar xzv $KREW && \
+    $KREW install krew && \
+    ln -s ~/.krew/bin/kubectl-krew /usr/local/bin/krew && \
+    for repo in ${KREW_REPOS}; do \
+        kubectl krew index add ${repo%%@*} ${repo##*@}; \
+    done && \
+    for plugin in ${KREW_PLUGINS}; do \
+        kubectl krew install $plugin; \
+    done
 
 COPY root/ /
 COPY root/etc/skel/ /root/
