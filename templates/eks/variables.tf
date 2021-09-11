@@ -37,12 +37,17 @@ variable "node_groups_defaults" {
   description = "AWS EKS default node_groups definition"
   type        = any
   default = {
-    instance_types   = ["m5.xlarge"]
+    instance_types   = []
     desired_capacity = 1
     min_capacity     = 1
     max_capacity     = 1
     disk_size        = 50
     additional_tags  = {}
+  }
+
+  validation {
+    condition     = length(var.node_groups_defaults.instance_types) > 0
+    error_message = "Missing instance_types[]. Ex: [\"m5.xlarge\"]."
   }
 }
 

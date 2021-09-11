@@ -62,10 +62,10 @@ variable "node_pool" {
   type        = any
   default = {
     name       = "infra"
-    size       = "s-4vcpu-8gb"
-    min_nodes  = 2
+    size       = ""
+    min_nodes  = 1
     max_nodes  = 2
-    node_count = 2
+    node_count = 1
     auto_scale = true
     labels = {
       role = "infra"
@@ -77,6 +77,11 @@ variable "node_pool" {
     }]
     tags = []
   }
+
+  validation {
+    condition     = length(var.node_pool.size) > 0
+    error_message = "Missing node_pool.size. Ex: \"s-4vcpu-8gb\"."
+  }
 }
 
 variable "node_pools" {
@@ -85,7 +90,7 @@ variable "node_pools" {
   default = [
     {
       name       = "app"
-      size       = "s-4vcpu-8gb"
+      size       = ""
       min_nodes  = 2
       max_nodes  = 4
       node_count = 2
@@ -97,6 +102,11 @@ variable "node_pools" {
       taints = []
     }
   ]
+
+  validation {
+    condition     = alltrue([for np in var.node_pools : length(np.size) > 0])
+    error_message = "Missing one or more node_pools[].size. Ex: \"s-4vcpu-8gb\"."
+  }
 }
 
 variable "flux_git_repo" {
