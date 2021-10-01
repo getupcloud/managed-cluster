@@ -82,6 +82,7 @@ start_container()
     docker_command=${docker_command:-/bin/bash --login}
     docker_run_options_defaults=(
         --cap-add=SYS_PTRACE
+        --userns host
         --rm
         -it
         --env-file $ROOTDIR/.dockerenv
