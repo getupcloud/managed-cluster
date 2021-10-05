@@ -1,3 +1,7 @@
+# Create VPC using CloudFormation
+
+See ./cloudformation for templates.
+
 # VPC requirements
 
 - At least 2 subnets (for HA)
