@@ -1,0 +1,21 @@
+FROM centos:8
+
+ENV CLUSTERDIR="/cluster" \
+    REPODIR="/repo" \
+    TERM="xterm-256color" \
+    PATH=$PATH:/root/.krew/bin
+
+SHELL ["/bin/bash", "-x", "-c"]
+
+RUN yum install -y epel-release centos-release-rabbitmq-38.noarch
+
+RUN INSTALL_PACKAGES="vim-enhanced docker \
+        dialog awscli httpie bind-utils httpd-tools \
+        git net-tools nmap openssl openssl-devel gnupg \
+        gettext jq rsync strace \
+        python3-pip python3-devel libffi-devel rust cargo" && \
+    yum install -y $INSTALL_PACKAGES && \
+    yum groupinstall -y 'Development Tools' && \
+    yum update -y && \
+    yum clean all && \
+    pip3 install giturlparse.py

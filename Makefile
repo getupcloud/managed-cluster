@@ -1,22 +1,16 @@
-VERSION := $(shell cat version.txt)
-IMAGE := getupcloud/cluster:$(VERSION)
+VERSION    := $(shell cat version.txt)
+IMAGE      := getupcloud/cluster:$(VERSION)
+IMAGE_BASE := getupcloud/cluster-base:$(VERSION)
 IMAGE_USER := root
 GIT_COMMIT := $(shell git log --pretty=format:"%h" -n 1)
-CLUSTERDIR := $(PWD)
-DOCKERFILE := Dockerfile
-DOCKER_BUILD_OPTIONS_DEFAULTS := --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION)
-DOCKER_RUN_OPTIONS_DEFAULTS := --network host \
-	-v /var/run/docker.sock:/var/run/docker.sock \
-	-it \
-	--user $(IMAGE_USER) \
-	-v $(CLUSTERDIR):/cluster
-CMD :=
+DOCKERFILE := Dockerfile.centos8
+DOCKER_BUILD_OPTIONS := --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION)
 
-build image:
-	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS_DEFAULTS) -t $(IMAGE)
+build: build-base
+	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE)
 
-run:
-	docker run $(DOCKER_RUN_OPTIONS) $(DOCKER_RUN_OPTIONS_DEFAULTS) $(IMAGE) $(CMD)
+build-base:
+	docker build . -f $(DOCKERFILE).base $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE)
 
 fmt:
 	terraform fmt -recursive
