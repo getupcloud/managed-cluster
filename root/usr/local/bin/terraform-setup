@@ -28,11 +28,12 @@ let i=0
 for v in ${variables_files[@]}; do
     if [ "${v##*/}" == variables.tf ]; then
         unset variables_files[$i]
-        variables_files=( $CLUSTERDIR/variables.tf ${variables_files[@]} )
         break
     fi
     let i+=1
 done
+
+variables_files=( $CLUSTERDIR/variables.tf ${variables_files[@]} )
 
 tfvars_data=""
 
