@@ -6,11 +6,14 @@ GIT_COMMIT := $(shell git log --pretty=format:"%h" -n 1)
 DOCKERFILE := Dockerfile.centos8
 DOCKER_BUILD_OPTIONS := --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION)
 
-build: build-base
+build: build-base version.txt
 	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE)
 
-build-base:
+build-base: $(DOCKERFILE) version.txt
 	docker build . -f $(DOCKERFILE).base $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE)
+
+$(DOCKERFILE): version.txt
+	sed -i -e "s|FROM .*|FROM $(IMAGE_BASE)|" $(DOCKERFILE)
 
 fmt:
 	terraform fmt -recursive

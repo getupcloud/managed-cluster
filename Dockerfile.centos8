@@ -1,24 +1,13 @@
-FROM getupcloud/cluster-base:0.0.1
+FROM getupcloud/cluster-base:0.0.2
 
-ENV CLUSTERDIR="/cluster" \
-    REPODIR="/repo" \
-    TERM="xterm-256color" \
-    PATH=$PATH:/root/.krew/bin
-
-SHELL ["/bin/bash", "-x", "-c"]
-
-RUN yum install -y epel-release centos-release-rabbitmq-38.noarch
-
-RUN INSTALL_PACKAGES="vim-enhanced docker \
-        dialog awscli httpie bind-utils httpd-tools \
-        git net-tools nmap openssl openssl-devel gnupg \
-        gettext jq rsync strace \
-        python3-pip python3-devel libffi-devel rust cargo" && \
-    yum install -y $INSTALL_PACKAGES && \
-    yum groupinstall -y 'Development Tools' && \
-    yum update -y && \
-    yum clean all && \
-    pip3 install giturlparse.py
+# it takes too long so we do it asap
+RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
+    chmod +x /etc/oci-install.sh && \
+    /etc/oci-install.sh --accept-all-defaults \
+        --install-dir /opt/oci \
+        --exec-dir /usr/local/bin/ \
+        --script-dir /usr/local/bin/ \
+        --rc-file-path /etc/profile.d/oci.sh
 
 ENV \
     DOCTL_VERSION="1.63.1" \
@@ -31,6 +20,7 @@ ENV \
     KUBECONFIG="${CLUSTERDIR}/.kube/config" \
     KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
     OSH="/etc/oh-my-bash" \
+    TERRAFORM_VERSION="1.0.9" \
     TF_DATA_DIR="${CLUSTERDIR}/.terraform.d" \
     TF_IN_AUTOMATION="true" \
     TF_LOG="INFO" \
@@ -39,16 +29,10 @@ ENV \
     TF_VARS_FILE="${CLUSTERDIR}/terraform.tfvars" \
     VELERO_VERSION="1.6.2"
 
-# it takes too long so we do it asap
-RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
-    chmod +x /etc/oci-install.sh && \
-    /etc/oci-install.sh --accept-all-defaults \
-        --install-dir /opt/oci \
-        --exec-dir /usr/local/bin/ \
-        --script-dir /usr/local/bin/ \
-        --rc-file-path /etc/profile.d/oci.sh
-
 RUN cd /usr/local/bin && \
+    curl -skLO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+        unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+        rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
     curl -skL https://github.com/mikefarah/yq/releases/download/v4.13.2/yq_linux_amd64 > yq && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 > kind && \
     curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.3/hcl2json_linux_amd64 > hcl2json && \

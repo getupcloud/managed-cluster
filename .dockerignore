@@ -1,2 +1,4 @@
 cluster.conf
 clusters
+**/.terraform
+**/.terraform.lock.hcl
