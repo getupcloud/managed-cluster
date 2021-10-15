@@ -7,9 +7,10 @@ ENV CLUSTERDIR="/cluster" \
 
 SHELL ["/bin/bash", "-x", "-c"]
 
-RUN yum install -y epel-release centos-release-rabbitmq-38.noarch
+RUN yum install -y dnf-utils epel-release centos-release-rabbitmq-38.noarch && \
+    yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo
 
-RUN INSTALL_PACKAGES="vim-enhanced docker \
+RUN INSTALL_PACKAGES="vim-enhanced docker teleport \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel gnupg \
         gettext jq rsync strace \

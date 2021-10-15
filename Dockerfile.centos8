@@ -1,4 +1,4 @@
-FROM getupcloud/cluster-base:0.0.2
+FROM getupcloud/cluster-base:0.0.3
 
 # it takes too long so we do it asap
 RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \

@@ -83,6 +83,8 @@ start_container()
     docker_run_options_defaults=(
         --cap-add=SYS_PTRACE
         --userns host
+        --network host
+        --user $UID:$GID
         --rm
         -it
         --env-file $ROOTDIR/.dockerenv
@@ -94,7 +96,6 @@ start_container()
 
     if [ "$type" == kind ]; then
         docker_run_options_defaults+=(
-            # --network host  ## incompatible with docker user mapping
             -v /var/run/docker.sock:/var/run/docker.sock
         )
     fi
@@ -138,11 +139,12 @@ devel=false
 standalone=false
 cluster_dir=""
 docker_run_options=()
+port_range=32000-32010
 
 while [ $# -gt 0 ]; do
     case $1 in
         --help|-h)
-            echo "Usage: $p [-s|--standalone] [-d|--devel] [-p|--port host_port:container_port] [--run-as-root] -- [command...] "
+            echo "Usage: $p [-s|--standalone] [-d|--devel] [-p|--port host_port:container_port] [--port-range $port_range] [--run-as-root] -- [command...] "
             exit 0
         ;;
         --standalone|-s)
@@ -150,6 +152,10 @@ while [ $# -gt 0 ]; do
         ;;
         --devel|-d)
             devel=true
+        ;;
+        --port-range)
+            shift
+            port_range=$1
         ;;
         --port|-p)
             shift
@@ -167,6 +173,7 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+#docker_run_options+=( -p $port_range:$port_range )
 
 if [ $# -gt 0 ]; then
   docker_command="$*"
@@ -185,7 +192,7 @@ if $standalone; then
     #        name=standalone
     #    ) > $cluster_dir/cluster.conf
     #fi
-    start_container $cluster_dir
+    start_container $cluster_dir ${docker_run_options[@]}
     exit
 fi
 
