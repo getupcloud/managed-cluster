@@ -84,9 +84,10 @@ start_container()
         --cap-add=SYS_PTRACE
         --userns host
         --network host
-        --user $UID:$GID
+        --user $CONTAINER_USER_ID:$CONTAINER_GROUP_ID
         --rm
         -it
+        --env HOME=${CONTAINER_HOME}
         --env-file $ROOTDIR/.dockerenv
         -v $cluster_dir:/cluster
         -v $ROOTDIR:/repo
@@ -144,7 +145,7 @@ port_range=32000-32010
 while [ $# -gt 0 ]; do
     case $1 in
         --help|-h)
-            echo "Usage: $p [-s|--standalone] [-d|--devel] [-p|--port host_port:container_port] [--port-range $port_range] [--run-as-root] -- [command...] "
+            echo "Usage: $p [-s|--standalone] [-d|--devel] [-p|--port host_port:container_port] [--port-range $port_range] [-u|--run-as-user] -- [command...] "
             exit 0
         ;;
         --standalone|-s)
@@ -164,6 +165,13 @@ while [ $# -gt 0 ]; do
             else
                 docker_run_options+=( -p $1 )
             fi
+        ;;
+        -r|--run-as-user)
+          export CONTAINER_USER=$(id -nu)
+          export CONTAINER_GROUP=$(id -ng)
+          export CONTAINER_USER_ID=$(id -u)
+          export CONTAINER_GROUP_ID=$(id -g)
+          export CONTAINER_HOME=/home/$CONTAINER_USER
         ;;
         --) shift
             break
