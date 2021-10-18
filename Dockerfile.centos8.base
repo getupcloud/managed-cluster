@@ -10,7 +10,7 @@ SHELL ["/bin/bash", "-x", "-c"]
 RUN yum install -y dnf-utils epel-release centos-release-rabbitmq-38.noarch && \
     yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo
 
-RUN INSTALL_PACKAGES="vim-enhanced docker teleport \
+RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel gnupg \
         gettext jq rsync strace \
