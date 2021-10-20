@@ -59,7 +59,7 @@ jobs:
       #   uses: docker/setup-buildx-action@v1
       #---------------------step 02-03-----------------
       - name: Get Version
-        run: echo "VERSION=`shell cat version.txt`" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
       #---------------------step 02-04-----------------        
       - name: Build Image
         run: |
