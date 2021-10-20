@@ -94,6 +94,9 @@ jobs:
         run: |
           docker load --input /tmp/image.tar
       #---------------------step 03-04-----------------
+      - name: Get Version
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV          
+      #---------------------step 03-05-----------------
       - name: Image Scan with Trivy
         uses: aquasecurity/trivy-action@master
         with:
