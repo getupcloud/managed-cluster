@@ -80,7 +80,7 @@ jobs:
     needs: build
     runs-on: ubuntu-20.04
     steps:
-      #---------------------step 0301-----------------
+      #---------------------step 03-01-----------------
       - name: Checkout code
         uses: actions/checkout@v2
       #---------------------step 03-02-----------------
@@ -97,7 +97,7 @@ jobs:
       - name: Image Scan with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: image
+          image-ref: ${{ env.container_name }}:${{ env.VERSION }}
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
