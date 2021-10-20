@@ -19,29 +19,29 @@ env:
 #                 Beginning of the jobs
 #------------------------------------------------------
 jobs:
-  #----------------------------------------------------
-  #             Job 01 - Dockerfile Linter
-  #----------------------------------------------------
-  lint:
-    name: Dockerfile Linter
-    runs-on: ubuntu-20.04
-    continue-on-error: true
-    steps:
-      #---------------------step 01-01-----------------
-      - name: Checkout
-        uses: actions/checkout@v2
-      #---------------------step 01-02-----------------
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile
-      #---------------------step 01-03-----------------
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile.centos8
-      #---------------------step 01-04-----------------
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile.centos8.base
+  # #----------------------------------------------------
+  # #             Job 01 - Dockerfile Linter
+  # #----------------------------------------------------
+  # lint:
+  #   name: Dockerfile Linter
+  #   runs-on: ubuntu-20.04
+  #   continue-on-error: true
+  #   steps:
+  #     #---------------------step 01-01-----------------
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     #---------------------step 01-02-----------------
+  #     - uses: hadolint/hadolint-action@v1.6.0
+  #       with:
+  #         dockerfile: Dockerfile
+  #     #---------------------step 01-03-----------------
+  #     - uses: hadolint/hadolint-action@v1.6.0
+  #       with:
+  #         dockerfile: Dockerfile.centos8
+  #     #---------------------step 01-04-----------------
+  #     - uses: hadolint/hadolint-action@v1.6.0
+  #       with:
+  #         dockerfile: Dockerfile.centos8.base
 
   #----------------------------------------------------
   #                 job 02 - Build Image
@@ -55,53 +55,53 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       #---------------------step 02-02-----------------
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v1
       #---------------------step 02-03-----------------
       - name: Get Version
         run: echo "VERSION=`shell cat version.txt`" >> $GITHUB_ENV
       #---------------------step 02-04-----------------        
       - name: Build Image
         run: |
-          make
-          docker images
-          echo ${{ env.container_name }}:$VERSION
-          docker save ${{ env.container_name }}:$VERSION > /tmp/image.tar
+          # make
+          # docker images
+          echo ${{ env.container_name }}:${{ env.VERSION }}
+          # docker save ${{ env.container_name }}:$VERSION > /tmp/image.tar
       #---------------------step 02-05-----------------
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: image
-          path: /tmp/image.tar
+      # - name: Upload Artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: image
+      #     path: /tmp/image.tar
 
-  #----------------------------------------------------
-  #            job 03 - Image Scan with Trivy
-  #----------------------------------------------------
-  scan:
-    name: Image Scan
-    needs: build
-    runs-on: ubuntu-20.04
-    steps:
-      #---------------------step 0301-----------------
-      - name: Checkout code
-        uses: actions/checkout@v2
-      #---------------------step 03-02-----------------
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: image
-          path: /tmp
-      #---------------------step 03-03-----------------
-      - name: Load Image
-        run: |
-          docker load --input /tmp/image.tar
-      #---------------------step 03-04-----------------
-      - name: Image Scan with Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: image
-          format: "table"
-          exit-code: "1"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+  # #----------------------------------------------------
+  # #            job 03 - Image Scan with Trivy
+  # #----------------------------------------------------
+  # scan:
+  #   name: Image Scan
+  #   needs: build
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     #---------------------step 0301-----------------
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     #---------------------step 03-02-----------------
+  #     - name: Download Artifact
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: image
+  #         path: /tmp
+  #     #---------------------step 03-03-----------------
+  #     - name: Load Image
+  #       run: |
+  #         docker load --input /tmp/image.tar
+  #     #---------------------step 03-04-----------------
+  #     - name: Image Scan with Trivy
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: image
+  #         format: "table"
+  #         exit-code: "1"
+  #         ignore-unfixed: true
+  #         vuln-type: "os,library"
+  #         severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
