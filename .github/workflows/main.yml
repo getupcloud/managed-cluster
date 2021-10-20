@@ -62,7 +62,7 @@ jobs:
         run: |
           echo "VERSION=`shell cat version.txt`" >> $GITHUB_ENV
           make
-          docker save ${{ env.container_name }}:${VERSION} > /tmp/$image.tar
+          docker save ${{ env.container_name }}:${VERSION} > /tmp/image.tar
       #---------------------step 02-04-----------------
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
