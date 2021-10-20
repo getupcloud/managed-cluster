@@ -48,7 +48,7 @@ jobs:
   #----------------------------------------------------
   build:
     name: Build Image
-    needs: lint
+    # needs: lint
     runs-on: ubuntu-20.04
     steps:
       #---------------------step 02-01-----------------
