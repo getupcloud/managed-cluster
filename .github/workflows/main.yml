@@ -58,16 +58,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       #---------------------step 02-03-----------------
-      - name: Get Image Version
+      - name: Build Image
         run: |
           echo "VERSION=`shell cat version.txt`" >> $GITHUB_ENV
           make
-          docker save ${{ env.container_name }}:${VERSION} > /tmp/${{ env.container_name }}.tar
+          docker save ${{ env.container_name }}:${VERSION} > /tmp/$image.tar
       #---------------------step 02-04-----------------
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.container_name }}
+          name: image
           path: /tmp/image.tar
 
   #----------------------------------------------------
