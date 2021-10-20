@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.container_name }}
-          path: /tmp/${{ env.container_name }}.tar
+          path: /tmp/image.tar
 
   #----------------------------------------------------
   #            job 03 - Image Scan with Trivy
@@ -85,17 +85,17 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ env.container_name }}
+          name: $image
           path: /tmp
       #---------------------step 03-03-----------------
       - name: Load Image
         run: |
-          docker load --input /tmp/${{ env.container_name }}.tar
+          docker load --input /tmp/$image.tar
       #---------------------step 03-04-----------------
       - name: Image Scan with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.container_name }}
+          image-ref: image
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
