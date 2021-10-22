@@ -98,7 +98,7 @@ variable "node_pools" {
       labels = {
         role = "app"
       }
-      tags  = []
+      tags   = []
       taints = []
     }
   ]
