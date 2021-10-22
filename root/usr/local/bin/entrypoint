@@ -1,11 +1,11 @@
 #!/bin/bash
 
 export ENTRYPOINT=$0
-export PATH="~/bin/:$PATH"
 
 source /etc/profile.d/getup.sh
 
 update_ca_certificates
+run_as_user "$*"
 
 if ! [ -d "${KUBECONFIG%/*}" ]; then
     mkdir -p "${KUBECONFIG%/*}"
@@ -36,4 +36,4 @@ if [ -e $CLUSTERDIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then
     ask_execute_command /usr/local/bin/terraform-setup
 fi
 
-exec "$@"
+exec /bin/bash -c "$*"

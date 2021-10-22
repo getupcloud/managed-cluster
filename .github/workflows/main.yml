@@ -1,0 +1,108 @@
+---
+#------------------------------------------------------
+#                        Header
+#------------------------------------------------------
+# Action name and Its triggers
+name: Check Dockerfile and Scan Image
+on:
+  push:
+    branches:
+      - main
+
+#------------------------------------------------------
+#                      Variables
+#------------------------------------------------------
+env:
+  container_name: "getupcloud/cluster"
+
+#------------------------------------------------------
+#                 Beginning of the jobs
+#------------------------------------------------------
+jobs:
+  #----------------------------------------------------
+  #             Job 01 - Dockerfile Linter
+  #----------------------------------------------------
+  lint:
+    name: Dockerfile Linter
+    runs-on: ubuntu-20.04
+    continue-on-error: true
+    steps:
+      #---------------------step 01-01-----------------
+      - name: Checkout
+        uses: actions/checkout@v2
+      #---------------------step 01-02-----------------
+      - uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: Dockerfile
+      #---------------------step 01-03-----------------
+      - uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: Dockerfile.centos8
+      #---------------------step 01-04-----------------
+      - uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: Dockerfile.centos8.base
+
+  #----------------------------------------------------
+  #                 job 02 - Build Image
+  #----------------------------------------------------
+  build:
+    name: Build Image
+    needs: lint
+    runs-on: ubuntu-20.04
+    steps:
+      #---------------------step 02-01-----------------
+      - name: Checkout
+        uses: actions/checkout@v2
+      #---------------------step 02-02-----------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      #---------------------step 02-03-----------------
+      - name: Get Version
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+      #---------------------step 02-04-----------------        
+      - name: Build Image
+        run: |
+          make
+          docker save ${{ env.container_name }}:${{ env.VERSION }} > /tmp/image.tar
+      #---------------------step 02-05-----------------
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image
+          path: /tmp/image.tar
+
+  #----------------------------------------------------
+  #            job 03 - Image Scan with Trivy
+  #----------------------------------------------------
+  scan:
+    name: Image Scan
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+      #---------------------step 03-01-----------------
+      - name: Checkout code
+        uses: actions/checkout@v2
+      #---------------------step 03-02-----------------
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: image
+          path: /tmp
+      #---------------------step 03-03-----------------
+      - name: Load Image
+        run: |
+          docker load --input /tmp/image.tar
+      #---------------------step 03-04-----------------
+      - name: Get Version
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV          
+      #---------------------step 03-05-----------------
+      - name: Image Scan with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.container_name }}:${{ env.VERSION }}
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"

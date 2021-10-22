@@ -12,6 +12,21 @@ source_env()
     $on || set +a
 }
 
+# copy from /etc/profile
+pathmunge () {
+    case ":${PATH}:" in
+        *:"$1":*)
+            ;;
+        *)
+            if [ "$2" = "after" ] ; then
+                PATH=$PATH:$1
+            else
+                PATH=$1:$PATH
+            fi
+    esac
+    export PATH
+}
+
 set_config()
 {
     local _name=${1%%=*}
@@ -164,6 +179,39 @@ update_ca_certificates()
         cp -f $CLUSTERDIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
         update-ca-certificates
     fi
+}
+
+run_as_user()
+{
+    if [ $CONTAINER_USER_ID -eq $(id -u) ]; then
+        if [ $CONTAINER_USER_ID -ne 0 ]; then
+            : warn "Already running as $CONTAINER_USER ($CONTAINER_USER_ID)"
+        fi
+        return 0
+    fi
+
+    info Creating user $CONTAINER_USER
+    [ -d $CONTAINER_HOME ] && has_home=true || has_home=false
+    #groupadd $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
+    useradd $CONTAINER_USER -u $CONTAINER_USER_ID -U -G wheel -m -k /etc/skel
+    shopt -s dotglob
+    $has_home || install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 700 /etc/skel/* $CONTAINER_HOME/
+    for src in .gitconfig .ssh; do
+        if [ -d "/home/_host/$src" ]; then
+            cp -an /home/_host/$src $CONTAINER_HOME/
+        elif [ -e "/home/_host/$src" ]; then
+            install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 700 "/home/_host/$src" $CONTAINER_HOME/
+        fi
+    done
+    shopt -u dotglob
+
+    # from oh-my-bash installer
+    #sed -e "s|^export OSH=.*|export OSH=$OSH|" $OSH/templates/bashrc.osh-template >> /home/$CONTAINER_USER/.bashrc
+    #echo DISABLE_AUTO_UPDATE=true >> /home/$CONTAINER_USER/.bashrc
+    #ln -s /home/$CONTAINER_USER/.bashrc /home/$CONTAINER_USER/.bash_profile
+    #chown -R $CONTAINER_USER. /home/$CONTAINER_USER
+
+    exec setpriv --reuid=$CONTAINER_USER_ID --regid=$CONTAINER_GROUP_ID --init-groups /usr/local/bin/entrypoint "$@" || exit 2
 }
 
 if [ -v CLUSTERDIR ]; then

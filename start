@@ -70,29 +70,36 @@ start_container()
     shift
     local docker_run_options="$@"
 
-    : ${CONTAINER_USER:=root}
-    : ${CONTAINER_GROUP:=root}
-    : ${CONTAINER_USER_ID:=0}
-    : ${CONTAINER_GROUP_ID:=0}
-    : ${CONTAINER_HOME:=/root}
+    if ! $run_as_user; then
+        : ${CONTAINER_USER:=root}
+        : ${CONTAINER_GROUP:=root}
+        : ${CONTAINER_USER_ID:=0}
+        : ${CONTAINER_GROUP_ID:=0}
+        : ${CONTAINER_HOME:=/root}
+    else
+        : ${CONTAINER_USER:=$(id -un)}
+        : ${CONTAINER_GROUP:=$(id -gn)}
+        : ${CONTAINER_USER_ID:=$(id -u)}
+        : ${CONTAINER_GROUP_ID:=$(id -g)}
+        : ${CONTAINER_HOME:=/home/$CONTAINER_USER}
+    fi
 
     docker_image_repo=${docker_image_repo:-getupcloud/cluster}
     docker_image_tag=${docker_image_tag:-$(cat version.txt)}
     docker_image=${docker_image_repo}:${docker_image_tag}
-    docker_command=${docker_command:-/bin/bash --login}
+    docker_command="${docker_command:-/bin/bash}"
     docker_run_options_defaults=(
         --cap-add=SYS_PTRACE
-        --userns host
+        #--userns host
         --network host
-        --user $CONTAINER_USER_ID:$CONTAINER_GROUP_ID
+        #--user $CONTAINER_USER_ID:$CONTAINER_GROUP_ID
         --rm
         -it
         --env HOME=${CONTAINER_HOME}
         --env-file $ROOTDIR/.dockerenv
         -v $cluster_dir:/cluster
         -v $ROOTDIR:/repo
-        -v $HOME/.gitconfig:$CONTAINER_HOME/.gitconfig.host
-        -v $HOME/.ssh:$CONTAINER_HOME/.ssh:ro
+        -v $HOME:/home/host:ro
     )
 
     if [ "$type" == kind ]; then
@@ -103,8 +110,7 @@ start_container()
 
     if $devel; then
         docker_run_options_defaults+=(
-            -v $ROOTDIR/root/usr/local/bin:$CONTAINER_HOME/bin
-            -v $ROOTDIR/root/etc/profile.d/getup.sh:/etc/profile.d/getup.sh
+            --env DEVEL=true
         )
     fi
 
@@ -130,7 +136,7 @@ start_container()
     fi
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
-    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
+    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} '${docker_command}'"
     info \$ $docker_run
     echo
     eval sudo $docker_run
@@ -141,24 +147,36 @@ standalone=false
 cluster_dir=""
 docker_run_options=()
 port_range=32000-32010
+run_as_user=false
+
+function usage()
+{
+    echo "Usage: $1 [options...] cluster_dir [-- command...] "
+    echo "Options:"
+    echo "  -s, --standalone                      Start from standalone dir ./standalone"
+    echo "  -d, --devel                           Mount ./ into container's /host, prepending it into PATH"
+    echo "  -p, --port host_port:container_port   "
+    echo "  -P, --port-range $port_range"
+    echo "  -u, --run-as-user"
+}
 
 while [ $# -gt 0 ]; do
     case $1 in
         --help|-h)
-            echo "Usage: $p [-s|--standalone] [-d|--devel] [-p|--port host_port:container_port] [--port-range $port_range] [-u|--run-as-user] -- [command...] "
+            usage $0
             exit 0
         ;;
-        --standalone|-s)
+        -s|--standalone)
             standalone=true
         ;;
-        --devel|-d)
+        -d|--devel)
             devel=true
         ;;
-        --port-range)
+        -P|--port-range)
             shift
             port_range=$1
         ;;
-        --port|-p)
+        -p|--port)
             shift
             if ! [[ "$1" =~ [0-9]+:[0-9]+ ]]; then
                 docker_run_options+=( -p $1:$1 )
@@ -166,18 +184,23 @@ while [ $# -gt 0 ]; do
                 docker_run_options+=( -p $1 )
             fi
         ;;
-        -r|--run-as-user)
-          export CONTAINER_USER=$(id -nu)
-          export CONTAINER_GROUP=$(id -ng)
-          export CONTAINER_USER_ID=$(id -u)
-          export CONTAINER_GROUP_ID=$(id -g)
-          export CONTAINER_HOME=/home/$CONTAINER_USER
+        -u|--run-as-user)
+            run_as_user=true
         ;;
         --) shift
             break
         ;;
+        ^-)
+            warn Invalid option: $1
+            exit 1
+        ;;
         *)
-            cluster_dir=$1
+            if [ -z "$cluster_dir" ]; then
+                cluster_dir=$1
+            else
+                warn Invalid parameter: $1
+                exit 1
+            fi
     esac
     shift
 done
@@ -204,7 +227,7 @@ if $standalone; then
     exit
 fi
 
-cluster_dir=$(select_cluster ${clusters})
+cluster_dir=$(select_cluster ${cluster_dir})
 
 if [ -d "$cluster_dir" ]; then
     :
@@ -224,5 +247,4 @@ fi
 cluster_dir=$(realpath ${cluster_dir})
 config_file=${cluster_dir}/cluster.conf
 source_env $config_file
-
 start_container $cluster_dir ${docker_run_options[@]}
