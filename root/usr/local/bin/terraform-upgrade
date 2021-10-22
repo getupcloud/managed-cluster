@@ -7,5 +7,5 @@ source /etc/profile.d/getup.sh
 info Switching to $REPODIR
 cd $CLUSTERDIR
 
-ask_execute_command terraform init --upgrade
+ask_execute_command terraform init -upgrade
 ask_execute_command terraform validate
