@@ -15,10 +15,6 @@ if [ -n "$GH_TOKEN" ]; then
     gh auth login --with-token <<<$GH_TOKEN
 fi
 
-if [ -r $HOME/.gitconfig.host ] && ! [ -e $HOME/.gitconfig ]; then
-    cp -f $HOME/.gitconfig.host $HOME/.gitconfig
-fi
-
 if [ "$type" == standalone ] || [ -z "$type" ]; then
     info Entering standalone mode
     export customer=${customer:-standalone}
