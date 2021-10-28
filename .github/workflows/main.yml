@@ -4,10 +4,11 @@
 #------------------------------------------------------
 # Action name and Its triggers
 name: Check Dockerfile and Scan Image
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
+# on:
+#   push:
+#     branches:
+#       - main
 
 #------------------------------------------------------
 #                      Variables
