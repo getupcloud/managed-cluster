@@ -7,16 +7,31 @@ ENV CLUSTERDIR="/cluster" \
 
 SHELL ["/bin/bash", "-x", "-c"]
 
-RUN yum install -y dnf-utils epel-release centos-release-rabbitmq-38.noarch && \
+COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
+
+RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
+    yum install -y dnf-utils epel-release && \
     yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo
 
-RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport \
+RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport azure-cli \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel gnupg \
         gettext jq rsync strace \
-        python3-pip python3-devel libffi-devel rust cargo" && \
+        python3-pip python3-devel libffi-devel rust cargo \
+        centos-release-rabbitmq-38.noarch" && \
     yum install -y $INSTALL_PACKAGES && \
     yum groupinstall -y 'Development Tools' && \
     yum update -y && \
     yum clean all && \
-    pip3 install giturlparse.py
+    pip3 install giturlparse.py && \
+    curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
+        unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
+        rm -f op_linux_amd64_v1.12.3.zip
+
+RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
+    chmod +x /etc/oci-install.sh && \
+    /etc/oci-install.sh --accept-all-defaults \
+        --install-dir /opt/oci \
+        --exec-dir /usr/local/bin/ \
+        --script-dir /usr/local/bin/ \
+        --rc-file-path /etc/profile.d/oci.sh
