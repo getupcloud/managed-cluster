@@ -13,7 +13,7 @@ RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
     yum install -y dnf-utils epel-release && \
     yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo
 
-RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport azure-cli \
+RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport azure-cli google-cloud-sdk \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel gnupg \
         gettext jq rsync strace \
@@ -23,8 +23,9 @@ RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport azure-cli \
     yum groupinstall -y 'Development Tools' && \
     yum update -y && \
     yum clean all && \
-    pip3 install giturlparse.py && \
-    curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
+    pip3 install giturlparse.py
+
+RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
         unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
         rm -f op_linux_amd64_v1.12.3.zip
 
