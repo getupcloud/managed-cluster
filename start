@@ -99,7 +99,7 @@ start_container()
         --env-file $ROOTDIR/.dockerenv
         -v $cluster_dir:/cluster
         -v $ROOTDIR:/repo
-        -v $HOME:/home/host:ro
+        -v $HOME:/home/_host:ro
     )
 
     if [ "$type" == kind ]; then
