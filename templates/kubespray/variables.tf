@@ -3,6 +3,11 @@ variable "name" {
   type        = string
 }
 
+variable "customer_name" {
+  description = "Customer name (Informative only)"
+  type        = string
+}
+
 variable "flux_git_repo" {
   description = "GitRepository URL"
   type        = string
