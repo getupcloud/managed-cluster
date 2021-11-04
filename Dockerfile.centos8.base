@@ -11,7 +11,8 @@ COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
 
 RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
     yum install -y dnf-utils epel-release && \
-    yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo
+    yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo && \
+    yum clean all
 
 RUN INSTALL_PACKAGES="vim-enhanced sudo docker teleport azure-cli google-cloud-sdk \
         dialog awscli httpie bind-utils httpd-tools \
