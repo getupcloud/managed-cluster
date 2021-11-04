@@ -7,4 +7,5 @@ module "cluster" {
   kubeconfig_filename    = var.kubeconfig_filename
   cronitor_api_key       = var.cronitor_api_key
   cronitor_pagerduty_key = var.cronitor_pagerduty_key
+  api_endpoint           = var.api_endpoint
 }
