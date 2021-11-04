@@ -20,6 +20,12 @@ variable "customer_name" {
   type        = string
 }
 
+variable "api_endpoint" {
+  description = "Kubernetes API endpoint (Informative only)"
+  type        = string
+  default     = ""
+}
+
 variable "cronitor_api_key" {
   description = "Cronitor API key. Leave empty to destroy"
   type        = string
