@@ -15,6 +15,11 @@ variable "kubeconfig_filename" {
   default     = "/cluster/.kube/config"
 }
 
+variable "customer_name" {
+  description = "Customer name (Informative only)"
+  type        = string
+}
+
 variable "cronitor_api_key" {
   description = "Cronitor API key. Leave empty to destroy"
   type        = string
