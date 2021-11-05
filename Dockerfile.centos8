@@ -1,4 +1,4 @@
-FROM getupcloud/cluster-base:0.0.4
+FROM getupcloud/cluster-base:0.0.5
 
 ENV \
     DOCTL_VERSION="1.63.1" \
