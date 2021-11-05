@@ -147,7 +147,7 @@ standalone=false
 cluster_dir=""
 docker_run_options=()
 port_range=32000-32010
-run_as_user=false
+run_as_user=true
 
 function usage()
 {
@@ -157,7 +157,7 @@ function usage()
     echo "  -d, --devel                           Mount ./ into container's /host, prepending it into PATH"
     echo "  -p, --port host_port:container_port   "
     echo "  -P, --port-range $port_range"
-    echo "  -u, --run-as-user"
+    echo "  -r, --run-as-root"
 }
 
 while [ $# -gt 0 ]; do
@@ -184,8 +184,8 @@ while [ $# -gt 0 ]; do
                 docker_run_options+=( -p $1 )
             fi
         ;;
-        -u|--run-as-user)
-            run_as_user=true
+        -r|--run-as-root)
+            run_as_user=false
         ;;
         --) shift
             break
