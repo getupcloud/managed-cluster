@@ -176,7 +176,14 @@ require_config customer "Customer name"
 require_config name "Cluster name"
 select_cluster_type
 
-set_config upstream_git_repo=$(git remote get-url origin) "Upstream SSH git repo"
+GIT_VERSION=$(git version | awk '{print $NF}')
+case $GIT_VERSION in
+    1.*)
+        set_config upstream_git_repo=$(git remote -v | grep -m1 ^origin|awk '{print $2}') "Upstream SSH git repo"
+        ;;
+    2.*)
+        set_config upstream_git_repo=$(git remote get-url origin) "Upstream SSH git repo"
+esac
 
 _origin_git_repo=$(git-url $upstream_git_repo url2ssh)
 set_config origin_git_repo=${_origin_git_repo%.git}-$customer.git "Origin SSH git repo"

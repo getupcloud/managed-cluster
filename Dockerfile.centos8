@@ -5,7 +5,7 @@ ENV \
     FLUX_VERSIONS="v0.15.3" \
     HCL2JSON_VERSION="v0.3.3" \
     KIND_VERSION="v0.11.1" \
-    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff" \
+    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.1" \
     KUBECONFIG="${CLUSTERDIR}/.kube/config" \
