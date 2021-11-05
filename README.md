@@ -33,7 +33,7 @@ Select cluster type: 2                                   <------ Select cluster 
 ... lots of outputs here ...
 ```
 
-All cluster configs will be stored in an exclusive directory `./cluster/${CUSTOMER_NAME}/${CLUSTER_NAME}`.
+All cluster configs will be stored in an exclusive directory `./clusters/${CUSTOMER_NAME}/${CLUSTER_NAME}`.
 
 ## Start installer container
 
