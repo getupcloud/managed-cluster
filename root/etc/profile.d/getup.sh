@@ -205,6 +205,8 @@ run_as_user()
     done
     shopt -u dotglob
 
+    chown -R $CONTAINER_USER:$CONTAINER_GROUP $REPODIR
+
     # from oh-my-bash installer
     #sed -e "s|^export OSH=.*|export OSH=$OSH|" $OSH/templates/bashrc.osh-template >> /home/$CONTAINER_USER/.bashrc
     #echo DISABLE_AUTO_UPDATE=true >> /home/$CONTAINER_USER/.bashrc
