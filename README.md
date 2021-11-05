@@ -1,5 +1,9 @@
 # Creating a cluster
 
+## Architecture
+
+![Architecture](./docs/architecture.png)
+
 ## Bootstrap from base repository
 
 Clone this repo and give it a meaningful name:
