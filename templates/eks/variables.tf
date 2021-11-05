@@ -5,6 +5,11 @@ variable "name" {
   type        = string
 }
 
+variable "customer_name" {
+  description = "Customer name"
+  type        = string
+}
+
 variable "aws_access_key_id" {
   description = "AWS Access Key ID"
   type        = string
