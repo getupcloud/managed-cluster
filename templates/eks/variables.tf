@@ -1,15 +1,5 @@
 ## Common variables
 
-variable "name" {
-  description = "Cluster name"
-  type        = string
-}
-
-variable "customer_name" {
-  description = "Customer name"
-  type        = string
-}
-
 variable "aws_access_key_id" {
   description = "AWS Access Key ID"
   type        = string
@@ -95,12 +85,6 @@ variable "auth_iam_roles" {
   default     = ["getupcloud"]
 }
 
-variable "flux_git_repo" {
-  description = "GitRepository URL"
-  type        = string
-  default     = ""
-}
-
 variable "s3_buckets" {
   description = "List of Space Buckets (See s3.tf for defaults)"
   type        = any
@@ -111,16 +95,4 @@ variable "tags" {
   description = "AWS tags to apply to resources"
   type        = any
   default     = {}
-}
-
-variable "cronitor_api_key" {
-  description = "Cronitor API key. Leave empty to destroy"
-  type        = string
-  default     = ""
-}
-
-variable "cronitor_pagerduty_key" {
-  description = "Cronitor PagerDuty key"
-  type        = string
-  default     = ""
 }

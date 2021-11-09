@@ -1,7 +1,7 @@
 module "eks" {
   source                 = "github.com/getupcloud/terraform-cluster-eks?ref=main"
   name                   = var.name
-  customer_name          = var.customer_name
+  customer_name          = var.customer
   aws_access_key_id      = var.aws_access_key_id
   region                 = var.region
   aws_secret_access_key  = var.aws_secret_access_key
