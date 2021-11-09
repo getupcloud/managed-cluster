@@ -85,12 +85,6 @@ variable "auth_iam_roles" {
   default     = ["getupcloud"]
 }
 
-variable "s3_buckets" {
-  description = "List of Space Buckets (See s3.tf for defaults)"
-  type        = any
-  default     = []
-}
-
 variable "tags" {
   description = "AWS tags to apply to resources"
   type        = any

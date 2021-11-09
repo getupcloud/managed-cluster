@@ -70,6 +70,12 @@ start_container()
     shift
     local docker_run_options="$@"
 
+    if $set_remote_upstream; then
+        info Adding remote: upstream ${upstream_git_repo:-git@github.com:getupcloud/managed-cluster.git}
+        git remote add upstream ${upstream_git_repo:-git@github.com:getupcloud/managed-cluster.git}
+        git remote set-url --push upstream FORBIDEN
+    fi
+
     if ! $run_as_user; then
         : ${CONTAINER_USER:=root}
         : ${CONTAINER_GROUP:=root}
@@ -148,6 +154,7 @@ cluster_dir=""
 docker_run_options=()
 port_range=32000-32010
 run_as_user=true
+set_remote_upstream=false
 
 function usage()
 {
@@ -158,6 +165,7 @@ function usage()
     echo "  -p, --port host_port:container_port   "
     echo "  -P, --port-range $port_range"
     echo "  -r, --run-as-root"
+    echo "  -U, --set-remote-upstream             Add git upstream \${upstream_git_repo} (pull-only)' on start"
 }
 
 while [ $# -gt 0 ]; do
@@ -186,6 +194,9 @@ while [ $# -gt 0 ]; do
         ;;
         -r|--run-as-root)
             run_as_user=false
+        ;;
+        -U|--set-remote-upstream)
+            set_remote_upstream=true
         ;;
         --) shift
             break
