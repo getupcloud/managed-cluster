@@ -75,7 +75,7 @@ for variables_file in ${variables_files[@]}; do
 
         # look for `value`. try various defaults, if nothing is found, ask user for input
         # Precedency is: variables.tf:default -> terraform.tfvars -> $TF_VAR_${name} -> $name
-        value=""
+        unset value
 
         # try default from $CLUSTERDIR/variables*.tf file
         variable_default=$(jq -r ".variable.${variable}[0].default" <<<$variables_file_data)
@@ -100,24 +100,25 @@ for variables_file in ${variables_files[@]}; do
             value="${!variable}"
         fi
 
-        if [ -n "$value" ]; then
+        if [ -v value ]; then
             debug "Using existing config $variable=${value}"
+        else
+            value=""
+            while [ -z "$value" ]; do
+                prompt=$(
+                    echo -n " Description: $variable_description\n" &&
+                    echo -n "        Type: $variable_type\n" &&
+                    echo -n "    Variable: $variable>"
+                )
+
+                read -e -p "$(prompt "$prompt")" value
+                history -s "$value"
+
+                if [ -z "$value" ]; then
+                    warn "Variable can't be empty: $variable"
+                fi
+            done
         fi
-
-        while [ -z "$value" ]; do
-            prompt=$(
-                echo -n " Description: $variable_description\n" &&
-                echo -n "        Type: $variable_type\n" &&
-                echo -n "    Variable: $variable>"
-            )
-
-            read -e -p "$(prompt "$prompt")" value
-            history -s "$value"
-
-            if [ -z "$value" ]; then
-                warn "Variable can't be empty: $variable"
-            fi
-        done
 
         {
             # handle multi-line values
@@ -134,7 +135,7 @@ for variables_file in ${variables_files[@]}; do
                 ;;
             esac
 
-            if [ -n "$value" ] && [ "$value" == "$variable_default" ]; then
+            if [ "$value" == "$variable_default" ]; then
                 # suppress if value is the same as default
                 echo "$variable_line" | sed -e 's/^/# /'
             else
