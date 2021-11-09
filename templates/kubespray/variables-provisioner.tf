@@ -65,12 +65,13 @@ variable "workers" {
 variable "ssh_user" {
   description = "SSH username"
   type        = string
+  default     = "centos"
 }
 
 variable "ssh_password" {
   description = "SSH password"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "ssh_private_key" {
@@ -82,19 +83,19 @@ variable "ssh_private_key" {
 variable "ssh_bastion_host" {
   description = "SSH password"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "ssh_bastion_user" {
   description = "SSH bastion username"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "ssh_bastion_password" {
   description = "SSH bastion password"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "ssh_bastion_private_key" {
@@ -106,7 +107,7 @@ variable "ssh_bastion_private_key" {
 variable "custom_provisioner" {
   description = "Path for custom provisioner script"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "install_packages" {
