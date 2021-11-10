@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -xe
+
+remote=$(git remote get-url origin)
+echo Remote: $remote
+
+tmp=$(mktemp -d)
+trap 'cd / && rm -rf "$tmp"' EXIT
+
+cd $tmp
+git clone $remote
+cd $(basename ${remote##*/} .git)
+git checkout -b remotes/origin/split-variables
+
+./bootstrap --customer evilcorp --name evilcluster --type generic
+./start -u -- ls -la
