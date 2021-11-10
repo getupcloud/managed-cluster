@@ -1,0 +1,29 @@
+{
+  "doks": {
+    "tfvars": {
+      "region": "fake"
+    }
+  },
+  "eks": {
+    "tfvars": {
+      "region": "us-east-2",
+      "subnet_ids": [ "xxx", "yyyy" ],
+      "aws_modules": {
+        "certmanager": {
+          "hosted_zone_id": "xxx"
+        },
+        "external-dns": {
+          "enabled": false
+        }
+      },
+      "node_groups_defaults": {
+        "instance_types": ["m5.large"],
+        "desired_capacity":  1,
+        "min_capacity": 1,
+        "max_capacity": 1,
+        "disk_size": 50,
+        "additional_tags": {}
+      }
+    }
+  }
+}

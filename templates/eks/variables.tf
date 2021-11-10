@@ -1,4 +1,4 @@
-## Common variables
+## Provider-specifc variables
 
 variable "aws_access_key_id" {
   description = "AWS Access Key ID"
@@ -77,6 +77,7 @@ variable "node_groups" {
 variable "auth_iam_users" {
   description = "List of IAM users to allow kubernetes access. Example: [\"eks-admin\"]"
   type        = list(string)
+  default     = []
 }
 
 variable "auth_iam_roles" {
@@ -85,8 +86,67 @@ variable "auth_iam_roles" {
   default     = ["getupcloud"]
 }
 
+variable "eks_addons" {
+  description = "Manages an EKS add-on"
+  type        = any
+  default     = {}
+
+  # Example:
+  # {
+  #   "vpc-cni": {
+  #     "addon_version": "v1.9.0-eksbuild.1",  ## required
+  #     "resolve_conflicts": "OVERWRITE"       ## default
+  #   }
+  # }
+}
+
+variable "endpoint_public_access_cidrs" {
+  description = "List of CIDRs to allow access to EKS private endpoint."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "tags" {
   description = "AWS tags to apply to resources"
   type        = any
   default     = {}
+}
+
+variable "flux_wait" {
+  description = "Wait for all manifests to apply"
+  type        = bool
+  default     = true
+}
+
+variable "aws_modules" {
+  description = "Configure AWS modules to install"
+  type        = any
+  default     = {
+    "certmanager" : {
+      "enabled" : true,
+      "hosted_zone_id": ""
+    }
+    "cluster-autoscaler" : {
+      "enabled" : true
+    }
+    "velero" : {
+      "enabled" : true
+    }
+    "ecr" : {
+      "enabled" : false
+    }
+    "efs" : {
+      "enabled" : false
+    }
+    "thanos" : {
+      "enabled" : false
+    }
+    "alb" : {
+      "enabled" : false
+    }
+    "external-dns" : {
+      "enabled" : false,
+      "hosted_zone_ids": []
+    }
+  }
 }

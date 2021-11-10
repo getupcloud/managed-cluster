@@ -4,6 +4,7 @@ module "eks" {
   auth_iam_roles               = var.auth_iam_roles
   auth_iam_users               = var.auth_iam_users
   aws_access_key_id            = var.aws_access_key_id
+  aws_modules                  = var.aws_modules
   aws_secret_access_key        = var.aws_secret_access_key
   cronitor_api_key             = var.cronitor_api_key
   cronitor_pagerduty_key       = var.cronitor_pagerduty_key
@@ -12,7 +13,6 @@ module "eks" {
   endpoint_public_access_cidrs = var.endpoint_public_access_cidrs
   flux_git_repo                = var.flux_git_repo
   flux_wait                    = var.flux_wait
-  hosted_zone                  = var.hosted_zone
   name                         = var.name
   node_groups_defaults         = var.node_groups_defaults
   node_groups                  = var.node_groups

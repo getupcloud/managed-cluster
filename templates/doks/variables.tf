@@ -57,7 +57,7 @@ variable "node_pool" {
   type        = any
   default = {
     name       = "infra"
-    size       = ""
+    size       = "s-4vcpu-8gb"
     min_nodes  = 1
     max_nodes  = 2
     node_count = 1
@@ -85,7 +85,7 @@ variable "node_pools" {
   default = [
     {
       name       = "app"
-      size       = ""
+      size       = "s-4vcpu-8gb"
       min_nodes  = 2
       max_nodes  = 4
       node_count = 2

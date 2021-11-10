@@ -128,6 +128,7 @@ select_cluster_type()
 ###########
 
 ssh_key_type=rsa
+force=false
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -136,6 +137,10 @@ while [ $# -gt 0 ]; do
             echo "  $0 [--customer NAME] [--name NAME] [--type NAME] [--ssh-key-type=$ssh_key_type]"
             echo "  $0 [--sync-template|-s]"
             exit 0
+        ;;
+        -f|--force)
+            force=true
+            shift
         ;;
         --sync-template|-s)
             sync_from_template $2
@@ -196,7 +201,7 @@ set_config flux_git_repo=${_git_repo} "Git repo for default flux GitRepository"
 cluster_root_dir=clusters/$name
 cluster_dir=$cluster_root_dir/$type
 
-if [ -d $cluster_dir ]; then
+if [ -d $cluster_dir ] && ! $force; then
     warn "Cluster already exists: $cluster_dir"
     exit 1
 fi
@@ -207,8 +212,13 @@ copy_from_template templates/$type $cluster_dir
 info Moving $config_file to $cluster_dir/cluster.conf
 mv $config_file $cluster_dir/cluster.conf
 
-info Generating $cluster_dir/identity
-ssh-keygen -t $ssh_key_type -b 2048 -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
+if ! [ -e $cluster_dir/identity ]; then
+    info Generating $cluster_dir/identity
+    ssh-keygen -t $ssh_key_type -b 2048 -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
+fi
 
-info Generating $cluster_dir/known_hosts
-ssh-keyscan -t $ssh_key_type github.com > $cluster_dir/known_hosts
+if ! [ -e $cluster_dir/known_hosts ]; then
+    info Generating $cluster_dir/known_hosts
+    ssh-keyscan -t $ssh_key_type github.com > $cluster_dir/known_hosts
+fi
+
