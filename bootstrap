@@ -127,7 +127,7 @@ select_cluster_type()
 ## Start ##
 ###########
 
-ssh_key_type=rsa
+ssh_key_type=ecdsa
 force=false
 
 while [ $# -gt 0 ]; do
@@ -219,6 +219,6 @@ fi
 
 if ! [ -e $cluster_dir/known_hosts ]; then
     info Generating $cluster_dir/known_hosts
-    ssh-keyscan -t $ssh_key_type github.com > $cluster_dir/known_hosts
+    ssh-keyscan github.com > $cluster_dir/known_hosts
 fi
 
