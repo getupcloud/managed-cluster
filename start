@@ -225,10 +225,8 @@ while [ $# -gt 0 ]; do
 done
 #docker_run_options+=( -p $port_range:$port_range )
 
-if [ $# -gt 0 ]; then
-  docker_command="$*"
-  shift $#
-fi
+docker_command="${*:-/bin/bash}"
+shift $#
 
 if $standalone; then
     cluster_dir="$PWD/standalone"
