@@ -1,5 +1,7 @@
 #!/bin/bash
 
+${DEBUG:-false} && set -x
+
 ROOTDIR=$(dirname $0)
 source $ROOTDIR/root/etc/profile.d/getup.sh
 export PATH="$PATH:$PWD/root/usr/local/bin/"
