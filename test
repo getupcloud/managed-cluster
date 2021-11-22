@@ -2,10 +2,11 @@
 
 function usage()
 {
-    echo "Usage: $0 [branch-name] [cluster-types]"
+    echo "Usage: $0 [branch-name] [cluster-types] [remote]"
     echo
     echo "  branch-name: Branch name to test [default=main]"
     echo "  cluster-types: Comma-separated list of tipes from ./templates/ [default=all]"
+    echo '  remote: Output from "git remote get-url origin"'
     exit 1
 }
 
@@ -23,6 +24,13 @@ if [ $# -gt 0 ]; then
     shift
 fi
 
+if [ $# -gt 0 ]; then
+    remote="$1"
+    shift
+else
+    remote=$(git remote get-url origin)
+fi
+
 if [ "$types" == 'all' ]; then
     # copied from ./bootstrap
     types=( templates/*/ )
@@ -38,7 +46,6 @@ fi
 
 set -exu
 
-remote=$(git remote get-url origin)
 echo Remote: $remote
 
 tmp=$(mktemp -d --suffix=-managed-cluster)
@@ -65,7 +72,7 @@ echo $version-$commit > version.txt
 echo "Starting tests for branch=$branch version=$(cat version.txt) [$PWD]"
 
 for type in $types; do
-    rm -f clusters/evilcluster/eks/{cluster.conf,terraform.tfvars}
+    rm -f clusters/evilcluster/$type/{cluster.conf,terraform.tfvars}
     ./bootstrap --customer evilcorp --name evilcluster --type $type --force
     terraform_params=( $(jq .${type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r test-data.json 2>/dev/null || true) )
 
