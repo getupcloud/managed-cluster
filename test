@@ -47,13 +47,16 @@ trap '${REMOVE_TMP_DIR:-true} && cd /tmp && rm -rf "$tmp" || true' EXIT
 cd $tmp
 git clone $remote
 cd $(basename ${remote##*/} .git)
+current_branch=$(branch --show-current)
 
-if ! git checkout -b ${branch##*/} $branch; then
-    set +x
-    git branch -va
-    echo
-    echo Invalid branch: $branch. Please select from one above.
-    exit 1
+if [ "$current_branch" != "$branch" ]; then
+    if ! git checkout -b ${branch##*/} $branch; then
+        set +x
+        git branch -va
+        echo
+        echo Invalid branch: $branch. Please select from one above.
+        exit 1
+    fi
 fi
 
 version=$(cat version.txt|cut -f1 -d-)
