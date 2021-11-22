@@ -47,7 +47,7 @@ trap '${REMOVE_TMP_DIR:-true} && cd /tmp && rm -rf "$tmp" || true' EXIT
 cd $tmp
 git clone $remote
 cd $(basename ${remote##*/} .git)
-current_branch=$(branch --show-current)
+current_branch=$(git branch --show-current)
 
 if [ "$current_branch" != "$branch" ]; then
     if ! git checkout -b ${branch##*/} $branch; then
