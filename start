@@ -169,8 +169,8 @@ function usage()
     echo "  -p, --port host_port:container_port   "
     echo "  -P, --port-range $port_range"
     echo "  -r, --run-as-root"
-    echo "  -U, --set-remote-upstream             Add git upstream \${upstream_git_repo} (pull-only)' on start"
-    echo "  -B, --force-docker-image-build        Force building local docker image"
+    echo "  -u, --set-remote-upstream             Add git upstream \${upstream_git_repo} (pull-only)' on start"
+    echo "  -b, --force-docker-image-build        Force building local docker image"
 }
 
 while [ $# -gt 0 ]; do
@@ -200,10 +200,10 @@ while [ $# -gt 0 ]; do
         -r|--run-as-root)
             run_as_user=false
         ;;
-        -U|--set-remote-upstream)
+        -u|--set-remote-upstream)
             set_remote_upstream=true
         ;;
-        -B|--force-docker-image-build)
+        -b|--force-docker-image-build)
             force_docker_image_build=true
         ;;
         --) shift
