@@ -128,7 +128,7 @@ generate_ssh_keys()
 {
     if ! [ -e $cluster_dir/identity ]; then
         info Generating $cluster_dir/identity
-        ssh-keygen -t $ssh_key_type -b 2048 -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
+        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
         ssh-keygen -yf $cluster_dir/identity > $cluster_dir/identity.pub
     else
         info Using existing $cluster_dir/identity
@@ -159,6 +159,7 @@ update_ssh_keys()
 
 update_ssh_keys=false
 ssh_key_type=ecdsa
+ssh_key_length=521
 force=false
 
 while [ $# -gt 0 ]; do
@@ -193,6 +194,10 @@ while [ $# -gt 0 ]; do
         --ssh-key-type)
             shift
             ssh_key_type=$1
+            case $ssh_key_type in
+                ecdsa) ssh_key_length=521 ;;
+                dsa|rsa) ssh_key_length=2048
+            esac
         ;;
         --update-ssh-keys|-S)
             update_ssh_keys $2
