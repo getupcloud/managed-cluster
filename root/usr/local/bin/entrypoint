@@ -27,7 +27,6 @@ if [ "$type" == standalone ] || [ -z "$type" ]; then
     done
 fi
 
-echo $#: [$@]
 if [ $# -eq 0 ]; then
     if [ -e $CLUSTERDIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then
         debug Terraform variables file not found: $TF_VARS_FILE
