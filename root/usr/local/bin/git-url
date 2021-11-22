@@ -2,6 +2,11 @@
 
 from giturlparse import parse
 import sys
+import os
+
+if os.path.exists(sys.argv[1]):
+    print(sys.argv[1])
+    sys.exit(0)
 
 p = parse(sys.argv[1], check_domain=False)
 print(getattr(p, sys.argv[2]))
