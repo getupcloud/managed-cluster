@@ -70,6 +70,12 @@ start_container()
     shift
     local docker_run_options="$@"
 
+    if $set_remote_upstream; then
+        info Adding remote: upstream ${upstream_git_repo:-git@github.com:getupcloud/managed-cluster.git}
+        git remote add upstream ${upstream_git_repo:-git@github.com:getupcloud/managed-cluster.git}
+        git remote set-url --push upstream FORBIDEN
+    fi
+
     if ! $run_as_user; then
         : ${CONTAINER_USER:=root}
         : ${CONTAINER_GROUP:=root}
@@ -87,7 +93,6 @@ start_container()
     docker_image_repo=${docker_image_repo:-getupcloud/cluster}
     docker_image_tag=${docker_image_tag:-$(cat version.txt)}
     docker_image=${docker_image_repo}:${docker_image_tag}
-    docker_command="${docker_command:-/bin/bash}"
     docker_run_options_defaults=(
         --cap-add=SYS_PTRACE
         #--userns host
@@ -123,20 +128,24 @@ start_container()
         echo GH_TOKEN=$GH_TOKEN
     } > .dockerenv
 
-    if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
-        local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
-        local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r '.[].Created')
-        local image_created_ts=$(date --date="$image_created" +%s)
+    if $force_docker_image_build; then
+        make
+    else
+        if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
+            local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
+            local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r '.[].Created')
+            local image_created_ts=$(date --date="$image_created" +%s)
 
-        if (( dockerfile_modified_ts > image_created_ts )); then
-            if ask "Docker image ${docker_image_repo}:${docker_image_tag} is outdated. Build now? [Y/n]"; then
-                make
+            if (( dockerfile_modified_ts > image_created_ts )); then
+                if ask "Docker image ${docker_image_repo}:${docker_image_tag} is outdated. Build now? [Y/n]"; then
+                    make
+                fi
             fi
         fi
     fi
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
-    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} '${docker_command}'"
+    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
     info \$ $docker_run
     echo
     eval sudo $docker_run
@@ -148,6 +157,8 @@ cluster_dir=""
 docker_run_options=()
 port_range=32000-32010
 run_as_user=true
+set_remote_upstream=false
+force_docker_image_build=false
 
 function usage()
 {
@@ -158,6 +169,8 @@ function usage()
     echo "  -p, --port host_port:container_port   "
     echo "  -P, --port-range $port_range"
     echo "  -r, --run-as-root"
+    echo "  -U, --set-remote-upstream             Add git upstream \${upstream_git_repo} (pull-only)' on start"
+    echo "  -B, --force-docker-image-build        Force building local docker image"
 }
 
 while [ $# -gt 0 ]; do
@@ -187,6 +200,12 @@ while [ $# -gt 0 ]; do
         -r|--run-as-root)
             run_as_user=false
         ;;
+        -U|--set-remote-upstream)
+            set_remote_upstream=true
+        ;;
+        -B|--force-docker-image-build)
+            force_docker_image_build=true
+        ;;
         --) shift
             break
         ;;
@@ -206,10 +225,8 @@ while [ $# -gt 0 ]; do
 done
 #docker_run_options+=( -p $port_range:$port_range )
 
-if [ $# -gt 0 ]; then
-  docker_command="$*"
-  shift $#
-fi
+docker_command="${*:-/bin/bash}"
+shift $#
 
 if $standalone; then
     cluster_dir="$PWD/standalone"
@@ -229,19 +246,10 @@ fi
 
 cluster_dir=$(select_cluster ${cluster_dir})
 
-if [ -d "$cluster_dir" ]; then
-    :
-#elif [ "$cluster_dir" == s ]; then
-#    echo TODO: ./bootstrap -s 
-elif [ "$cluster_dir" == b ]; then
-    ./bootstrap
-else
-    exit
-fi
-
 if [ -z "$cluster_dir" ] || ! [ -d "$cluster_dir" ]; then
-    warn No clusters found. Please run \`./bootstrap\` to create one.
-    exit
+    warn Cluster invalid or dir not found.
+    warn Please run \`./bootstrap\` to create or specifiy one from \`clusters/XXX/XXX\`
+    exit 1
 fi
 
 cluster_dir=$(realpath ${cluster_dir})

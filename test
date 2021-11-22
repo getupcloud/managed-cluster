@@ -1,0 +1,100 @@
+#!/bin/bash
+
+function usage()
+{
+    echo "Usage: $0 [branch-name] [cluster-types] [remote]"
+    echo
+    echo "  branch-name: Branch name to test [default=main]"
+    echo "  cluster-types: Comma-separated list of tipes from ./templates/ [default=all]"
+    echo '  remote: Output from "git remote get-url origin"'
+    exit 1
+}
+
+if [[ "$*" =~ -h ]]; then
+    usage
+fi
+
+branch=${1:-main}
+branch=${branch#*=}
+shift
+types=all
+
+if [ $# -gt 0 ]; then
+    types="${1//,/ }"
+    shift
+fi
+
+if [ $# -gt 0 ]; then
+    remote="$1"
+    shift
+else
+    remote=$(git remote get-url origin)
+fi
+
+if [ "$types" == 'all' ]; then
+    # copied from ./bootstrap
+    types=( templates/*/ )
+    types=( ${types[@]#*/} )
+    types=( ${types[@]%/} )
+    types="${types[@]/manifests}" ## remove manifests from types
+fi
+
+if [ $# -gt 0 ]; then
+    echo "Invalid extra parameter: $1"
+    usage
+fi
+
+set -exu
+
+echo Remote: $remote
+
+tmp=$(mktemp -d --suffix=-managed-cluster)
+trap '${REMOVE_TMP_DIR:-true} && cd /tmp && rm -rf "$tmp" || true' EXIT
+
+cd $tmp
+git clone $remote
+cd $(basename ${remote##*/} .git)
+current_branch=$(git branch --show-current)
+
+if [ "$current_branch" != "$branch" ]; then
+    if ! git checkout -b ${branch##*/} $branch; then
+        set +x
+        git branch -va
+        echo
+        echo Invalid branch: $branch. Please select from one above.
+        exit 1
+    fi
+fi
+
+version=$(cat version.txt|cut -f1 -d-)
+commit=$(git log -1 --pretty=format:%h)
+echo $version-$commit > version.txt
+echo "Starting tests for branch=$branch version=$(cat version.txt) [$PWD]"
+
+for type in $types; do
+    rm -f clusters/evilcluster/$type/{cluster.conf,terraform.tfvars}
+    ./bootstrap --customer evilcorp --name evilcluster --type $type --force
+    terraform_params=( $(jq .${type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r test-data.json 2>/dev/null || true) )
+
+    cat > clusters/evilcluster/$type/test-cluster <<EOF
+#!/bin/bash
+
+tput rev
+m="Starting tests for cluster type $type at branch $branch"
+printf '%0.s#' \$(seq 1 \${#m})
+echo -e "\\n\${m}"
+printf '%0.s#' \$(seq 1 \${#m})
+echo
+tput sgr0
+
+set -exu
+
+cd /cluster
+/usr/local/bin/terraform-setup -f -G -- ${terraform_params[@]@Q}
+terraform init
+terraform validate
+#terraform plan -out=/tmp/terraform.tfplan
+EOF
+    chmod +x clusters/evilcluster/$type/test-cluster
+    ./start --force-docker-image-build clusters/evilcluster/$type -- bash -c /cluster/test-cluster
+done

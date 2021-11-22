@@ -1,10 +1,5 @@
 ## Common variables
 
-variable "name" {
-  description = "Cluster name"
-  type        = string
-}
-
 variable "do_token" {
   description = "Digital Ocean Token"
   type        = string
@@ -62,7 +57,7 @@ variable "node_pool" {
   type        = any
   default = {
     name       = "infra"
-    size       = ""
+    size       = "s-4vcpu-8gb"
     min_nodes  = 1
     max_nodes  = 2
     node_count = 1
@@ -90,7 +85,7 @@ variable "node_pools" {
   default = [
     {
       name       = "app"
-      size       = ""
+      size       = "s-4vcpu-8gb"
       min_nodes  = 2
       max_nodes  = 4
       node_count = 2
@@ -107,10 +102,4 @@ variable "node_pools" {
     condition     = alltrue([for np in var.node_pools : length(np.size) > 0])
     error_message = "Missing one or more node_pools[].size. Ex: \"s-4vcpu-8gb\"."
   }
-}
-
-variable "flux_git_repo" {
-  description = "GitRepository URL"
-  type        = string
-  default     = ""
 }

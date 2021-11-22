@@ -196,6 +196,7 @@ run_as_user()
     useradd $CONTAINER_USER -u $CONTAINER_USER_ID -U -G wheel -m -k /etc/skel
     shopt -s dotglob
     $has_home || install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 700 /etc/skel/* $CONTAINER_HOME/
+
     for src in .gitconfig .ssh .tsh; do
         if [ -d "/home/_host/$src" ]; then
             cp -an /home/_host/$src $CONTAINER_HOME/

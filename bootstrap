@@ -1,5 +1,7 @@
 #!/bin/bash
 
+${DEBUG:-false} && set -x
+
 ROOTDIR=$(dirname $0)
 source $ROOTDIR/root/etc/profile.d/getup.sh
 export PATH="$PATH:$PWD/root/usr/local/bin/"
@@ -73,9 +75,8 @@ sync_from_template()
       return 0
     fi
 
-    copy_from_template $src $dest --exclude=manifests/cluster/ --exclude=\*.swp
+    copy_from_template $src $dest --exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp
 }
-
 
 require_config()
 {
@@ -123,19 +124,56 @@ select_cluster_type()
     set_config type=$type "Cluster type. One of dir names from ./templates/"
 }
 
+generate_ssh_keys()
+{
+    if ! [ -e $cluster_dir/identity ]; then
+        info Generating $cluster_dir/identity
+        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
+        ssh-keygen -yf $cluster_dir/identity > $cluster_dir/identity.pub
+    else
+        info Using existing $cluster_dir/identity
+    fi
+
+    info Generating $cluster_dir/known_hosts
+    ssh-keyscan github.com > $cluster_dir/known_hosts
+}
+
+update_ssh_keys()
+{
+    if ! ask "Generate new ssh keys now? [Y/n]"; then
+        return
+    fi
+
+    if [ -e $cluster_dir/identity ]; then
+        local bkp=$cluster_dir/identity.bkp$(date +%s)
+        info Renaming existing ssh key to $bkp
+        mv $cluster_dir/identity $bkp
+    fi
+
+    generate_ssh_keys
+}
+
 ###########
 ## Start ##
 ###########
 
-ssh_key_type=rsa
+update_ssh_keys=false
+ssh_key_type=ecdsa
+ssh_key_length=521
+force=false
 
 while [ $# -gt 0 ]; do
     case $1 in
         --help|-h)
             echo "Usage:"
             echo "  $0 [--customer NAME] [--name NAME] [--type NAME] [--ssh-key-type=$ssh_key_type]"
-            echo "  $0 [--sync-template|-s]"
+            echo "  $0 [--sync-template|-s] CLUSTER-IDR"
+            echo "  $0 [--update-ssh-keys|-U] CLUSTER-DIR"
             exit 0
+        ;;
+        -f|--force)
+            force=true
+            shift
         ;;
         --sync-template|-s)
             sync_from_template $2
@@ -156,6 +194,14 @@ while [ $# -gt 0 ]; do
         --ssh-key-type)
             shift
             ssh_key_type=$1
+            case $ssh_key_type in
+                ecdsa) ssh_key_length=521 ;;
+                dsa|rsa) ssh_key_length=2048
+            esac
+        ;;
+        --update-ssh-keys|-S)
+            update_ssh_keys $2
+            exit
     esac
     shift
 done
@@ -196,7 +242,7 @@ set_config flux_git_repo=${_git_repo} "Git repo for default flux GitRepository"
 cluster_root_dir=clusters/$name
 cluster_dir=$cluster_root_dir/$type
 
-if [ -d $cluster_dir ]; then
+if [ -d $cluster_dir ] && ! $force; then
     warn "Cluster already exists: $cluster_dir"
     exit 1
 fi
@@ -207,8 +253,4 @@ copy_from_template templates/$type $cluster_dir
 info Moving $config_file to $cluster_dir/cluster.conf
 mv $config_file $cluster_dir/cluster.conf
 
-info Generating $cluster_dir/identity
-ssh-keygen -t $ssh_key_type -b 2048 -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
-
-info Generating $cluster_dir/known_hosts
-ssh-keyscan -t $ssh_key_type github.com > $cluster_dir/known_hosts
+generate_ssh_keys

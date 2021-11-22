@@ -32,7 +32,7 @@
 #
 #      backupStorageLocation:
 #        name: default
-#        prefix: velero/
+#        prefix: velero/${cluster_name}-${suffix}
 #        bucket: ### TODO: UPDATE HERE ###
 #        config:
 #          region: ### TODO: UPDATE HERE ###

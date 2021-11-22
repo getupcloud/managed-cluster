@@ -3,14 +3,30 @@
 source /etc/profile.d/getup.sh
 
 force=false
+generate_all_empty=false
 
 while [ $# -gt 0 ]; do
   case $1 in
-    --force|-f)
+    -f|--force)
         force=true
+    ;;
+    -G|--generate-all-empty)
+        generate_all_empty=true
+    ;;
+    --)
+        shift
+        break
   esac
   shift
 done
+
+for var; do
+    export "TF_VAR_${var@E}"
+done
+
+if $generate_all_empty; then
+    warn NOTICE: Generating all non-default values as empty strings
+fi
 
 if [ -r "$TF_VARS_FILE" ]; then
   if ! $force; then
@@ -104,20 +120,22 @@ for variables_file in ${variables_files[@]}; do
             debug "Using existing config $variable=${value}"
         else
             value=""
-            while [ -z "$value" ]; do
-                prompt=$(
-                    echo -n " Description: $variable_description\n" &&
-                    echo -n "        Type: $variable_type\n" &&
-                    echo -n "    Variable: $variable>"
-                )
+            if ! $generate_all_empty; then
+                while [ -z "$value" ]; do
+                    prompt=$(
+                        echo -n " Description: $variable_description\n" &&
+                        echo -n "        Type: $variable_type\n" &&
+                        echo -n "    Variable: $variable>"
+                    )
 
-                read -e -p "$(prompt "$prompt")" value
-                history -s "$value"
+                    read -e -p "$(prompt "$prompt")" value
+                    history -s "$value"
 
-                if [ -z "$value" ]; then
-                    warn "Variable can't be empty: $variable"
-                fi
-            done
+                    if [ -z "$value" ]; then
+                        warn "Variable can't be empty: $variable"
+                    fi
+                done
+            fi
         fi
 
         {
