@@ -106,3 +106,12 @@ metadata:
 spec:
   interval: 1h
   url: https://charts.releases.teleport.dev
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: external-dns
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://kubernetes-sigs.github.io/external-dns/
