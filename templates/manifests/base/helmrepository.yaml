@@ -97,3 +97,12 @@ metadata:
 spec:
   interval: 1h
   url: https://helm.goharbor.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: teleport
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.releases.teleport.dev
