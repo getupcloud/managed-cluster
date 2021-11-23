@@ -59,32 +59,32 @@ prompt()
 
 debug()
 {
-  echo -e "${COLOR_RESET}$@"
+  echo -e "${COLOR_RESET}$@" >&2
 }
 
 debugn()
 {
-  echo -ne "${COLOR_RESET}$@"
+  echo -ne "${COLOR_RESET}$@" >&2
 }
 
 info()
 {
-  echo -e "${COLOR_YELLOW}$@${COLOR_RESET}"
+  echo -e "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
 }
 
 infon()
 {
-  echo -ne "${COLOR_YELLOW}$@${COLOR_RESET}"
+  echo -ne "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
 }
 
 warn()
 {
-  echo -e "${COLOR_RED}$@${COLOR_RESET}"
+  echo -e "${COLOR_RED}$@${COLOR_RESET}" >&2
 }
 
 warnn()
 {
-  echo -ne "${COLOR_RED}$@${COLOR_RESET}"
+  echo -ne "${COLOR_RED}$@${COLOR_RESET}" >&2
 }
 
 read_config()

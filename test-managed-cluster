@@ -1,0 +1,101 @@
+#!/bin/bash
+
+COLOR_RED="$(tput setaf 1)"
+COLOR_GREEN="$(tput setaf 2)"
+COLOR_YELLOW="$(tput setaf 3)"
+COLOR_YELLOW_BG="$(tput setaf 0)$(tput setab 3)"
+COLOR_RESET="$(tput sgr0)"
+COLOR_BOLD="$(tput bold)"
+
+FAIL=0
+PASS=0
+
+function testing()
+{
+    echo -e "${COLOR_YELLOW_BG}Testing: $@${COLOR_RESET}"
+}
+
+function run()
+{
+    echo -e "${COLOR_YELLOW}> $@${COLOR_RESET}"
+    eval "$@"
+}
+
+
+function assert()
+{
+    eval "$@"
+
+    if [ $? -ne 0 ]; then
+        echo -n "${COLOR_RED}${COLOR_BOLD}FAILED[${BASH_LINENO[0]}]: $@"
+        let FAIL+=1
+    else
+        echo -n "${COLOR_GREEN}${COLOR_BOLD}PASSED[${BASH_LINENO[0]}]: $@"
+        let PASS+=1
+    fi
+
+    echo ${COLOR_RESET}
+}
+
+rm -rf clusters/evilcluster
+
+testing "Can create cluster"
+run "./managed-cluster create-cluster -c evilcorp -n evilcluster -t generic -k ecdsa"
+assert 'grep -q customer=evilcorp clusters/evilcluster/generic/cluster.conf'
+assert 'grep -q name=evilcluster clusters/evilcluster/generic/cluster.conf'
+assert 'grep -q type=generic clusters/evilcluster/generic/cluster.conf'
+assert 'grep -q upstream_git_repo=git@github.com:getupcloud/managed-cluster.git clusters/evilcluster/generic/cluster.conf'
+assert 'grep -q origin_git_repo=git@github.com:getupcloud/managed-cluster-evilcorp.git clusters/evilcluster/generic/cluster.conf'
+assert 'grep -q https_origin_git_repo=https://github.com/getupcloud/managed-cluster-evilcorp.git clusters/evilcluster/generic/cluster.conf'
+assert 'grep -q flux_git_repo=ssh://git@github.com/getupcloud/managed-cluster-evilcorp.git clusters/evilcluster/generic/cluster.conf'
+assert "[ \$(wc -l clusters/evilcluster/generic/identity | cut -f1 -d' ') -eq 12 ]"
+assert "[ \$(cut -f1 -d' ' clusters/evilcluster/generic/identity.pub) == ecdsa-sha2-nistp521 ]"
+
+testing "Can set remote upstream"
+run "./managed-cluster -v set-upstream clusters/evilcluster/generic"
+assert "[ \$(git remote get-url upstream --all) == 'git@github.com:getupcloud/managed-cluster.git'  ]"
+assert "[ \$(git remote get-url upstream --push) == FORBIDEN ]"
+
+testing "Forbid update already existing upstream remote"
+run "./managed-cluster -v set-upstream -r git@github.com:getupcloud/somewhere-over-the-rainbown.git clusters/evilcluster/generic"
+assert "[ $? -eq 1 ]"
+
+testing "Can replace existing upstream remote"
+run "./managed-cluster -v set-upstream -f -r git@github.com:getupcloud/somewhere-over-the-rainbown.git clusters/evilcluster/generic"
+assert "[ \$(git remote get-url upstream --all) == 'git@github.com:getupcloud/somewhere-over-the-rainbown.git'  ]"
+assert "[ \$(git remote get-url upstream --push) == FORBIDEN ]"
+git remote remove upstream
+
+testing "Can create cluster with non-default key size"
+rm -f clusters/evilcluster/generic/identity
+run "./managed-cluster -v create-cluster -c evilcorp -n evilcluster -t generic -k ecdsa -l 256 -f"
+assert "[ \$(wc -l clusters/evilcluster/generic/identity | cut -f1 -d' ') -eq 9 ]"
+assert "[ \$(cut -f1 -d' ' clusters/evilcluster/generic/identity.pub) == ecdsa-sha2-nistp256 ]"
+
+testing "Can start and execute container"
+run container_uid=$(./managed-cluster start -f clusters/evilcluster/generic/ -- id -u | tail -n1 | tr -d '\r')
+assert '[ $container_uid -eq $UID ]'
+
+testing "Can sync templates"
+cp templates/generic/variables.tf templates/generic/variables.tf.test
+grep -q 'TESTING LINE' templates/generic/variables.tf || echo -e "\n# TESTING LINE #$$" >> templates/generic/variables.tf
+run "./managed-cluster -v sync-templates -f clusters/evilcluster/generic"
+assert "grep -q '# TESTING LINE #$$' clusters/evilcluster/generic/variables.tf"
+mv templates/generic/variables.tf.test templates/generic/variables.tf
+
+testing "Can update ssh key"
+run "./managed-cluster -v update-ssh-key -k rsa -l 2048 -f clusters/evilcluster/generic"
+assert "[ \$(wc -l clusters/evilcluster/generic/identity | cut -f1 -d' ') -eq 27 ]"
+assert "[ \$(cut -f1 -d' ' clusters/evilcluster/generic/identity.pub) == ssh-rsa ]"
+
+echo ${COLOR_BOLD}
+if [ $FAIL -eq 0 ]; then
+    echo "${COLOR_GREEN}ALL PASSED"
+    status=0
+else
+   echo "${COLOR_RED}FAILED: $FAIL"
+   echo "${COLOR_GREEN}PASSED: $PASS"
+   status=1
+fi
+echo ${COLOR_RESET}
+exit $status

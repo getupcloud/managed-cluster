@@ -66,8 +66,10 @@ function sync_from_template()
       return 1
     fi
 
-    if ! ask "Copy from $src to $dest? [Y/n]"; then
-      return 0
+    if ! $force; then
+        if ! ask "Copy from $src to $dest? [Y/n]"; then
+            return 0
+        fi
     fi
 
     copy_from_template $src $dest --exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp
@@ -150,7 +152,9 @@ function select_cluster()
 
     clusters=( ${clusters[*]%/} )
 
-    if [ ${#clusters[*]} -le 1 ]; then
+    export config_file
+
+    if [ ${#clusters[*]} -eq 1 ]; then
         config_file=$clusters/cluster.conf
         if ! has_valid_config $config_file; then
             warn Config not found: $config_file
@@ -196,8 +200,18 @@ function select_cluster()
     echo $cluster_dir
 }
 
+function assert_cluster_dir()
+{
+    if ! [ -e "$cluster_dir/cluster.conf" ]; then
+        warn "Invalid cluster dir: $cluster_dir"
+        exit 1
+    fi
+}
+
 function start_container()
 {
+    assert_cluster_dir
+
     if $run_as_root; then
         : ${CONTAINER_USER:=root}
         : ${CONTAINER_GROUP:=root}
@@ -212,7 +226,7 @@ function start_container()
         : ${CONTAINER_HOME:=/home/$CONTAINER_USER}
     fi
 
-    local docker_image_repo=${docker_image_repo:-getupcloud/cluster}
+    local docker_image_repo=${docker_image_repo:-ghcr.io/getupcloud/cluster}
     local docker_image_tag=${docker_image_tag:-$(cat version.txt)}
     local docker_image=${docker_image_repo}:${docker_image_tag}
     local docker_run_options_defaults=(
@@ -246,22 +260,22 @@ function start_container()
 
     if $force_docker_image_build; then
         make
-    fi
+    else
+        if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
+            local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
+            local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r '.[].Created')
+            local image_created_ts=$(date --date="$image_created" +%s)
 
-    if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
-        local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
-        local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r '.[].Created')
-        local image_created_ts=$(date --date="$image_created" +%s)
-
-        if (( dockerfile_modified_ts > image_created_ts )); then
-            if ask "Docker image ${docker_image_repo}:${docker_image_tag} is outdated. Build now? [Y/n]"; then
-                make
+            if (( dockerfile_modified_ts > image_created_ts )); then
+                if ask "Docker image ${docker_image_repo}:${docker_image_tag} is outdated. Build now? [Y/n]"; then
+                    make
+                fi
             fi
         fi
     fi
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
-    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_run_options} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
+    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
     info \$ $docker_run
     echo
     eval sudo $docker_run
@@ -280,8 +294,9 @@ function usage()
         echo
         echo "Available commands and options:"
         echo
-        echo "    -h, --help    This help message."
-        echo "    --debug       Turn bash debug messages on (set -x) and dump options."
+        echo "    -h, --help       This help message."
+        echo "    -d, --debug      Turn bash debug messages on (set -x). Implies --verbose."
+        echo "    -v, --verbose    Turn verbose messages on."
     else
         echo
         echo "Run \`$0 --help\` for full help."
@@ -307,9 +322,10 @@ function usage()
         echo "     -f, --force-docker-image-build        Force building local docker image."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "sync-template" ]; then
+    if [ -z "$command" ] || [ "$command" == "sync-templates" ]; then
         echo "$COLOR_GREEN"
-        echo "  -> sync-template [CLUSTER-DIR]    Sync files from ./templates/\$type into CLUSTER-DIR" "$COLOR_RESET"
+        echo "  -> sync-templates [CLUSTER-DIR]   Sync files from ./templates/\$type into CLUSTER-DIR" "$COLOR_RESET"
+        echo "     -f, --force                    Force template sync."
     fi
 
     if [ -z "$command" ] || [ "$command" == "set-upstream" ]; then
@@ -346,18 +362,18 @@ function invalid_argument()
 {
     case "$1" in
         -*)
-            usage "Invalid option: $@"
+            usage "Invalid option[${BASH_LINENO[0]}]: $@"
         ;;
         *)
-            usage "Invalid or missing parameter: $@"
+            usage "Invalid or missing parameter[${BASH_LINENO[0]}]: $@"
     esac
 }
 
 function dump_options()
 {
     echo Current options:
-    for i in command debug force ssh_key_type ssh_key_length \
-        standalone docker_run_options port_range run_as_root \
+    for i in command debug verbose force ssh_key_type ssh_key_length \
+        standalone docker_command port_range run_as_root \
         force_docker_image_build cluster_dir; do
         echo "  ${!i@A}"
     done
@@ -372,12 +388,14 @@ function dump_options()
 command=''
 cluster_dir=""
 debug=false
+verbose=false
 force=false
 ssh_key_length_rsa=4096
 ssh_key_length_dsa=1024
 ssh_key_length_ecdsa=521
 ssh_key_type=ecdsa
 ssh_key_length=0
+
 
 #############################
 ## COMMAND: create-cluster ##
@@ -392,32 +410,31 @@ function getopt_create_cluster()
             ;;
             -f|--force)
                 force=true
-                shift
             ;;
             -c|--customer)
-                customer=$2
-                [ -n "$customer" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                customer=$1
             ;;
             -n|--name)
-                name=$2
-                [ -n "$name" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                name=$1
             ;;
             -t|--type)
-                type=$2
-                [ -n "$type" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                type=$1
             ;;
             -k|--ssh-key-type)
-                ssh_key_type=$2
-                [ -n "$ssh_key_type" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                ssh_key_type=$1
             ;;
             -l|--ssh-key-length)
-                ssh_key_length=$2
-                [ -n "$ssh_key_length" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                ssh_key_length=$1
             ;;
             *)
                 invalid_argument $1
@@ -433,7 +450,7 @@ function getopt_create_cluster()
 
 function command_create_cluster()
 {
-    local config_file=${1:-$ROOTDIR/.cluster.conf}
+    export config_file=${1:-$ROOTDIR/.cluster.conf}
 
     if [ -e $config_file ]; then
         debug Reading config from temporary file: $config_file
@@ -477,8 +494,11 @@ function command_create_cluster()
     mkdir -p ${cluster_root_dir}
     copy_from_template templates/$type $cluster_dir
 
-    info Moving $config_file to $cluster_dir/cluster.conf
-    mv $config_file $cluster_dir/cluster.conf
+    local temp_config_file=$config_file
+    config_file=$cluster_dir/cluster.conf
+
+    info Moving $temp_config_file to $config_file
+    mv $temp_config_file $config_file
 
     generate_ssh_key
 }
@@ -489,7 +509,6 @@ function command_create_cluster()
 
 standalone=false
 docker_command=/bin/bash
-docker_run_options=""
 port_range=32000-32010
 run_as_root=false
 force_docker_image_build=false
@@ -505,6 +524,7 @@ function getopt_start()
                 standalone=true
             ;;
             -P|--port-range)
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
                 port_range=$1
             ;;
@@ -515,7 +535,8 @@ function getopt_start()
                 force_docker_image_build=true
             ;;
             --)
-                docker_run_options+="${@@Q}"
+                shift
+                docker_command="${@@Q}"
                 shift $#
             ;;
             *)
@@ -540,22 +561,30 @@ function command_start()
         touch $cluster_dir/terraform.tfvars
     fi
 
-    start_container "${docker_run_options}"
+    assert_cluster_dir
+    start_container ${docker_command}
 }
 
 ############################
 ## COMMAND: sync-template ##
 ############################
 
-function getopt_sync_template()
+function getopt_sync_templates()
 {
     while [ $# -gt 0 ]; do
         case $1 in
             -h|--help)
                 usage
             ;;
+            -f|--force)
+                force=true
+            ;;
             *)
-                invalid_argument $1
+                if [ -z "$cluster_dir" ]; then
+                    cluster_dir=$1
+                else
+                    invalid_argument $1
+                fi
         esac
         shift
     done
@@ -563,8 +592,9 @@ function getopt_sync_template()
     cluster_dir=$( select_cluster $1 )
 }
 
-function command_sync_template()
+function command_sync_templates()
 {
+    assert_cluster_dir
     sync_from_template
 }
 
@@ -579,8 +609,12 @@ function getopt_set_upstream()
     while [ $# -gt 0 ]; do
         case $1 in
             -r|--remote)
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
                 remote_upstream=$1
+            ;;
+            -f|--force)
+                force=true
             ;;
             *)
                 if [ -z "$cluster_dir" ]; then
@@ -597,8 +631,23 @@ function getopt_set_upstream()
 
 function command_set_upstream()
 {
-    info Adding remote: upstream ${upstream_git_repo:-git@github.com:getupcloud/managed-cluster.git}
-    git remote add upstream ${upstream_git_repo:-git@github.com:getupcloud/managed-cluster.git}
+    set -e
+    assert_cluster_dir
+
+    source_env $cluster_dir/cluster.conf
+
+    if git remote | grep -q '^upstream$'; then
+        if $force; then
+            info Removing old remote: upstream $remote_upstream
+            git remote remove upstream
+        else
+            warn Remote already exists: upstream $remote_upstream
+            return 1
+        fi
+    fi
+
+    info Adding remote: upstream $remote_upstream
+    git remote add upstream $remote_upstream
     git remote set-url --push upstream FORBIDEN
 }
 
@@ -614,14 +663,17 @@ function getopt_update_ssh_key()
                 usage
             ;;
             -k|--ssh-key-type)
-                ssh_key_type=$2
-                [ -n "$ssh_key_type" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                ssh_key_type=$1
             ;;
             -l|--ssh-key-length)
-                ssh_key_length=$2
-                [ -n "$ssh_key_length" ] || invalid_argument $1
+                [ $# -lt 2 ] && invalid_argument $1
                 shift
+                ssh_key_length=$1
+            ;;
+            -f|--force)
+                force=true
             ;;
             *)
                 if [ -z "$cluster_dir" ]; then
@@ -643,8 +695,10 @@ function getopt_update_ssh_key()
 
 function command_update_ssh_key()
 {
-    if ! ask "Generate new ssh keys now for $cluster_dir? [Y/n]"; then
-        return
+    if ! $force; then
+        if ! ask "Generate new ssh keys now for $cluster_dir? [Y/n]"; then
+            return
+        fi
     fi
 
     if [ -e $cluster_dir/identity ]; then
@@ -655,17 +709,22 @@ function command_update_ssh_key()
 
     generate_ssh_key
 }
+
 ##########
 ## Main ##
 ##########
 
 while [ $# -gt 0 ]; do
     case $1 in
-        --help|-h)
+        -h|--help)
             usage
         ;;
-        --debug)
+        -d|--debug)
             debug=true
+            verbose=true
+        ;;
+        -v|--verbose)
+            verbose=true
         ;;
         --)
             break
@@ -676,6 +735,7 @@ while [ $# -gt 0 ]; do
         *)
             if [ -z "$command" ]; then
                 command=$1
+                shift
                 break
             else
                 exit_code=1
@@ -691,8 +751,8 @@ fi
 
 eval getopt_${command//-/_} "$@"
 
-dump_options
 
 $debug && set -x
+$verbose && dump_options
 
 eval command_${command//-/_}
