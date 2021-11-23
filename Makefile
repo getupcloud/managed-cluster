@@ -25,3 +25,7 @@ $(DOCKERFILE): version.txt
 
 fmt:
 	terraform fmt -recursive
+
+install:
+	pip3 install --user giturlparser || pip install --user giturlparser
+	sudo yum install jq || sudo apt install jq
