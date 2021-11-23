@@ -89,8 +89,9 @@ assert "[ \$(wc -l clusters/evilcluster/generic/identity | cut -f1 -d' ') -eq 27
 assert "[ \$(cut -f1 -d' ' clusters/evilcluster/generic/identity.pub) == ssh-rsa ]"
 
 echo ${COLOR_BOLD}
+echo -----------------------------------
 if [ $FAIL -eq 0 ]; then
-    echo "${COLOR_GREEN}ALL PASSED"
+    echo "${COLOR_GREEN}ALL $PASS TESTS PASSED"
     status=0
 else
    echo "${COLOR_RED}FAILED: $FAIL"
