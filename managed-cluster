@@ -226,9 +226,6 @@ function start_container()
         : ${CONTAINER_HOME:=/home/$CONTAINER_USER}
     fi
 
-    local docker_image_repo=${docker_image_repo:-ghcr.io/getupcloud/cluster}
-    local docker_image_tag=${docker_image_tag:-$(cat version.txt)}
-    local docker_image=${docker_image_repo}:${docker_image_tag}
     local docker_run_options_defaults=(
         --cap-add=SYS_PTRACE
         #--userns host
@@ -261,13 +258,13 @@ function start_container()
     if $force_docker_image_build; then
         make
     else
-        if docker inspect ${docker_image_repo}:${docker_image_tag} &>/dev/null; then
+        if docker inspect ${docker_image} &>/dev/null; then
             local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
-            local image_created=$(docker inspect ${docker_image_repo}:${docker_image_tag} | jq -r '.[].Created')
+            local image_created=$(docker inspect ${docker_image} | jq -r '.[].Created')
             local image_created_ts=$(date --date="$image_created" +%s)
 
             if (( dockerfile_modified_ts > image_created_ts )); then
-                if ask "Docker image ${docker_image_repo}:${docker_image_tag} is outdated. Build now? [Y/n]"; then
+                if ask "Docker image ${docker_image} is outdated. Build now? [Y/n]"; then
                     make
                 fi
             fi
@@ -275,7 +272,7 @@ function start_container()
     fi
 
     info Starting cluster: $cluster_dir with docker image ${docker_image}
-    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_image_repo}:${docker_image_tag} ${docker_command}"
+    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_image} ${docker_command}"
     info \$ $docker_run
     echo
     eval sudo $docker_run
@@ -302,9 +299,9 @@ function usage()
         echo "Run \`$0 --help\` for full help."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "create-cluster" ]; then
+    if [ -z "$command" ] || [ "$command" == "create" ]; then
         echo "$COLOR_GREEN"
-        echo "  -> create-cluster          Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
+        echo "  -> create                  Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
         echo "     -c, --customer NAME     Customer name."
         echo "     -n, --name NAME         Unique name for new cluster."
         echo "     -t, --type NAME         Cluster type: $(list_cluster_types)."
@@ -319,6 +316,7 @@ function usage()
         echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
         echo "     -p, --port-range $port_range          Exposes container port range into host using format FIRST:LAST."
         echo "     -r, --run-as-root                     Run container as root."
+        echo "     -i, --image NAME                      Image name (default: $docker_image)."
         echo "     -f, --force-docker-image-build        Force building local docker image."
     fi
 
@@ -396,12 +394,11 @@ ssh_key_length_ecdsa=521
 ssh_key_type=ecdsa
 ssh_key_length=0
 
+#####################
+## COMMAND: create ##
+#####################
 
-#############################
-## COMMAND: create-cluster ##
-#############################
-
-function getopt_create_cluster()
+function getopt_create()
 {
     while [ $# -gt 0 ]; do
         case $1 in
@@ -448,7 +445,7 @@ function getopt_create_cluster()
     fi
 }
 
-function command_create_cluster()
+function command_create()
 {
     export config_file=${1:-$ROOTDIR/.cluster.conf}
 
@@ -511,6 +508,7 @@ standalone=false
 docker_command=/bin/bash
 port_range=32000-32010
 run_as_root=false
+docker_image=ghcr.io/getupcloud/managed-cluster:$(cat version.txt)
 force_docker_image_build=false
 
 function getopt_start()
@@ -530,6 +528,11 @@ function getopt_start()
             ;;
             -r|--run-as-root)
                 run_as_root=true
+            ;;
+            -i|--image)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                docker_image=$1
             ;;
             -f|--force-docker-image-build)
                 force_docker_image_build=true
@@ -561,8 +564,7 @@ function command_start()
         touch $cluster_dir/terraform.tfvars
     fi
 
-    assert_cluster_dir
-    start_container ${docker_command}
+    start_container
 }
 
 ############################

@@ -25,7 +25,7 @@ for var; do
 done
 
 if $generate_all_empty; then
-    warn NOTICE: Generating all non-default values as empty strings
+    note Generating all non-default values as empty strings
 fi
 
 if [ -r "$TF_VARS_FILE" ]; then

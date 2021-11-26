@@ -1,0 +1,205 @@
+#!/bin/bash
+
+export TEST_ROOTDIR=$(dirname $(readlink -ne $0))
+export REPO_ROOTDIR=$(dirname $TEST_ROOTDIR)
+
+cd $REPO_ROOTDIR
+
+COLOR_RED="$(tput setaf 1)"
+COLOR_GREEN="$(tput setaf 2)"
+COLOR_YELLOW="$(tput setaf 3)"
+COLOR_YELLOW_BG="$(tput setaf 0)$(tput setab 3)"
+COLOR_RESET="$(tput sgr0)"
+COLOR_BOLD="$(tput bold)"
+
+function testing()
+{
+    echo -e "${COLOR_YELLOW_BG}TESTING ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
+}
+
+function run()
+{
+    echo -e "${COLOR_YELLOW}RUNNING ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
+    eval "$@"
+}
+
+function assert()
+{
+    eval "$@"
+    local ret_code=$?
+
+    if [ $ret_code -eq 0 ]; then
+        echo -n "${COLOR_GREEN}${COLOR_BOLD}PASSED ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@"
+        let PASS+=1
+    else
+        echo -n "${COLOR_RED}${COLOR_BOLD}FAILED ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@"
+        let FAIL+=1
+        echo ${COLOR_RESET}
+        exit
+    fi
+
+    echo ${COLOR_RESET}
+}
+
+function invalid_argument()
+{
+    case "$1" in
+        -*)
+            usage "Invalid option[${BASH_LINENO[0]}]: $@"
+        ;;
+        *)
+            usage "Invalid or missing parameter[${BASH_LINENO[0]}]: $@"
+    esac
+}
+
+function usage()
+{
+    {
+    echo "Usage: $0 [OPTIONS...]"
+    echo
+    echo "  -b, --branch BRANCH-NAME     Branch name to test [default: main]."
+    echo "  -h, --help                   This help message."
+    echo "  -k, --keep                   Keep repo dir after exit."
+    echo "  -p, --plans TEST-PLANS       List of test plans [default: tests/test-*]."
+    echo "  -r, --remote REMOTE          Output from "git remote get-url origin". Use \`local\` to avoid clonning."
+    echo "  -t, --types CLUSTER-TYPES    Comma-separated list of types to test from ./templates/ [default: all]."
+
+    if [ $# -gt 0 ]; then
+        echo
+        echo -e "${COLOR_RED}$@${COLOR_RESET}"
+        exit_code=1
+    fi
+
+    exit ${exit_code:-0}
+    } >&2
+}
+
+branch=main
+types=all
+remote=""
+plans=tests/test-*
+keep=false
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        -h|--help)
+            usage
+        ;;
+        -b|--branch)
+            [ $# -lt 2 ] && invalid_argument $1
+            shift
+            branch=$1
+        ;;
+        -k|--keep)
+            keep=true
+        ;;
+        -p|--plans)
+            [ $# -lt 2 ] && invalid_argument $1
+            shift
+            plans="$1"
+        ;;
+        -r|--remote)
+            [ $# -lt 2 ] && invalid_argument $1
+            shift
+            remote=$1
+        ;;
+        -t|--types)
+            [ $# -lt 2 ] && invalid_argument $1
+            shift
+            types="${1//,/ }"
+        ;;
+        *)
+            invalid_argument $1
+    esac
+    shift
+done
+
+if [ "$types" == 'all' ]; then
+    # copied from ./bootstrap
+    types=( templates/*/ )
+    types=( ${types[@]#*/} )
+    types=( ${types[@]%/} )
+    types="${types[@]/manifests}" ## remove manifests from types
+fi
+
+if [ -z "$remote" ]; then
+    remote=$(git remote get-url origin 2>&1)
+fi
+
+if [ -z "$remote" ]; then
+    remote=local
+fi
+
+set -u
+
+if [ "$remote" != local ]; then
+
+    tmp=$(mktemp -d --suffix=-managed-cluster)
+    if ! $keep; then
+        trap 'cd /tmp && rm -rf "$tmp" || true' EXIT
+    else
+        trap 'echo Keeping dir: $tmp' EXIT
+    fi
+
+    echo Cloning from remote $remote into $tmp/managed-cluster
+    git clone $remote $tmp/managed-cluster
+    cd $tmp/managed-cluster
+else
+    echo Testing from local directory $PWD
+fi
+
+current_branch=$(git branch --show-current)
+
+if [ "$current_branch" != "$branch" ]; then
+    if ! git checkout -b test-$$-${branch##*/} $branch; then
+        git branch -va
+        echo
+        echo Invalid branch: $branch. Please select from one above.
+        exit 1
+    fi
+fi
+
+if ! [ -v VERSION ]; then
+    VERSION=$(cat version.txt|cut -f1 -d-)
+fi
+
+testing "Starting $VERSION tests on branch $branch [$PWD]"
+
+export types
+export branch
+
+FAIL=0
+PASS=0
+: ${CUSTOMER:=evilcorp}
+: ${NAME:=evilcluster}
+
+if [ -z "$CUSTOMER" ] || [ -z "$NAME" ]; then
+    usage Invalid or missing var: ${CUSTOMER@A} ${NAMEW@A}
+fi
+
+export CUSTOMER NAME
+
+function run_test_plan()
+{
+    local plan=$1
+
+    rm -rf clusters/$CUSTOMER
+    testing "--- Starting test $plan --------------------------------"
+    source $plan
+    testing "--- Finished test $plan --------------------------------"
+
+    echo
+    echo ${COLOR_BOLD}
+    if [ $FAIL -eq 0 ]; then
+        echo "${COLOR_GREEN}ALL $PASS TESTS PASSED: ${BASH_SOURCE[0]}"
+        status=0
+    else
+       echo "${COLOR_RED}FAILED ${BASH_SOURCE[0]}: $FAIL"
+       echo "${COLOR_GREEN}PASSED ${BASH_SOURCE[0]}: $PASS"
+       status=1
+    fi
+    echo ${COLOR_RESET}
+}
+
+run_test_plan tests/test-managed-cluster
+run_test_plan tests/test-cluster-types
