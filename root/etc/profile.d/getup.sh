@@ -59,12 +59,12 @@ prompt()
 
 debug()
 {
-  echo -e "${COLOR_RESET}$@" >&2
+  echo -e "${COLOR_RESET}DEBUG[${BASH_LINENO[0]}]: $@" >&2
 }
 
 debugn()
 {
-  echo -ne "${COLOR_RESET}$@" >&2
+  echo -ne "${COLOR_RESET}DEBUG[${BASH_LINENO[0]}]: $@" >&2
 }
 
 info()
@@ -77,14 +77,24 @@ infon()
   echo -ne "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
 }
 
+note()
+{
+  echo -e "${COLOR_CYAN}NOTICE: $@${COLOR_RESET}" >&2
+}
+
+noten()
+{
+  echo -ne "${COLOR_CYAN}NOTICE: $@${COLOR_RESET}" >&2
+}
+
 warn()
 {
-  echo -e "${COLOR_RED}$@${COLOR_RESET}" >&2
+  echo -e "${COLOR_RED}WARNING[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
 }
 
 warnn()
 {
-  echo -ne "${COLOR_RED}$@${COLOR_RESET}" >&2
+  echo -ne "${COLOR_RED}WARNING[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
 }
 
 read_config()
