@@ -94,8 +94,8 @@ for variables_file in ${variables_files[@]}; do
         unset value
 
         # try default from $CLUSTERDIR/variables*.tf file
-        variable_default=$(jq -r ".variable.${variable}[0].default" <<<$variables_file_data)
-        if [ "$variable_default" != null ]; then
+        variable_default=$(jq -r ".variable.${variable}[0].default // empty" <<<$variables_file_data)
+        if [ -z "$variable_default" ]; then
           value="$variable_default"
         fi
 
