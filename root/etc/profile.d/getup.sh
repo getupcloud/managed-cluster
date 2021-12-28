@@ -202,8 +202,8 @@ run_as_user()
 
     info Creating user $CONTAINER_USER
     [ -d $CONTAINER_HOME ] && has_home=true || has_home=false
-    #groupadd $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
-    useradd $CONTAINER_USER -u $CONTAINER_USER_ID -U -G wheel -m -k /etc/skel
+    groupadd $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
+    useradd $CONTAINER_USER -u $CONTAINER_USER_ID -U -g $CONTAINER_GROUP -G wheel -m -k /etc/skel
     shopt -s dotglob
     $has_home || install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 700 /etc/skel/* $CONTAINER_HOME/
 
@@ -215,6 +215,9 @@ run_as_user()
         fi
     done
     shopt -u dotglob
+
+    rm -rf ~$CONTAINER_USER/.kube
+    ln -s $CLUSTER_DIR/.kube ~$CONTAINER_USER/.kube
 
     chown -R $CONTAINER_USER:$CONTAINER_GROUP $REPODIR
 
