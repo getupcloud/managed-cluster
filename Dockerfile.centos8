@@ -42,6 +42,7 @@ RUN cd /usr/local/bin && \
         kubectl_${KUBECTL_VERSION}; \
     done && \
     ln -s kubectl_$KUBECTL_VERSION kubectl && \
+    ln -s ${KUBECONFIG%/*} /root/.kube && \
     for FLUX_VERSION in $FLUX_VERSIONS; do \
         curl -skL https://github.com/fluxcd/flux2/releases/download/${FLUX_VERSION}/flux_${FLUX_VERSION:1}_linux_amd64.tar.gz \
             | tar xzv --transform="s,.*,flux-$FLUX_VERSION,"; \
