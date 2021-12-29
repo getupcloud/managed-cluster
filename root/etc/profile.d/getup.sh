@@ -219,6 +219,7 @@ run_as_user()
     if [ -d $CONTAINER_HOME/.kube ]; then
         rm -rf $CONTAINER_HOME/.kube
     fi
+    ln -s ${KUBECONFIG%/*} $CONTAINER_HOME/.kube
 
     chown -R $CONTAINER_USER:$CONTAINER_GROUP $REPODIR
 
