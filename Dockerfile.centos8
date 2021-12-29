@@ -3,6 +3,7 @@ FROM ghcr.io/getupcloud/managed-cluster-base:0.1.0
 ENV \
     DOCTL_VERSION="1.63.1" \
     FLUX_VERSIONS="v0.15.3" \
+    GOOGLE_APPLICATION_CREDENTIALS="${CLUSTERDIR}/service-account.json" \
     HCL2JSON_VERSION="v0.3.3" \
     KIND_VERSION="v0.11.1" \
     KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage" \
