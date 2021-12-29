@@ -32,6 +32,8 @@ spec:
   interval: ${ reconcile_interval }
   path: ${ manifests_path }/cluster
   prune: true
+  decryption:
+    provider: sops  
   sourceRef:
     kind: GitRepository
     name: ${ git_repository_name }
