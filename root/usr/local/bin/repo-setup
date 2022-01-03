@@ -75,6 +75,6 @@ info "Uploading ssh key: $CLUSTERDIR/identity.pub"
 ssh-keygen -l -E sha256 -f $CLUSTERDIR/identity.pub
 
 if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
-        -f "key=$(<$CLUSTERDIR/identity.pub)" -f read_only=true -f title="managed-cluster"; then
+        -f "key=$(<$CLUSTERDIR/identity.pub)" -f read_only=true -f title="managed-cluster-${name}-${type}"; then
     warn "Failed adding key"
 fi
