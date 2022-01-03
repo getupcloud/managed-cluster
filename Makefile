@@ -43,8 +43,13 @@ fmt:
 	terraform fmt -recursive
 
 install:
-	pip3 install --user giturlparser || pip install --user giturlparser
-	sudo yum install jq || sudo apt install jq
+	if [ -e /etc/debian_version ]; then \
+		apt install -y make jq python3-pip; \
+	fi
+	if [ -e /etc/redhat-release ]; then \
+		yum install -y make jq python3-pip; \
+	fi
+	pip3 install --user giturlparse || pip install --user giturlparse
 
 test: TEST_PARAMS=--branch remotes/origin/$(shell git branch --show-current)
 test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)
