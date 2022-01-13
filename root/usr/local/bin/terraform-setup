@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source /etc/profile.d/getup.sh
 
@@ -44,7 +44,7 @@ fi
 
 declare -r tfvars_data
 
-variables_files=( $(echo $CLUSTERDIR/variables*.tf | sort -ur) )
+variables_files=( $(echo $CLUSTER_DIR/variables*.tf | sort -ur) )
 
 #
 # check if all variables are correctly defined
@@ -52,7 +52,12 @@ variables_files=( $(echo $CLUSTERDIR/variables*.tf | sort -ur) )
 for variables_file in ${variables_files[@]}; do
   debug "Verifing ${variables_file}... "
   variables_file_data=$(hcl2json $variables_file)
-  variables=( $(jq -r '.variable|keys|.[]' <<<$variables_file_data | sort) )
+  variables=( $(jq -r '.variable // empty |keys|.[]' <<<$variables_file_data | sort) )
+
+  if [ ${#variables[*]} -eq 0 ]; then
+    info Ignoring empty file: $variables_file
+    continue
+  fi
 
   for variable in ${variables[*]}; do
     variable_description=$(jq -r ".variable.${variable}[0].description" <<<$variables_file_data)
@@ -74,7 +79,7 @@ temp_file=$(mktemp -u)
 debug "Creating temporary file: $temp_file"
 exec 3>$temp_file
 
-export HISTFILE=$CLUSTERDIR/.setup_history
+export HISTFILE=$CLUSTER_DIR/.setup_history
 history -r
 
 #
@@ -83,7 +88,12 @@ history -r
 for variables_file in ${variables_files[@]}; do
     debug Processing ${variables_file}
     variables_file_data=$(hcl2json $variables_file)
-    variables=( $(jq -r '.variable|keys|.[]' <<<$variables_file_data | sort) )
+    variables=( $(jq -r '.variable // empty |keys|.[]' <<<$variables_file_data | sort) )
+
+    if [ ${#variables[*]} -eq 0 ]; then
+        info Ignoring empty file: $variables_file
+        continue
+    fi
 
     for variable in ${variables[*]}; do
         variable_description=$(jq -r ".variable.${variable}[0].description" <<<$variables_file_data)
@@ -93,13 +103,13 @@ for variables_file in ${variables_files[@]}; do
         # Precedency is: variables.tf:default -> terraform.tfvars -> $TF_VAR_${name} -> $name
         unset value
 
-        # try default from $CLUSTERDIR/variables*.tf file
-        variable_default=$(jq -r ".variable.${variable}[0].default // empty" <<<$variables_file_data)
-        if [ -z "$variable_default" ]; then
+        # try default from $CLUSTER_DIR/variables*.tf file
+        variable_default=$(jq -r ".variable.${variable}[0].default"' // "%null%"' <<<$variables_file_data)
+        if [ "$variable_default" != '%null%' ]; then
           value="$variable_default"
         fi
 
-        # try $CLUSTERDIR/terraform.tfvars
+        # try $CLUSTER_DIR/terraform.tfvars
         tfvar_value=$(jq -r ".$variable" <<<$tfvars_data)
         if [ -n "$tfvar_value" ]; then
           value="$tfvar_value"
@@ -121,20 +131,14 @@ for variables_file in ${variables_files[@]}; do
         else
             value=""
             if ! $generate_all_empty; then
-                while [ -z "$value" ]; do
-                    prompt=$(
-                        echo -n " Description: $variable_description\n" &&
-                        echo -n "        Type: $variable_type\n" &&
-                        echo -n "    Variable: $variable>"
-                    )
+                prompt=$(
+                    echo -n " Description: $variable_description\n" &&
+                    echo -n "        Type: $variable_type\n" &&
+                    echo -n "    Variable: $variable>"
+                )
 
-                    read -e -p "$(prompt "$prompt")" value
-                    history -s "$value"
-
-                    if [ -z "$value" ]; then
-                        warn "Variable can't be empty: $variable"
-                    fi
-                done
+                read -e -p "$(prompt "$prompt")" value
+                history -s "$value"
             fi
         fi
 

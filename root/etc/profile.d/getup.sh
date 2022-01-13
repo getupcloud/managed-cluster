@@ -1,9 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 shopt -s nullglob
+shopt -s checkwinsize
+
+export INSIDE_CONTAINER=${INSIDE_CONTAINER:-false}
+
+export COLOR_BLACK="$(tput setaf 1)"
+export COLOR_RED="$(tput setaf 1)"
+export COLOR_GREEN="$(tput setaf 2)"
+export COLOR_YELLOW="$(tput setaf 3)"
+export COLOR_BLUE="$(tput setaf 4)"
+export COLOR_MAGENTA="$(tput setaf 5)"
+export COLOR_CYAN="$(tput setaf 6)"
+export COLOR_WHITE="$(tput setaf 7)"
+export COLOR_GRAY="$(tput setaf 8)"
+export COLOR_BOLD="$(tput bold)"
+export COLOR_RESET="$(tput sgr0)"
 
 source_env()
 {
+    if ! [ -e "$1" ]; then
+        verb "Reading $1: not found"
+        return
+    fi
+    verb "Reading $1"
     # salve `set -a` state
     [ ${-//a/} != $- ] && on=true || on=false
     set -a
@@ -31,12 +51,12 @@ set_config()
 {
     local _name=${1%%=*}
     local _description="$2"
-    local _config_file="${3:-$config_file}"
+    local _config_file="${3}"
 
     export "$1"
 
-    if grep -q "^\s*${_name}=.*" $_config_file; then
-        sed -i -e "s|^\s${_name}=.*|$1|" $_config_file
+    if grep -q "^\s*${_name}=.*" $_config_file 2>/dev/null; then
+        sed -i -e "s|^\s*${_name}=.*|$1|" $_config_file
     else
         {
             echo "# $_description"
@@ -59,71 +79,104 @@ prompt()
 
 debug()
 {
-  echo -e "${COLOR_RESET}DEBUG[${BASH_LINENO[0]}]: $@" >&2
+    echo -e "${COLOR_RESET}DEBUG[${BASH_LINENO[0]}]: $@" >&2
 }
 
 debugn()
 {
-  echo -ne "${COLOR_RESET}DEBUG[${BASH_LINENO[0]}]: $@" >&2
+    echo -ne "${COLOR_RESET}DEBUG[${BASH_LINENO[0]}]: $@" >&2
+}
+
+verb()
+{
+    if ! ${verbose:-false}; then
+        return
+    fi
+    echo -e "${COLOR_GRAY}$@${COLOR_RESET}" >&2
+}
+
+verbn()
+{
+    if ! ${verbose:-false}; then
+        return
+    fi
+    echo -ne "${COLOR_GRAY}$@${COLOR_RESET}" >&2
 }
 
 info()
 {
-  echo -e "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
+    echo -e "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
 }
 
 infon()
 {
-  echo -ne "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
+    echo -ne "${COLOR_YELLOW}$@${COLOR_RESET}" >&2
 }
 
 note()
 {
-  echo -e "${COLOR_CYAN}NOTICE: $@${COLOR_RESET}" >&2
+    echo -e "${COLOR_CYAN}NOTICE: $@${COLOR_RESET}" >&2
 }
 
 noten()
 {
-  echo -ne "${COLOR_CYAN}NOTICE: $@${COLOR_RESET}" >&2
+    echo -ne "${COLOR_CYAN}NOTICE: $@${COLOR_RESET}" >&2
 }
 
 warn()
 {
-  echo -e "${COLOR_RED}WARNING[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
+    echo -e "${COLOR_RED}${COLOR_BOLD}WARNING[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
 }
 
 warnn()
 {
-  echo -ne "${COLOR_RED}WARNING[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
+    echo -ne "${COLOR_RED}${COLOR_BOLD}WARNING[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
+}
+
+line()
+{
+    if [ -n "$COLUMNS" ]; then ## requires interactive shell (-i)
+        local COLUMNS=20
+    fi
+
+    printf "%-${COLUMNS}s" ${1:--} | tr ' ' ${1:--}
+    echo
 }
 
 read_config()
 {
     local _name="${1}"
-    if [ -v "$_name" ]; then
-        local _value="${!_name}"
-    else
-        local _value=""
-    fi
+    local _opt_name="opt_$_name"
+    local _opt_value="${!_opt_name}"
+    local _default="${!_name}"
     shift
     local prompt="$@"
 
-    if [ ! -v "$_name" ] || [ -z "$_value" ]; then
-        read -p "$(prompt "$prompt")" $_name
+    if [ -n "$_default" ]; then
+        prompt+=" [$_default]"
+    fi
+    if [ -n "$_opt_value" ]; then
+        #prompt "$prompt <- Using command line parameter."
+        #echo
+        export "$_name=$_opt_value"
+        return
     fi
 
+    line
+    read -e -p "$(prompt "$prompt")" $_name
+
     local _value="${!_name}"
-    if [ -n "$_value" ]; then
-        export $_name
+    if [ -z "$_value" ]; then
+        export $_name="$_default"
     else
-        return 1
+        export $_name
     fi
 }
 
 ask()
 {
   local res
-  read -p "$(prompt COLOR_GREEN "$@")" res
+  read -e -p "$(prompt COLOR_GREEN "$@")" res
   res="${res:-y}"
 
   case "${res,,}" in
@@ -132,9 +185,37 @@ ask()
   esac
 }
 
+#input()
+#{
+#  local _name="$1"
+#  local _prompt="$2"
+#  local _default="$3"
+#  local _value
+#
+#  if [ -v _default ]; then
+#    read -e -p "$(prompt COLOR_GREEN "$_prompt [$_default]")" _value
+#    if [ -z "$_value" ]; then
+#      _value="$_default"
+#    fi
+#  else
+#    read -e -p "$(prompt COLOR_GREEN "$_prompt")" _value
+#  fi
+#
+#  export "$_name=$_value"
+#}
+#
+#input_no_empty()
+#{
+#    local _name="$1"
+#    unset $_name
+#    while [ -z "${!_name}" ]; do
+#        input "$@"
+#    done
+#}
+
 ask_execute_command()
 {
-  read -p "$(prompt COLOR_GREEN "Execute \"${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}\" now? [Y/n]")" res
+  read -e -p "$(prompt COLOR_GREEN "Execute \"${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}\" now? [Y/n]")" res
   res="${res:-y}"
 
   case "${res,,}" in
@@ -165,11 +246,21 @@ git_owner_name()
     echo $(git_owner $1)/$(git_name $1)
 }
 
+git_remote()
+{
+    local GIT_VERSION=$(git version | awk '{print $3}')
+    case $GIT_VERSION in
+        1.*)
+            GIT_DIR=${REPO_DIR:-.}/.git git remote -v 2>/dev/null | grep -m1 "^$1" | awk '{print $2}' || true
+            ;;
+        2.*)
+            GIT_DIR=${REPO_DIR:-.}/.git git remote get-url "$1" 2>/dev/null || true
+    esac
+}
+
 has_remote()
 {
-    local remote=$1
-
-    GIT_DIR=${REPODIR:-.}/.git git remote get-url $remote &>/dev/null
+    [ -n "$(git_remote $1)" ]
 }
 
 repo_match()
@@ -195,33 +286,48 @@ run_as_user()
 {
     if [ $CONTAINER_USER_ID -eq $(id -u) ]; then
         if [ $CONTAINER_USER_ID -ne 0 ]; then
-            : warn "Already running as $CONTAINER_USER ($CONTAINER_USER_ID)"
+            CONTAINER_USER=$(id -nu $CONTAINER_USER_ID)
+            #info "Running as user $CONTAINER_USER ($CONTAINER_USER_ID)"
         fi
         return 0
     fi
 
-    info Creating user $CONTAINER_USER
-    [ -d $CONTAINER_HOME ] && has_home=true || has_home=false
-    groupadd $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
-    useradd $CONTAINER_USER -u $CONTAINER_USER_ID -g $CONTAINER_GROUP -G wheel -m -k /etc/skel
+    CONTAINER_GROUP=$(getent group $CONTAINER_GROUP_ID 2>/dev/null | cut -f1 -d:)
+    if [ -z "$CONTAINER_GROUP" ]; then
+        CONTAINER_GROUP=getup
+        #info "Creating group $CONTAINER_GROUP ($CONTAINER_GROUP_ID)"
+        groupadd $CONTAINER_GROUP -g $CONTAINER_GROUP_ID
+    fi
+    export CONTAINER_GROUP
+
+    if ! CONTAINER_USER=$(id -nu $CONTAINER_USER_ID 2>/dev/null); then
+        CONTAINER_USER=getup
+        #info "Creating user $CONTAINER_USER ($CONTAINER_USER_ID)"
+        useradd $CONTAINER_USER -u $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -G wheel -m -k /etc/skel
+    fi
+    export CONTAINER_USER
+    export HOME=/home/$CONTAINER_USER
+
     shopt -s dotglob
-    $has_home || install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 700 /etc/skel/* $CONTAINER_HOME/
+    if [ -d $HOME ]; then
+        install -o $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -m 700 /etc/skel/* $HOME/
+    fi
 
     for src in .gitconfig .ssh .tsh; do
         if [ -d "/home/_host/$src" ]; then
-            cp -an /home/_host/$src $CONTAINER_HOME/
+            cp -an /home/_host/$src $HOME/
         elif [ -e "/home/_host/$src" ]; then
-            install -o $CONTAINER_USER -g $CONTAINER_GROUP -m 700 "/home/_host/$src" $CONTAINER_HOME/
+            install -o $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -m 700 "/home/_host/$src" $HOME/
         fi
     done
     shopt -u dotglob
 
-    if [ -d $CONTAINER_HOME/.kube ]; then
-        rm -rf $CONTAINER_HOME/.kube
+    if [ -d $HOME/.kube ]; then
+        rm -rf $HOME/.kube
     fi
-    ln -s ${KUBECONFIG%/*} $CONTAINER_HOME/.kube
+    ln -s ${KUBECONFIG%/*} $HOME/.kube
 
-    chown -R $CONTAINER_USER:$CONTAINER_GROUP $REPODIR
+    chown -R $CONTAINER_USER_ID:$CONTAINER_GROUP_ID $REPO_DIR $HOME/
 
     # from oh-my-bash installer
     #sed -e "s|^export OSH=.*|export OSH=$OSH|" $OSH/templates/bashrc.osh-template >> /home/$CONTAINER_USER/.bashrc
@@ -231,31 +337,6 @@ run_as_user()
 
     exec setpriv --reuid=$CONTAINER_USER_ID --regid=$CONTAINER_GROUP_ID --init-groups /usr/local/bin/entrypoint "$@" || exit 2
 }
-
-if [ -v CLUSTERDIR ]; then
-    if [ -r $CLUSTERDIR/cluster.conf ]; then
-        source_env $CLUSTERDIR/cluster.conf
-    fi
-
-    if [ -e $CLUSTERDIR/provider.env ]; then
-        source_env $CLUSTERDIR/provider.env
-    fi
-fi
-
-if [ -v REPODIR ] && [ -r $REPODIR/.dockerenv ]; then
-    source_env $REPODIR/.dockerenv
-fi
-
-export COLOR_BLACK="$(tput setaf 1)"
-export COLOR_RED="$(tput setaf 1)"
-export COLOR_GREEN="$(tput setaf 2)"
-export COLOR_YELLOW="$(tput setaf 3)"
-export COLOR_BLUE="$(tput setaf 4)"
-export COLOR_MAGENTA="$(tput setaf 5)"
-export COLOR_CYAN="$(tput setaf 6)"
-export COLOR_WHITE="$(tput setaf 7)"
-export COLOR_BOLD="$(tput bold)"
-export COLOR_RESET="$(tput sgr0)"
 
 if [ -t 0 ]; then
     alias l='ls -la --color'
@@ -335,4 +416,25 @@ if [ -t 0 ]; then
         PS1="$ps1"
     }
     export PROMPT_COMMAND=do_ps1
+fi
+
+if ! $INSIDE_CONTAINER; then
+    if [ -z "$ROOT_DIR" ]; then
+        export ROOT_DIR=$(readlink -ne $(dirname $0))
+    fi
+
+    export REPO_DIR=$ROOT_DIR
+fi
+
+export REPO_CONFIG=$REPO_DIR/repo.conf
+
+source_env "$REPO_CONFIG"
+source_env $REPO_DIR/.dockerenv
+
+if [ -v CLUSTER_DIR ]; then
+    export CLUSTER_CONFIG="$CLUSTER_DIR/cluster.conf"
+    export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
+
+    source_env "$CLUSTER_CONFIG"
+    source_env "$PROVIDER_ENV"
 fi

@@ -1,0 +1,49 @@
+FROM centos:8
+
+ENV CLUSTER_DIR="/cluster" \
+    REPO_DIR="/repo" \
+    INSIDE_CONTAINER=true \
+    TERM="xterm-256color" \
+    PATH=$PATH:/opt/krew/bin
+
+SHELL ["/bin/bash", "-x", "-c"]
+
+COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
+
+RUN yum install -y dnf-utils epel-release && \
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    yum clean all
+
+RUN INSTALL_PACKAGES="vim-enhanced sudo docker-ce-cli \
+        dialog awscli httpie bind-utils httpd-tools \
+        git net-tools nmap openssl openssl-devel gnupg \
+        gettext jq rsync strace make \
+        python3-pip python3-devel libffi-devel rust cargo \
+        centos-release-rabbitmq-38.noarch" && \
+    yum install -y $INSTALL_PACKAGES && \
+    yum groupinstall -y 'Development Tools' && \
+    yum update -y && \
+    yum clean all && \
+    chmod +s /usr/bin/docker && \
+    pip3 install giturlparse.py && \
+    pip3 install setuptools-rust wheel && \
+    pip3 install azure-cli awscli
+
+RUN curl -kLO https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-363.0.0-darwin-arm.tar.gz && \
+    tar -xvzf google-cloud-sdk-363.0.0-darwin-arm.tar.gz && \
+    cd google-cloud-sdk && \
+    yes | ./install.sh && \
+    cd - && \
+    rm -rf google-cloud-sdk ../google-cloud-sdk-363.0.0-darwin-arm.tar.gz
+
+RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
+        unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
+        rm -f op_linux_amd64_v1.12.3.zip
+
+RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
+    chmod +x /etc/oci-install.sh && \
+    /etc/oci-install.sh --accept-all-defaults \
+        --install-dir /opt/oci \
+        --exec-dir /usr/local/bin/ \
+        --script-dir /usr/local/bin/ \
+        --rc-file-path /etc/profile.d/oci.sh

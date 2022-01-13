@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
 source /etc/profile.d/getup.sh
 
-info Switching to $REPODIR
-cd $REPODIR
+info Switching to $REPO_DIR
+cd $REPO_DIR
 
 #git_cache_config=$(git config --global credential.https://github.com.helper)
 #if [ "$git_cache_config" != "cache --timeout=3600" ]; then

@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
 source /etc/profile.d/getup.sh
 
-info Switching to $REPODIR
-cd $CLUSTERDIR
+info Switching to $REPO_DIR
+cd $CLUSTER_DIR
 
 ask_execute_command terraform init -upgrade
 ask_execute_command terraform validate

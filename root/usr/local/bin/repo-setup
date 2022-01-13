@@ -1,33 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
 source /etc/profile.d/getup.sh
 
-info Switching to $REPODIR
-cd $REPODIR
-
-# having an upstream is considered as already configured
-if has_remote upstream; then
-    warn "Refusing to continue: repository already has remote \`upstream\`"
-    exit 1
-fi
-
-# must have origin
-if ! has_remote origin; then
-    warn "Refusing to continue: repository has no remote \`origin\`"
-    exit 1
-fi
+info Switching to $REPO_DIR
+cd $REPO_DIR
 
 if ! gh auth status; then
     gh auth login
 fi
 
-gh_owner=$(git_owner $origin_git_repo)
-gh_name=$(git_name $origin_git_repo)
+gh_owner=$(git_owner $origin)
+gh_name=$(git_name $origin)
 
 if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
-    warn Invalid git url: $origin_git_repo
+    warn Invalid git url: $origin
     exit 1
 fi
 
@@ -36,45 +24,47 @@ fi
 : ${gh_enable_wiki:=false}
 : ${gh_enable_issues:=false}
 
-echo
-info --- Current Git remotes ---
-git remote -v
-info ----- New Git remotes -----
-echo "origin   $origin_git_repo (push, pull)"
-echo "upstream $upstream_git_repo (pull)"
-info ---------------------------
-
-if ask "Update remotes now? [Y/n]"; then
-    git remote remove origin 2>/dev/null || true
-    git remote add upstream $upstream_git_repo
-    git remote set-url --push upstream FORBIDEN
+if ! gh api orgs/$gh_owner/teams/$gh_team &>/dev/null; then
+    gh_team=""
 fi
 
-if PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
-    # repo already exists just add origin
-    git remote add origin $origin_git_repo
-elif ask "Create repository $gh_owner/$gh_name now? [Y/n]"; then
+if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
+    ask "Create repository $gh_owner/$gh_name now? [Y/n]"
     # repo doesn't exists, create now
     # origin will be added by `gh`
     gh repo create $gh_owner/$gh_name \
         --confirm \
         --private=true \
-        --team=${gh_team} \
+        ${gh_team:+--team=$gh_team} \
         --description="${gh_description}" \
         --enable-issues=${gh_enable_issues} \
         --enable-wiki=${gh_enable_wiki}
 fi
 
-echo
-info --- Current Git remotes ---
-git remote -v
-info ---------------------------
-
 # upload flux ssh deploy key
-info "Uploading ssh key: $CLUSTERDIR/identity.pub"
-ssh-keygen -l -E sha256 -f $CLUSTERDIR/identity.pub
+#info Checking ssh key
+local_ssh_key_fingerprint=$(ssh-keygen -l -E sha256 -f $CLUSTER_DIR/identity.pub | awk '{print $2}')
+remote_ssh_key_fingerprints=(
+  $(PAGER= gh api repos/$gh_owner/$gh_name/keys | jq '.[]|.key' -r | ssh-keygen -l -E sha256 -f - | awk '{print $2}')
+)
 
-if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
-        -f "key=$(<$CLUSTERDIR/identity.pub)" -f read_only=true -f title="managed-cluster-${name}-${type}"; then
-    warn "Failed adding key"
+found=false
+if [ ${#remote_ssh_key_fingerprints[*]} -gt 0 ]; then
+  for fp in ${remote_ssh_key_fingerprints[*]}; do
+    if [ "$fp" == "$local_ssh_key_fingerprint" ]; then
+      found=true
+      break
+    fi
+  done
+fi
+
+if $found; then
+  info "Ssh key $CLUSTER_DIR/identity.pub ($local_ssh_key_fingerprint) already registered at repo $origin"
+else
+  info "Uploading ssh key: $CLUSTER_DIR/identity.pub ($local_ssh_key_fingerprint)"
+
+  if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
+      -f "key=$(<$CLUSTER_DIR/identity.pub)" -f read_only=false -f title="managed-cluster-${name}-${type}"; then
+          warn "Failed adding key"
+  fi
 fi
