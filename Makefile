@@ -1,5 +1,6 @@
 FILE_VERSION         := $(shell cat version.txt)
 VERSION              ?= $(FILE_VERSION)
+ARCH                 := $(shell uname -m | tr '[:upper:]' '[:lower:]')
 
 IMAGE_HOST           ?= ghcr.io
 IMAGE_NAME           ?= getupcloud/managed-cluster
@@ -27,7 +28,7 @@ build: build-base
 	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(VERSION)
 
 build-base: check-version $(DOCKERFILE)
-	docker build . -f $(DOCKERFILE).base $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(VERSION)
+	docker build . -f $(DOCKERFILE).base.$(ARCH) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(VERSION)
 
 tag:
 	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
@@ -48,6 +49,9 @@ install:
 	fi
 	if [ -e /etc/redhat-release ]; then \
 		yum install -y make jq python3-pip; \
+	fi
+	if [ -d /Applications ]; then \
+		brew install make jq; \
 	fi
 	pip3 install --user giturlparse || pip install --user giturlparse
 

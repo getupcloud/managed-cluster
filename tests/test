@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-export TEST_ROOTDIR=$(dirname $(readlink -ne $0))
-export REPO_ROOTDIR=$(dirname $TEST_ROOTDIR)
+export TEST_ROOT_DIR=$(dirname $(realpath -e $0))
+export REPO_ROOT_DIR=$(dirname $TEST_ROOT_DIR)
 
-cd $REPO_ROOTDIR
+cd $REPO_ROOT_DIR
 
 COLOR_RED="$(tput setaf 1)"
 COLOR_GREEN="$(tput setaf 2)"
@@ -20,7 +20,7 @@ function testing()
 function run()
 {
     echo -e "${COLOR_YELLOW}RUNNING ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@${COLOR_RESET}" >&2
-    eval "$@"
+    eval "$@" || exit 1
 }
 
 function assert()
@@ -57,10 +57,11 @@ function usage()
     {
     echo "Usage: $0 [OPTIONS...]"
     echo
+    echo "  -c, --clone                  Git-clone repository instead copy."
     echo "  -b, --branch BRANCH-NAME     Branch name to test [default: main]."
     echo "  -h, --help                   This help message."
     echo "  -k, --keep                   Keep repo dir after exit."
-    echo "  -p, --plans TEST-PLANS       List of test plans [default: tests/test-*]."
+    echo "  -p, --plans TEST-PLANS       List of test plans [default: tests/test_*]."
     echo "  -r, --remote REMOTE          Output from "git remote get-url origin". Use \`local\` to avoid clonning."
     echo "  -t, --types CLUSTER-TYPES    Comma-separated list of types to test from ./templates/ [default: all]."
 
@@ -74,10 +75,11 @@ function usage()
     } >&2
 }
 
+clone=false
 branch=main
 types=all
 remote=""
-plans=tests/test-*
+plans=tests/test_*
 keep=false
 
 while [ $# -gt 0 ]; do
@@ -89,6 +91,9 @@ while [ $# -gt 0 ]; do
             [ $# -lt 2 ] && invalid_argument $1
             shift
             branch=$1
+        ;;
+        -c|--clone)
+            clone=true
         ;;
         -k|--keep)
             keep=true
@@ -141,21 +146,28 @@ if [ "$remote" != local ]; then
         trap 'echo Keeping dir: $tmp' EXIT
     fi
 
-    echo Cloning from remote $remote into $tmp/managed-cluster
-    git clone $remote $tmp/managed-cluster
+    if $clone; then
+        echo Cloning from remote $remote into $tmp/managed-cluster
+        git clone $remote $tmp/managed-cluster
+    else
+        echo Copying from $PWD into $tmp/managed-cluster
+        rsync -a $PWD/ $tmp/managed-cluster
+    fi
     cd $tmp/managed-cluster
 else
     echo Testing from local directory $PWD
 fi
 
-current_branch=$(git branch --show-current)
+if [ -d .git ]; then
+    current_branch=$(git branch --show-current)
 
-if [ "$current_branch" != "$branch" ]; then
-    if ! git checkout -b test-$$-${branch##*/} $branch; then
-        git branch -va
-        echo
-        echo Invalid branch: $branch. Please select from one above.
-        exit 1
+    if [ "$current_branch" != "$branch" ]; then
+        if ! git checkout -b test-$$-${branch##*/} $branch; then
+            git branch -va
+            echo
+            echo Invalid branch: $branch. Please select from one above.
+            exit 1
+        fi
     fi
 fi
 
@@ -201,5 +213,6 @@ function run_test_plan()
     echo ${COLOR_RESET}
 }
 
-run_test_plan tests/test-managed-cluster
-run_test_plan tests/test-cluster-types
+for plan in $plans; do
+    run_test_plan $plan
+done

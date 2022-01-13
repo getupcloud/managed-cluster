@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env -S bash --norc --noprofile -i
 
 ${DEBUG:-false} && set -x
 
-ROOTDIR=$(readlink -ne $(dirname $0))
-source $ROOTDIR/root/etc/profile.d/getup.sh
-export PATH="$PATH:$PWD/root/usr/local/bin/"
+if [ -d /opt/homebrew/Cellar/coreutils/9.0/libexec/gnubin ]; then
+    export PATH="/opt/homebrew/Cellar/coreutils/9.0/libexec/gnubin:$PATH"
+fi
+
+export ROOT_DIR=$(readlink -ne $(dirname $0))
+source $ROOT_DIR/root/etc/profile.d/getup.sh
+export PATH="$PATH:$ROOT_DIR/root/usr/local/bin/"
 
 if [ -t 0 ]; then
     COLOR_RED="$(tput setaf 1)"
@@ -75,28 +79,25 @@ function sync_from_template()
     copy_from_template $src $dest --exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp
 }
 
-function require_config()
-{
-    local _name="${1}"
-    local _description="$2"
-
-    # use value if already exists
-    if [ -n "${!_name}" ]; then
-        set_config ${_name}="${!_name}" "$_description"
-        return 0
-    fi
-
-    until read_config "$@"; do
-        warn "Value can't be empty"
-    done
-
-    local _value="${!_name}"
-    if grep -q "\s" <<<$_value; then
-        set_config "$_name='$_value'" "$_description"
-    else
-        set_config "$_name=$_value" "$_description"
-    fi
-}
+#function require_config()
+#{
+#    local _name="${1}"
+#    local _description="${2}"
+#    local _filename="${3}"
+#
+#    # use value if already exists
+#    if [ -n "${!_name}" ]; then
+#        set_config ${_name}="${!_name}" "$_description" $_filename
+#        return 0
+#    fi
+#
+#    until read_config "$_name" "$_description"; do
+#        warn "Value can't be empty"
+#    done
+#
+#    local _value="${!_name}"
+#    set_config "$_name='$_value'" "$_description" $_filename
+#}
 
 function list_cluster_types()
 {
@@ -110,9 +111,15 @@ function list_cluster_types()
 function select_cluster_type()
 {
     # use value if already exists
-    if [ -n "$type" ]; then
-        set_config type=$type "Cluster type. One of dir names from ./templates/"
-        return 0
+    if [ -n "$opt_type" ]; then
+        for i in $(list_cluster_types); do
+            if [ "$opt_type" == "$i" ]; then
+                export type="$opt_type"
+                return
+            fi
+        done
+        warn Invalid cluster type: $opt_type
+        return 1
     fi
 
     local types=$(list_cluster_types)
@@ -122,8 +129,7 @@ function select_cluster_type()
         break;
     done
 
-    export template=templates/$type
-    set_config type=$type "Cluster type."
+    export type
 }
 
 function generate_ssh_key()
@@ -152,12 +158,12 @@ function select_cluster()
 
     clusters=( ${clusters[*]%/} )
 
-    export config_file
+    export CLUSTER_CONFIG
 
     if [ ${#clusters[*]} -eq 1 ]; then
-        config_file=$clusters/cluster.conf
-        if ! has_valid_config $config_file; then
-            warn Config not found: $config_file
+        CLUSTER_CONFIG=$clusters/cluster.conf
+        if ! has_valid_config $CLUSTER_CONFIG; then
+            warn Config not found: $CLUSTER_CONFIG
             return 1
         fi
 
@@ -188,11 +194,11 @@ function select_cluster()
         local PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
 
         select cluster_dir in ${clusters[*]}; do
-            config_file=$cluster_dir/cluster.conf
+            CLUSTER_CONFIG=$cluster_dir/cluster.conf
             if has_valid_config $cluster_dir; then
                 break
             else
-                warn Config not found: $config_file
+                warn Config not found: $CLUSTER_CONFIG
             fi
         done
     fi
@@ -208,59 +214,76 @@ function assert_cluster_dir()
     fi
 }
 
+function update_git_remotes()
+{
+    line
+    info Updating remotes
+
+    if [ -z "$upstream" ]; then
+        warn Missing UPSTREAM remote
+        return 1
+    fi
+
+    if [ -z "$origin" ]; then
+        warn Missing ORIGIN remote
+        return 1
+    fi
+
+    git remote remove upstream 2>/dev/null || true
+    git remote add upstream "$upstream"
+    git remote set-url --push upstream FORBIDEN
+
+    git remote remove origin 2>/dev/null || true
+    git remote add origin $origin
+}
+
 function start_container()
 {
     assert_cluster_dir
 
     if $run_as_root; then
-        : ${CONTAINER_USER:=root}
-        : ${CONTAINER_GROUP:=root}
         : ${CONTAINER_USER_ID:=0}
         : ${CONTAINER_GROUP_ID:=0}
-        : ${CONTAINER_HOME:=/root}
     else
-        : ${CONTAINER_USER:=$(id -un)}
-        : ${CONTAINER_GROUP:=$(id -gn)}
         : ${CONTAINER_USER_ID:=$(id -u)}
         : ${CONTAINER_GROUP_ID:=$(id -g)}
-        : ${CONTAINER_HOME:=/home/$CONTAINER_USER}
     fi
 
     local docker_run_options_defaults=(
         --cap-add=SYS_PTRACE
-        #--userns host
         --network host
-        #--user $CONTAINER_USER_ID:$CONTAINER_GROUP_ID
         --rm
         -it
-        --env HOME=${CONTAINER_HOME}
-        --env-file $ROOTDIR/.dockerenv
+        --env-file $ROOT_DIR/.dockerenv
         -v $(readlink -ne $cluster_dir):/cluster
-        -v $ROOTDIR:/repo
+        -v $ROOT_DIR:/repo
         -v $HOME:/home/_host:ro
     )
 
-    if [ "$type" == kind ]; then
+    if [ -e /var/run/docker.sock ]; then
         docker_run_options_defaults+=(
             -v /var/run/docker.sock:/var/run/docker.sock
         )
     fi
 
     {
-        echo CONTAINER_USER=$CONTAINER_USER
-        echo CONTAINER_GROUP=$CONTAINER_GROUP
         echo CONTAINER_USER_ID=$CONTAINER_USER_ID
         echo CONTAINER_GROUP_ID=$CONTAINER_GROUP_ID
-        echo CONTAINER_HOME=$CONTAINER_HOME
         echo GH_TOKEN=$GH_TOKEN
+        echo debug=$debug
+        echo verbose=$verbose
     } > .dockerenv
 
     if $force_docker_image_build; then
         make
     else
         if docker inspect ${docker_image} &>/dev/null; then
-            local dockerfile_modified_ts=$(stat --format %Y Dockerfile)
-            local image_created=$(docker inspect ${docker_image} | jq -r '.[].Created')
+            if [ Dockerfile.centos8 -nt Dockerfile.centos8.base ]; then
+                local dockerfile_modified_ts=$(stat --format %Y Dockerfile.centos8)
+            else
+                local dockerfile_modified_ts=$(stat --format %Y Dockerfile.centos8.base)
+            fi
+            local image_created=$(docker inspect ${docker_image} -f '{{.Created}}')
             local image_created_ts=$(date --date="$image_created" +%s)
 
             if (( dockerfile_modified_ts > image_created_ts )); then
@@ -274,8 +297,8 @@ function start_container()
     info Starting cluster: $cluster_dir with docker image ${docker_image}
     docker_run="docker run ${docker_run_options_defaults[@]} ${docker_image} ${docker_command}"
     info \$ $docker_run
-    echo
-    eval sudo $docker_run
+    #echo
+    eval $sudo $docker_run
 }
 
 ###########
@@ -291,8 +314,8 @@ function usage()
         echo
         echo "Available commands and options:"
         echo
-        echo "    -h, --help       This help message."
         echo "    -d, --debug      Turn bash debug messages on (set -x). Implies --verbose."
+        echo "    -h, --help       This help message."
         echo "    -v, --verbose    Turn verbose messages on."
     else
         echo
@@ -301,35 +324,41 @@ function usage()
 
     if [ -z "$command" ] || [ "$command" == "create" ]; then
         echo "$COLOR_GREEN"
-        echo "  -> create                  Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
-        echo "     -c, --customer NAME     Customer name."
-        echo "     -n, --name NAME         Unique name for new cluster."
-        echo "     -t, --type NAME         Cluster type: $(list_cluster_types)."
-        echo "     -k, --ssh-key-type      SSH key type (default: $ssh_key_type)."
-        echo "     -l, --ssh-key-length    SSH key length, depends on ssh key type."
-        echo "     -f, --force             Force create even if CLUSTER-DIR exists."
+        echo "  -> create                     Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
+        echo "     -c, --customer NAME        Customer name."
+        echo "         --force                Force create even if CLUSTER-DIR exists."
+        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
+        echo "     -l, --ssh-key-length       SSH key length, depends on ssh key type."
+        echo "     -n, --name NAME            Unique name for new cluster."
+        echo "     -o, --origin REMOTE        Define ORIGIN remote address."
+        echo "     -t, --type NAME            Cluster type: $(list_cluster_types)."
+        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
     if [ -z "$command" ] || [ "$command" == "start" ]; then
         echo "$COLOR_GREEN"
         echo "  -> start [CLUSTER-DIR] [-- params...]    Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
-        echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
+        echo "         --force-docker-image-build        Force building local docker image."
+        echo "     -i, --image NAME                      Image name (default: $docker_image)."
+        echo "         --no-sudo                         Dont use 'sudo' to run docker."
         echo "     -p, --port-range $port_range          Exposes container port range into host using format FIRST:LAST."
         echo "     -r, --run-as-root                     Run container as root."
-        echo "     -i, --image NAME                      Image name (default: $docker_image)."
-        echo "     -f, --force-docker-image-build        Force building local docker image."
+        echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "sync-templates" ]; then
+    if [ -z "$command" ] || [ "$command" == "sync-template" ]; then
         echo "$COLOR_GREEN"
-        echo "  -> sync-templates [CLUSTER-DIR]   Sync files from ./templates/\$type into CLUSTER-DIR" "$COLOR_RESET"
-        echo "     -f, --force                    Force template sync."
+        echo "  -> sync-template [CLUSTER-DIR]   Sync files from ./templates/\$type into CLUSTER-DIR." "$COLOR_RESET"
+        echo "         --force                    Force template sync."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "set-upstream" ]; then
+    if [ -z "$command" ] || [ "$command" == "remote-setup" ]; then
         echo "$COLOR_GREEN"
-        echo "  -> set-upstream [CLUSTER-DIR]    Update local repo's remote upstream." "$COLOR_RESET"
-        echo "     -r, --remote REMOTE           Define upstream remote address (default: $remote_upstream)"
+        echo "  -> remote-setup [OPTIONS...]    Update local repo's remote upstream." "$COLOR_RESET."
+        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -o, --origin REMOTE          Define ORIGIN remote address."
+        echo "     -u, --upstream REMOTE        Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
     if [ -z "$command" ] || [ "$command" == "update-ssh-key" ]; then
@@ -338,6 +367,11 @@ function usage()
         echo "     -k, --ssh-key-type              New SSH key type (default: $ssh_key_type)."
         echo "     -l, --ssh-key-length            SSH key length, depends on ssh key type."
     fi
+
+#    if [ -z "$command" ] || [ "$command" == "import-variables" ]; then
+#        echo "$COLOR_GREEN"
+#        echo "  -> import-variables [PREFIX SOURCE]...  Adds PREFIX to terraform variables from SOURCE." "$COLOR_RESET"
+#    fi
 
     if [ -z "$command" ]; then
         echo
@@ -372,7 +406,9 @@ function dump_options()
     echo Current options:
     for i in command debug verbose force ssh_key_type ssh_key_length \
         standalone docker_command port_range run_as_root \
-        force_docker_image_build cluster_dir; do
+        force_docker_image_build cluster_dir \
+        import_var_prefixes import_var_sources
+        do
         echo "  ${!i@A}"
     done
 }
@@ -393,11 +429,20 @@ ssh_key_length_dsa=1024
 ssh_key_length_ecdsa=521
 ssh_key_type=ecdsa
 ssh_key_length=0
+default_upstream=git@github.com:getupcloud/managed-cluster.git
 
 #####################
 ## COMMAND: create ##
 #####################
 
+opt_origin=
+opt_upstream=
+opt_customer=
+opt_name=
+opt_type=
+opt_flux_git_repo=
+
+alias getopt_c=getopt_create
 function getopt_create()
 {
     while [ $# -gt 0 ]; do
@@ -405,23 +450,38 @@ function getopt_create()
             -h|--help)
                 usage
             ;;
-            -f|--force)
+            --force)
                 force=true
+            ;;
+            -f|--flux-git-repo)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_flux_git_repo=$1
+            ;;
+            -o|--origin)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_origin=$1
+            ;;
+            -u|--upstream)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_upstream=$1
             ;;
             -c|--customer)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                customer=$1
+                opt_customer=$1
             ;;
             -n|--name)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                name=$1
+                opt_name=$1
             ;;
             -t|--type)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                type=$1
+                opt_type=$1
             ;;
             -k|--ssh-key-type)
                 [ $# -lt 2 ] && invalid_argument $1
@@ -445,59 +505,80 @@ function getopt_create()
     fi
 }
 
+alias command_c=command_create
 function command_create()
 {
-    export config_file=${1:-$ROOTDIR/.cluster.conf}
-
-    if [ -e $config_file ]; then
-        debug Reading config from temporary file: $config_file
-        source $config_file
-    else
-        echo Creating temporary config: $config_file
-        touch $config_file
-    fi
-
     set -e
 
-    require_config customer "Customer name"
-    require_config name "Cluster name"
+    if ! [ -e "$REPO_CONFIG" ]; then
+        create_repo_config
+    fi
+
+    create_cluster
+
+    if ! has_remote upstream; then
+        line
+        info Current remotes:
+        git remote -v
+
+        update_git_remotes
+
+        line
+        info New remotes:
+        git remote -v
+    fi
+}
+
+function create_repo_config()
+{
+    info Creating $REPO_CONFIG
+
+    read_config customer "Customer name"
+
+    local current_upstream=$(git_remote upstream)
+    [ -z "$upstream" ] && upstream="$origin"
+    [ -z "$upstream" ] && upstream="$current_upstream"
+    [ -z "$upstream" ] && upstream="$default_upstream"
+    read_config upstream "Set UPSTREAM remote"
+
+    [ -z "$origin" ] && origin="$(git-url $(git_remote origin) url2ssh)"
+    origin=${origin%.git}-$customer.git
+    read_config origin "Set ORIGIN remote"
+
+    flux_git_repo=${origin#git://}
+    flux_git_repo=ssh://${flux_git_repo/:/\/}
+    read_config flux_git_repo "Flux git repository"
+
+    save_repo_config
+}
+
+function save_repo_config()
+{
+    set_config customer="$customer" "Customer name" $REPO_CONFIG
+    set_config upstream="$upstream" "Upstream git repo" $REPO_CONFIG
+    set_config origin="$origin" "Origin git repo" $REPO_CONFIG
+    set_config flux_git_repo="$flux_git_repo" "Git repo for default flux GitRepository" $REPO_CONFIG
+}
+
+function create_cluster()
+{
     select_cluster_type
-
-    GIT_VERSION=$(git version | awk '{print $NF}')
-    case $GIT_VERSION in
-        1.*)
-            set_config upstream_git_repo=$(git remote -v | grep -m1 ^origin|awk '{print $2}') "Upstream SSH git repo"
-            ;;
-        2.*)
-            set_config upstream_git_repo=$(git remote get-url origin) "Upstream SSH git repo"
-    esac
-
-    local _origin_git_repo=$(git-url $upstream_git_repo url2ssh)
-    set_config origin_git_repo=${_origin_git_repo%.git}-$customer.git "Origin SSH git repo"
-    set_config https_origin_git_repo=$(git-url $origin_git_repo url2https) "Origin HTTPS git repo"
-
-    local _git_repo=${origin_git_repo#git://}
-    _git_repo=ssh://${origin_git_repo/:/\/}
-    set_config flux_git_repo=${_git_repo} "Git repo for default flux GitRepository"
+    read_config name "Cluster name"
 
     local cluster_root_dir=clusters/$name
     cluster_dir=$cluster_root_dir/$type
+    export CLUSTER_CONFIG=$cluster_dir/cluster.conf
 
-    if [ -d $cluster_dir ] && ! $force; then
-        warn "Cluster already exists: $cluster_dir"
-        exit 1
-    fi
-
-    mkdir -p ${cluster_root_dir}
+    mkdir -p ${cluster_dir}
+    save_cluster_config
     copy_from_template templates/$type $cluster_dir
-
-    local temp_config_file=$config_file
-    config_file=$cluster_dir/cluster.conf
-
-    info Moving $temp_config_file to $config_file
-    mv $temp_config_file $config_file
-
     generate_ssh_key
+}
+
+function save_cluster_config()
+{
+    set_config type="$type" "Cluster Type" $CLUSTER_CONFIG
+    set_config name="$name" "Cluster Name" $CLUSTER_CONFIG
 }
 
 ####################
@@ -505,12 +586,14 @@ function command_create()
 ####################
 
 standalone=false
-docker_command=/bin/bash
+docker_command="" # /bin/bash
 port_range=32000-32010
 run_as_root=false
-docker_image=ghcr.io/getupcloud/managed-cluster:$(cat version.txt)
+docker_image=ghcr.io/getupcloud/managed-cluster:$(cat ${ROOT_DIR}/version.txt)
 force_docker_image_build=false
+sudo=sudo
 
+alias getopt_s=getopt_start
 function getopt_start()
 {
     while [ $# -gt 0 ]; do
@@ -529,12 +612,15 @@ function getopt_start()
             -r|--run-as-root)
                 run_as_root=true
             ;;
+            --no-sudo)
+                sudo=""
+            ;;
             -i|--image)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 docker_image=$1
             ;;
-            -f|--force-docker-image-build)
+            --force-docker-image-build)
                 force_docker_image_build=true
             ;;
             --)
@@ -552,11 +638,56 @@ function getopt_start()
         shift
     done
 
-    cluster_dir=$( select_cluster $cluster_dir )
+    cluster_dir=$(select_cluster $cluster_dir)
 }
 
+function check_dependencies()
+{
+    local status=0
+
+    for bin in jq make; do
+        if ! which $bin &>/dev/null; then
+            warn "Missing required command: $bin"
+            status=1
+        fi
+    done
+
+    for lib in giturlparse; do
+        if ! python3 -c "import $lib; print($lib)" &>/dev/null && ! python -c "import $lib; print($lib)" &>/dev/null; then
+            warn "Missing required python lib: $lib"
+            status=1
+        fi
+    done
+
+    return $status
+}
+
+function check_deprecations()
+{
+    local old_cluster_configs=(
+        upstream_git_repo
+        origin_git_repo
+        https_origin_git_repo
+        flux_git_repo
+    )
+
+    for i in ${old_cluster_configs[*]}; do
+        if grep -q $i $cluster_dir/cluster.conf; then
+            warn "DEPRECATED: $cluster_dir/cluster.conf: $i: Please remove this config."
+        fi
+    done
+}
+
+alias command_s=command_start
 function command_start()
 {
+    check_deprecations
+
+    if ! check_dependencies; then
+        info "Execute 'make install' or install missing command(s) or lib(s)"
+        exit 1
+    fi
+
     if $standalone; then
         cluster_dir="$PWD/standalone"
         mkdir -p $cluster_dir
@@ -571,14 +702,15 @@ function command_start()
 ## COMMAND: sync-template ##
 ############################
 
-function getopt_sync_templates()
+alias getopt_st=getopt_sync_template
+function getopt_sync_template()
 {
     while [ $# -gt 0 ]; do
         case $1 in
             -h|--help)
                 usage
             ;;
-            -f|--force)
+            --force)
                 force=true
             ;;
             *)
@@ -591,72 +723,96 @@ function getopt_sync_templates()
         shift
     done
 
-    cluster_dir=$( select_cluster $1 )
+    cluster_dir=$(select_cluster $cluster_dir)
 }
 
-function command_sync_templates()
+alias command_st=command_sync_template
+function command_sync_template()
 {
     assert_cluster_dir
     sync_from_template
 }
 
 ###########################
-## COMMAND: set-upstream ##
+## COMMAND: remote-setup ##
 ###########################
 
-remote_upstream=git@github.com:getupcloud/managed-cluster.git
+opt_upstream=
+opt_origin=
 
-function getopt_set_upstream()
+alias getopt_rs=getopt_remote_setup
+function getopt_remote_setup()
 {
     while [ $# -gt 0 ]; do
         case $1 in
-            -r|--remote)
-                [ $# -lt 2 ] && invalid_argument $1
-                shift
-                remote_upstream=$1
-            ;;
-            -f|--force)
+            --force)
                 force=true
             ;;
-            *)
-                if [ -z "$cluster_dir" ]; then
-                    cluster_dir=$1
-                else
-                    invalid_argument $1
-                fi
+            -o|--origin)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_origin=$1
+            ;;
+            -u|--upstream)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_upstream=$1
+            ;;
+            -f|--flux-git-repo)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_flux_git_repo=$1
         esac
         shift
     done
-
-    cluster_dir=$( select_cluster $1 )
 }
 
-function command_set_upstream()
+alias command_rs=command_remote_setup
+function command_remote_setup()
 {
     set -e
-    assert_cluster_dir
+    line
+    info Current remotes:
+    git remote -v
 
-    source_env $cluster_dir/cluster.conf
+    source_env $REPO_CONFIG
 
-    if git remote | grep -q '^upstream$'; then
-        if $force; then
-            info Removing old remote: upstream $remote_upstream
-            git remote remove upstream
-        else
-            warn Remote already exists: upstream $remote_upstream
-            return 1
+    echo "$opt_upstream$opt_origin$opt_flux_git_repo"
+    if [ -z "$opt_upstream$opt_origin$opt_flux_git_repo" ]; then
+        read_config upstream "Set UPSTREAM remote"
+        read_config origin "Set ORIGIN remote"
+        read_config flux_git_repo "Flux git repository"
+    else
+        [ -z "$opt_upstream" ] || read_config upstream "Set UPSTREAM remote"
+        [ -z "$opt_origin" ] || read_config origin "Set ORIGIN remote"
+        [ -z "$opt_flux_git_repo" ] || read_config flux_git_repo "Flux git repository"
+    fi
+
+    line
+    info Will update to:
+    info "-> upstream: $upstream"
+    info "-> origin: $origin"
+    info "-> flux_git_repo: $flux_git_repo"
+
+    if ! $force; then
+        if ! ask "Continue? [Y/n]"; then
+            return
         fi
     fi
 
-    info Adding remote: upstream $remote_upstream
-    git remote add upstream $remote_upstream
-    git remote set-url --push upstream FORBIDEN
+    save_repo_config
+    update_git_remotes
+
+    line
+    info New remotes:
+    git remote -v
 }
 
 #############################
 ## COMMAND: update-ssh-key ##
 #############################
 
+alias getopt_usk=getopt_update_ssh_key
 function getopt_update_ssh_key()
 {
     while [ $# -gt 0 ]; do
@@ -674,7 +830,7 @@ function getopt_update_ssh_key()
                 shift
                 ssh_key_length=$1
             ;;
-            -f|--force)
+            --force)
                 force=true
             ;;
             *)
@@ -692,9 +848,10 @@ function getopt_update_ssh_key()
         ssh_key_length=${!key_len}
     fi
 
-    cluster_dir=$( select_cluster $1 )
+    cluster_dir=$(select_cluster $cluster_dir)
 }
 
+alias command_usk=command_update_ssh_key
 function command_update_ssh_key()
 {
     if ! $force; then
@@ -710,6 +867,60 @@ function command_update_ssh_key()
     fi
 
     generate_ssh_key
+}
+
+###############################
+## COMMAND: import-variables ##
+###############################
+
+import_var_prefixes=()
+import_var_sources=()
+
+alias getopt_iv=getopt_import_variables
+function getopt_import_variables()
+{
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h|--help)
+                usage
+            ;;
+            *)
+                [ $# -lt 2 ] && invalid_argument "missing source"
+                import_var_prefixes+=( "$1" )
+                import_var_sources+=( "$2" )
+                shift
+            ;;
+        esac
+        shift
+    done
+}
+
+function prepend_prefix()
+{
+    local prefix="$1"
+    local source="$2"
+
+    echo "## Starting - auto-generated by $0 from $source"
+    sed -e '/^\s*variable\s\+"\?'$prefix'_/!s/^\(\s*variable\s\+"\)\?\([a-zA-Z0-9]\+\)/\1'$prefix'_\2/'
+    echo "## Finished - auto-generated by $0 from $source"
+}
+
+alias command_iv=command_import_variables
+function command_import_variables()
+{
+    for i in $(seq 0 $(( ${#import_var_prefixes[*]} - 1 )) ); do
+        prefix=${import_var_prefixes[$i]}
+        source=${import_var_sources[$i]}
+
+        if [[ "$source" =~ ^https?:// ]]; then
+            curl -skL "$source" | prepend_prefix "$prefix" "$source"
+        elif [ "$source" == "-" ] || [ -e "$source" ]; then
+            cat "$source" | prepend_prefix "$prefix" "$source"
+        else
+            echo "File not found: $source"
+            exit 1
+        fi
+    done
 }
 
 ##########
@@ -748,7 +959,9 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$command" ]; then
-    invalid_argument "COMMAND"
+    #invalid_argument "COMMAND"
+    usage
+    exit 1
 fi
 
 eval getopt_${command//-/_} "$@"

@@ -1,7 +1,8 @@
 FROM centos:8
 
-ENV CLUSTERDIR="/cluster" \
-    REPODIR="/repo" \
+ENV CLUSTER_DIR="/cluster" \
+    REPO_DIR="/repo" \
+    INSIDE_CONTAINER=true \
     TERM="xterm-256color" \
     PATH=$PATH:/root/.krew/bin
 
