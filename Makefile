@@ -45,15 +45,15 @@ fmt:
 
 install:
 	if [ -e /etc/debian_version ]; then \
-		apt install -y make jq python3-pip; \
+		apt install -y jq python3-pip rsync; \
 	fi
 	if [ -e /etc/redhat-release ]; then \
-		yum install -y make jq python3-pip; \
+		yum install -y jq python3-pip rsync; \
 	fi
 	if [ -d /Applications ]; then \
-		brew install make jq; \
+		brew install jq; \
 	fi
-	pip3 install --user giturlparse || pip install --user giturlparse
+	pip3 install giturlparse || pip install giturlparse
 
 test: TEST_PARAMS=--branch remotes/origin/$(shell git branch --show-current)
 test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)
