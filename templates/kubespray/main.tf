@@ -13,4 +13,5 @@ module "cluster" {
   workers         = var.workers
   ssh_user        = var.ssh_user
   ssh_private_key = var.ssh_private_key
+  etc_hosts       = var.etc_hosts
 }
