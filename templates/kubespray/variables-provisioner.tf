@@ -140,3 +140,9 @@ variable "uninstall_packages" {
     "ntpd"
   ]
 }
+
+variable "etc_hosts" {
+  description = "Entries to add to /etc/hosts on each node, Example: {\"1.1.1.1\":\"example.com example.io\"}"
+  type        = map(string)
+  default     = {}
+}
