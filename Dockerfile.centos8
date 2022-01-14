@@ -92,7 +92,8 @@ ARG VERSION
 RUN echo $VERSION > /.version && \
     echo $GIT_COMMIT > /.gitcommit && \
     rsync /etc/skel/ /root/ && \
-    chmod -R +x /etc/profile.d/
+    chmod -R +x /etc/profile.d/ && \
+    chmod 777 /usr/share
 
 WORKDIR $CLUSTER_DIR
 
