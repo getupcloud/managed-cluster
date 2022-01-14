@@ -17,6 +17,8 @@ ENV \
     TF_DATA_DIR="${CLUSTER_DIR}/.terraform" \
     TF_IN_AUTOMATION="true" \
     TF_LOG="INFO" \
+    TF_LOG_PROVIDER="INFO" \
+    TF_LOG_CORE="WARN" \
     TF_LOG_PATH="${CLUSTER_DIR}/terraform.log" \
     TF_PLAN_FILE="${CLUSTER_DIR}/terraform.tfplan" \
     TF_VARS_FILE="${CLUSTER_DIR}/terraform.tfvars" \
