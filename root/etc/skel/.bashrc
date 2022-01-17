@@ -15,5 +15,6 @@ pathmunge () {
     esac
 }
 
+pathmunge ~/.local/bin
 ${DEVEL:-false} && pathmunge /repo/root/usr/local/bin || true
 _kube_ps1_init || true
