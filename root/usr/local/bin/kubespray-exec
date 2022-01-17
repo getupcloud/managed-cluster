@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+user=${1}
+shift
+
+ansible all -i $INVENTORY_FILE --become --user $user -m shell -a "$*"
