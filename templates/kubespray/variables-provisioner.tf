@@ -1,4 +1,4 @@
-variable "masters" {
+variable "master_nodes" {
   description = "List of master nodes to provision"
   type        = list(any)
   default = [
@@ -25,7 +25,7 @@ variable "masters" {
   ]
 }
 
-variable "workers" {
+variable "infra_nodes" {
   description = "List of worker nodes to provision"
   type        = list(any)
   default = [
@@ -43,7 +43,14 @@ variable "workers" {
           mountpoint : "/var/lib/containers",
         }
       }
-    },
+    }
+  ]
+}
+
+variable "app_nodes" {
+  description = "List of worker nodes to provision"
+  type        = list(any)
+  default = [
     {
       address : "3.3.3.3",
       hostname : "app-0",
