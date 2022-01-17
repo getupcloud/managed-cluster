@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+user=${1:-centos}
+
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $KUBESPRAY_DIR/cluster.yml

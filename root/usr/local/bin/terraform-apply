@@ -4,7 +4,7 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-info Switching to $REPO_DIR
+info Switching to $CLUSTER_DIR
 cd $CLUSTER_DIR
 
 ask_execute_command terraform init
