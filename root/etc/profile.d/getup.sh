@@ -325,7 +325,8 @@ run_as_user()
     if [ -d $HOME/.kube ]; then
         rm -rf $HOME/.kube
     fi
-    ln -s ${KUBECONFIG%/*} $HOME/.kube
+    ln -fs ${KUBECONFIG%/*} $HOME/.kube
+    ln -fs $CLUSTER_DIR/.local $HOME/.local
 
     chown -R $CONTAINER_USER_ID:$CONTAINER_GROUP_ID $REPO_DIR $HOME/
 
