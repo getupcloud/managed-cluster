@@ -4,7 +4,7 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-user=$(grep 'ssh_user\s*=\s*.*'|awk '{print $NF}'|tr -d '"')
+user=$(grep 'ssh_user\s*=\s*.*' $CLUSTER_DIR/terraform.tfvars | awk '{print $NF}' | tr -d '"')
 if [ -z "$user" ]; then
     user=centos
 fi
