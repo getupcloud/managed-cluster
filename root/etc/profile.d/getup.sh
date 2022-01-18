@@ -327,6 +327,7 @@ run_as_user()
     fi
     ln -fs ${KUBECONFIG%/*} $HOME/.kube
     ln -fs $CLUSTER_DIR/.local $HOME/.local
+    mkdir -p $CLUSTER_DIR/.local
 
     chown -R $CONTAINER_USER_ID:$CONTAINER_GROUP_ID $REPO_DIR $HOME/
 
