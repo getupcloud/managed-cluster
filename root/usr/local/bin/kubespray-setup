@@ -1,0 +1,11 @@
+#!/bin/bash
+
+PS3='Select file (press "q" to exit)'
+
+select f in $(find /cluster/group_vars/ -type f); do
+    if [ -n "$f" ]; then
+        vim "$f"
+    else
+        break
+    fi
+done
