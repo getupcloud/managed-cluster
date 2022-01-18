@@ -17,6 +17,22 @@ export COLOR_GRAY="$(tput setaf 8)"
 export COLOR_BOLD="$(tput bold)"
 export COLOR_RESET="$(tput sgr0)"
 
+save_opt()
+{
+    for i; do
+        [ ${-//$i/} != $- ] && state="-$i" || state="+$i"
+        export _SAVE_OPT_$i="$state"
+    done
+}
+
+load_opt()
+{
+    for i; do
+        local state=_SAVE_OPT_$i
+        set ${!state}
+    done
+}
+
 source_env()
 {
     if ! [ -e "$1" ]; then
@@ -24,12 +40,10 @@ source_env()
         return
     fi
     verb "Reading $1"
-    # salve `set -a` state
-    [ ${-//a/} != $- ] && on=true || on=false
+    save_opt a
     set -a
     source $1
-    # restore `set -a` if was set before
-    $on || set +a
+    load_opt a
 }
 
 # copy from /etc/profile
