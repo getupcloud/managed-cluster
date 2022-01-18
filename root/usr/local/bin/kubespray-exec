@@ -4,7 +4,11 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-user=${1}
-shift
+user=$(grep 'ssh_user\s*=\s*.*'|awk '{print $NF}'|tr -d '"')
+if [ -z "$user" ]; then
+    user=centos
+fi
+
+set -x
 
 ansible all -i $INVENTORY_FILE --become --user $user -m shell -a "$*"
