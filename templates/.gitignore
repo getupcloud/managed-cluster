@@ -1,6 +1,8 @@
 .kube
 .local
+.setup_history
 .terraform.d
 .terraform.lock.hcl
-.setup_history
+doctl
+helm
 terraform.log
