@@ -565,6 +565,8 @@ function create_repo_config()
 
 function save_repo_config()
 {
+    info Saving $REPO_CONFIG
+
     set_config customer="$customer" "Customer name" $REPO_CONFIG
     set_config upstream="$upstream" "Upstream git repo" $REPO_CONFIG
     set_config origin="$origin" "Origin git repo" $REPO_CONFIG
@@ -588,6 +590,7 @@ function create_cluster()
 
 function save_cluster_config()
 {
+    info Saving $CLUSTER_CONFIG
     set_config type="$type" "Cluster Type" $CLUSTER_CONFIG
     set_config name="$name" "Cluster Name" $CLUSTER_CONFIG
 }
