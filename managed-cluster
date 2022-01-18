@@ -56,10 +56,11 @@ function sync_from_template()
       return 1
     fi
 
-    source $dest/cluster.conf || return 1
+    source_env $ROOT_DIR/repo.conf || return 1
+    source_env $dest/cluster.conf || return 1
 
     if [ -z "$customer" ] || [ -z "$name" ] || [ -z "$type" ]; then
-      warn "Invalid $dest/cluster.conf: ${customer@A} ${name@A} ${type@A}"
+      warn "Invalid $dest/cluster.conf: customer=${customer} name=${name} type=${type}"
       return 1
     fi
 

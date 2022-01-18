@@ -1,0 +1,6 @@
+.kube
+.local
+.terraform.d
+.terraform.lock.hcl
+.setup_history
+terraform.log
