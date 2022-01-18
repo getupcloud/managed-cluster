@@ -39,7 +39,7 @@ function copy_from_template()
       mkdir -p "$dest"
     fi
 
-    rsync -va $rsync_params $src/ templates/manifests templates/*.* "$dest"
+    rsync -va $rsync_params $src/ ${common_template_files[@]} "$dest"
 }
 
 function sync_from_template()
@@ -48,6 +48,11 @@ function sync_from_template()
 
     if ! [ -d "$dest" ]; then
       warn "Cluster dir not found: $dest"
+      return 1
+    fi
+
+    if ! [ -e "$ROOT_DIR/repo.conf" ]; then
+      warn "Missing $ROOT_DIR/repo.conf"
       return 1
     fi
 
@@ -431,6 +436,11 @@ ssh_key_length_ecdsa=521
 ssh_key_type=ecdsa
 ssh_key_length=0
 default_upstream=git@github.com:getupcloud/managed-cluster.git
+common_template_files=(
+    templates/manifests
+    templates/*.*
+    templates/.gitignore
+)
 
 #####################
 ## COMMAND: create ##
