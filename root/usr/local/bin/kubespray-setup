@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PS3='Select file (press "q" to exit)'
+PS3='Select file (press "q" to exit): '
 
 select f in $(find /cluster/group_vars/ -type f | sort); do
     if [ -n "$f" ]; then
