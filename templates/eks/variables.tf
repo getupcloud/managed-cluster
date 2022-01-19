@@ -121,10 +121,10 @@ variable "flux_wait" {
 variable "aws_modules" {
   description = "Configure AWS modules to install"
   type        = any
-  default     = {
+  default = {
     "certmanager" : {
       "enabled" : true,
-      "hosted_zone_id": ""
+      "hosted_zone_id" : ""
     }
     "cluster-autoscaler" : {
       "enabled" : true
@@ -146,7 +146,7 @@ variable "aws_modules" {
     }
     "external-dns" : {
       "enabled" : false,
-      "hosted_zone_ids": []
+      "hosted_zone_ids" : []
     }
   }
 }
