@@ -1,0 +1,102 @@
+annotate "Create kube-router annotation" off \
+apps "K8s apps definitions" off \
+asserts "Check tasks for download role" off \
+aws-ebs-csi-driver "Configuring csi driver: aws-ebs" off \
+azure-csi-driver "Configuring csi driver: azure" off \
+bastion "Setup ssh config for bastion" off \
+bootstrap-os "Anything related to host OS configuration" off \
+calico "Network plugin Calico" off \
+calico_rr "Configuring Calico route reflector" off \
+canal "Network plugin Canal" off \
+cephfs-provisioner "Configuring CephFS" off \
+cert-manager "Configuring certificate manager for K8s" off \
+cilium "Network plugin Cilium" off \
+cinder-csi-driver "Configuring csi driver: cinder" off \
+client "Kubernetes clients role" off \
+cloud-provider "Cloud-provider related tasks" off \
+cluster-roles "Configuring cluster wide application (psp ...)" off \
+cni "CNI plugins for Network Plugins" off \
+containerd "Configuring containerd engine runtime for hosts" off \
+container_engine_accelerator "Enable nvidia accelerator for runtimes" off \
+container-engine "Configuring container engines" off \
+container-runtimes "Configuring container runtimes" off \
+coredns "Configuring coredns deployment" off \
+crio "Configuring crio container engine for hosts" off \
+crun "Configuring crun runtime" off \
+csi-driver "Configuring csi driver" off \
+dashboard "Installing and configuring the Kubernetes Dashboard" off \
+dns "Remove dns entries when resetting" off \
+docker "Configuring docker engine runtime for hosts" off \
+download "Fetching container images to a delegate host" off \
+etcd "Configuring etcd cluster" off \
+etcd-secrets "Configuring etcd certs/keys" off \
+etchosts "Configuring /etc/hosts entries for hosts" off \
+external-cloud-controller "Configure cloud controllers" off \
+external-openstack "Cloud controller : openstack" off \
+external-provisioner "Configure external provisioners" off \
+external-vsphere "Cloud controller : vsphere" off \
+facts "Gathering facts and misc check results" off \
+files "Remove files when resetting" off \
+flannel "Network plugin flannel" off \
+gce "Cloud-provider GCP" off \
+gcp-pd-csi-driver "Configuring csi driver: gcp-pd" off \
+gvisor "Configuring gvisor runtime" off \
+helm "Installing and configuring Helm" off \
+ingress-controller "Configure ingress controllers" off \
+ingress_alb "AWS ALB Ingress Controller" off \
+init "Windows kubernetes init nodes" off \
+iptables "Flush and clear iptable when resetting" off \
+k8s-pre-upgrade "Upgrading K8s cluster" off \
+k8s-secrets "Configuring K8s certs/keys" off \
+k8s-gen-tokens "Configuring K8s tokens" off \
+kata-containers "Configuring kata-containers runtime" off \
+krew "Install and manage krew" off \
+kubeadm "Roles linked to kubeadm tasks" off \
+kube-apiserver "Configuring static pod kube-apiserver" off \
+kube-controller-manager "Configuring static pod kube-controller-manager" off \
+kubectl "Installing kubectl and bash completion" off \
+kubelet "Configuring kubelet service" off \
+kube-ovn "Network plugin kube-ovn" off \
+kube-router "Network plugin kube-router" off \
+kube-proxy "Configuring static pod kube-proxy" off \
+localhost "Special steps for the localhost (ansible runner)" off \
+local-path-provisioner "Configure External provisioner: local-path" off \
+local-volume-provisioner "Configure External provisioner: local-volume" off \
+macvlan "Network plugin macvlan" off \
+master "Configuring K8s master node role" off \
+metallb "Installing and configuring metallb" off \
+metrics_server "Configuring metrics_server" off \
+netchecker "Installing netchecker K8s app" off \
+network "Configuring networking plugins for K8s" off \
+mounts "Umount kubelet dirs when reseting" off \
+multus "Network plugin multus" off \
+nginx "Configuring LB for kube-apiserver instances" off \
+node "Configuring K8s minion (compute) node role" off \
+nodelocaldns "Configuring nodelocaldns daemonset" off \
+node-label "Tasks linked to labeling of nodes" off \
+node-webhook "Tasks linked to webhook (grating access to resources)" off \
+nvidia_gpu "Enable nvidia accelerator for runtimes" off \
+oci "Cloud provider: oci" off \
+persistent_volumes "Configure csi volumes" off \
+persistent_volumes_aws_ebs_csi "Configuring csi driver: aws-ebs" off \
+persistent_volumes_cinder_csi "Configuring csi driver: cinder" off \
+persistent_volumes_gcp_pd_csi "Configuring csi driver: gcp-pd" off \
+persistent_volumes_openstack "Configuring csi driver: openstack" off \
+policy-controller "Configuring Calico policy controller" off \
+post-remove "Tasks running post-remove operation" off \
+post-upgrade "Tasks running post-upgrade operation" off \
+pre-remove "Tasks running pre-remove operation" off \
+pre-upgrade "Tasks running pre-upgrade operation" off \
+preinstall "Preliminary configuration steps" off \
+registry "Configuring local docker registry" off \
+reset "Tasks running doing the node reset" off \
+resolvconf "Configuring /etc/resolv.conf for hosts/apps" off \
+rbd-provisioner "Configure External provisioner: rdb" off \
+services "Remove services (etcd, kubelet etc...) when resetting" off \
+snapshot "Enabling csi snapshot" off \
+snapshot-controller "Configuring csi snapshot controller" off \
+upgrade "Upgrading, f.e. container images/binaries" off \
+upload "Distributing images/binaries across hosts" off \
+vsphere-csi-driver "Configuring csi driver: vsphere" off \
+weave "Network plugin Weave" off \
+win_nodes "Running windows specific tasks" off

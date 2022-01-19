@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -eu
+
+export ROOT_DIR=$(readlink -ne $(dirname $0))
+
+source /etc/profile.d/getup.sh
+
+user=${1:-centos}
+
+out=/tmp/.dialog
+exec 3>$out
+eval dialog \
+    --output-fd 3 \
+    --checklist '"Select kubespray tags (https://github.com/kubernetes-sigs/kubespray/blob/master/docs/ansible.md)"' \
+    0 0 0 \
+    "$(<$ROOT_DIR/kubespray-tags.txt)"
+tags=$(tr ' ' , <$out)
+rm -f $out
+
+if [ -z "$tags" ]; then
+    echo No tags selected
+    exit 0
+fi
+
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $KUBESPRAY_DIR/cluster.yml --tags $tags
