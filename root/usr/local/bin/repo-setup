@@ -3,6 +3,7 @@
 set -eu
 
 source /etc/profile.d/getup.sh
+source repo-git-config-setup
 
 info Switching to $REPO_DIR
 cd $REPO_DIR

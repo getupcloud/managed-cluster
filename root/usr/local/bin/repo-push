@@ -3,6 +3,7 @@
 set -eu
 
 source /etc/profile.d/getup.sh
+source repo-git-config-setup
 
 info Switching to $REPO_DIR
 cd $REPO_DIR
@@ -17,22 +18,6 @@ if ! has_remote upstream 2>/dev/null; then
     info "Local repository has no upstream remote"
     ask_execute_command repo-setup
 fi
-
-save_opt u
-set +u
-git_user_name=$(git config --get user.name || true)
-git_user_email=$(git config --get user.email || true)
-
-if [ -z "$git_user_name" ]; then
-    read_config git_user_name "Your git user.name"
-    git config --global user.name "$git_user_name"
-fi
-
-if [ -z "$git_user_email" ]; then
-    read_config git_user_email "Your git user.email"
-    git config --global user.email "$git_user_email"
-fi
-load_opt u
 
 if ask_execute_command git status --short clusters/$name/$type; then
 info "$(cat <<.

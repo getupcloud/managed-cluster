@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+source /etc/profile.d/getup.sh
+
+cd $REPO_DIR
+
+save_opt u
+set +u
+
+git_user_name=$(git config --get user.name || true)
+git_user_email=$(git config --get user.email || true)
+
+if [ -z "$git_user_name" ]; then
+    read_config git_user_name "Your git user.name"
+    git config --global user.name "$git_user_name"
+fi
+
+if [ -z "$git_user_email" ]; then
+    read_config git_user_email "Your git user.email"
+    git config --global user.email "$git_user_email"
+fi
+
+load_opt u
