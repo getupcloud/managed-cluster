@@ -6,3 +6,4 @@
 doctl
 helm
 terraform.log
+ansible.log
