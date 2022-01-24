@@ -140,6 +140,17 @@ function select_cluster_type()
 
 function select_cluster_sla()
 {
+    if [ -n "$opt_sla" ]; then
+        case "$opt_sla" in
+            high|low|none)
+                export sla=$opt_sla
+                return
+            ;;
+        esac
+        warn Invalid cluster SLA: $opt_sla
+        return 1
+    fi
+
     local PS3=$(prompt "Select cluster SLA")
 
     select sla in "high (prod|hlg)" "low (dev|test)" "none (no remote-ops)"; do
@@ -353,6 +364,7 @@ function usage()
         echo "     -l, --ssh-key-length       SSH key length, depends on ssh key type."
         echo "     -n, --name NAME            Unique name for new cluster."
         echo "     -o, --origin REMOTE        Define ORIGIN remote address."
+        echo "     -s, --sla VALUE            Cluster SLA: high, low, none (default: $opt_sla)."
         echo "     -t, --type NAME            Cluster type: $(list_cluster_types)."
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
@@ -466,6 +478,7 @@ opt_upstream=
 opt_customer=
 opt_name=
 opt_type=
+opt_sla=
 opt_flux_git_repo=
 
 alias getopt_c=getopt_create
@@ -518,6 +531,11 @@ function getopt_create()
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 ssh_key_length=$1
+            ;;
+            -s|--sla)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_sla=$1
             ;;
             *)
                 invalid_argument $1
@@ -609,6 +627,7 @@ function save_cluster_config()
     info Saving $CLUSTER_CONFIG
     set_config type="$type" "Cluster Type" $CLUSTER_CONFIG
     set_config name="$name" "Cluster Name" $CLUSTER_CONFIG
+    set_config sla="$sla" "Cluster SLA" $CLUSTER_CONFIG
 }
 
 ####################

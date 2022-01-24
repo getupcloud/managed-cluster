@@ -4,7 +4,7 @@ for type in $types; do
     CLUSTER_DIR=$PWD/clusters/$NAME/$type
 
     rm -rf $CLUSTER_DIR
-    ./managed-cluster create --customer $CUSTOMER --name $NAME --type $type
+    ./managed-cluster create --customer $CUSTOMER --name $NAME --type $type --sla none
     terraform_params=( $(jq .${type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r tests/test-data.json 2>/dev/null || true) )
 
     cat > $CLUSTER_DIR/test-cluster <<EOF

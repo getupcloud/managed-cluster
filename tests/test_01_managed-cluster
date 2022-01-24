@@ -12,7 +12,7 @@ FLUX_GIT_REPO=ssh://git@github.com/$CUSTOMER/managed-cluster-$CUSTOMER.git
 
 rm -vf $REPO_CONFIG $CLUSTER_CONFIG
 testing "Can create cluster"
-run "./managed-cluster create -c $CUSTOMER -n $NAME -t $TYPE -k ecdsa -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO"
+run "./managed-cluster create -c $CUSTOMER -n $NAME -t $TYPE -s high -k ecdsa -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO"
 assert "grep -q customer=$CUSTOMER $REPO_CONFIG"
 [ "$remote" == local ] || \
     assert "grep -q upstream=$UPSTREAM $REPO_CONFIG"
@@ -20,6 +20,7 @@ assert "grep -q origin=$ORIGIN $REPO_CONFIG"
 assert "grep -q flux_git_repo=$FLUX_GIT_REPO $REPO_CONFIG"
 assert "grep -q name=$NAME $CLUSTER_CONFIG"
 assert "grep -q type=$TYPE $CLUSTER_CONFIG"
+assert "grep -q sla=high $CLUSTER_CONFIG"
 assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 12 ]"
 assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp521 ]"
 
@@ -39,7 +40,7 @@ assert "grep -q flux_git_repo=flux-$FLUX_GIT_REPO $REPO_CONFIG"
 
 testing "Can create cluster with non-default key size"
 rm -f $CLUSTER_DIR/identity
-run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE -k ecdsa -l 256 --force"
+run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE -s none -k ecdsa -l 256 --force"
 assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 9 ]"
 assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp256 ]"
 
