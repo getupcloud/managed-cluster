@@ -154,7 +154,7 @@ spec:
     #    tls:
     #    - hosts:
     #      - alertmanager.example.com
-    #      secretName: ${ try(helm_releases.monitoring.monitoring.template_vars.alertmanager_ingress_tls, "alertmanager-ingress-tls") }
+    #      secretName: lertmanager-ingress-tls
 
 
       config:
@@ -266,7 +266,7 @@ spec:
     #      slack_configs:
     #      - send_resolved: true
     #        api_url: https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    #        channel: "#${trimprefix(slack.channel, "#")}"
+    #        channel: "#${trimprefix(alertmanager_slack_channel, "#")}"
     #        color: |-
     #          {{- if eq .Status "firing" -}}
     #            {{- if eq (index .Alerts 0).Labels.severity "critical" -}}
@@ -301,7 +301,7 @@ spec:
     #    #############################
     #    - name: opsgenie
     #      opsgenie_configs:
-    #      - api_key: ${alertmanager_opsgenie_key}
+    #      - api_key: ${alertmanager_opsgenie_api_ey}
     #        # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
     #        tags: ${cluster_name}, sla-${cluster_sla}
 
