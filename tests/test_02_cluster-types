@@ -4,7 +4,11 @@ for type in $types; do
     CLUSTER_DIR=$PWD/clusters/$NAME/$type
 
     rm -rf $CLUSTER_DIR
-    ./managed-cluster create --customer $CUSTOMER --name $NAME --type $type --sla none
+    ./managed-cluster create --customer $CUSTOMER --name $NAME --type $type --sla none \
+        --flux-git-repo ssh://git@github.com/eveilcorp/managed-cluster-evilcluster.git \
+        --origin git@github.com:evilcorp/managed-cluster-evilcluster.git \
+        --upstream git@github.com:evilcorp/managed-cluster.git
+
     terraform_params=( $(jq .${type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r tests/test-data.json 2>/dev/null || true) )
 
     cat > $CLUSTER_DIR/test-cluster <<EOF
@@ -27,5 +31,5 @@ terraform validate
 #terraform plan -out=/tmp/terraform.tfplan
 EOF
     chmod +x $CLUSTER_DIR/test-cluster
-    ./managed-cluster start --force-docker-image-build $CLUSTER_DIR -- bash -c /cluster/test-cluster
+    run ./managed-cluster start --force-docker-image-build $CLUSTER_DIR -- bash -c /cluster/test-cluster
 done
