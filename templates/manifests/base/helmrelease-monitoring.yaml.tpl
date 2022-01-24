@@ -375,24 +375,6 @@ spec:
           isDefault: false
           editable: true
 
-    #%{ if try(helm_releases.monitoring.grafana-extra-dashboards.enabled, false) }
-    #  dashboardProviders:
-    #    dashboardproviders.yaml:
-    #      apiVersion: 1
-    #      providers:
-    #      - name: 'grafana-extra-dashboards'
-    #        orgId: 1
-    #        folder: ''
-    #        type: file
-    #        disableDeletion: true
-    #        editable: true
-    #        options:
-    #          path: /var/lib/grafana/dashboards/grafana-extra-dashboards
-    #
-    #  dashboardsConfigMaps:
-    #    grafana-extra-dashboards: grafana-extra-dashboards
-    #%{ endif }
-
       adminUsername: admin
       #adminPassword: prom-operator
 
