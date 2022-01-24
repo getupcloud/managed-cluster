@@ -9,5 +9,4 @@ module "kind" {
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   manifests_template_vars = local.manifests_template_vars
-  region                  = "local"
 }
