@@ -138,6 +138,21 @@ function select_cluster_type()
     export type
 }
 
+function select_cluster_sla()
+{
+    local PS3=$(prompt "Select cluster SLA")
+
+    select sla in "high (prod|hlg)" "low (dev|test)" "none (no remote-ops)"; do
+        sla=$(cut -f1 -d' ' <<<$sla)
+        case "$sla" in
+            high|low|none)
+                break;
+        esac
+    done
+
+    export sla
+}
+
 function generate_ssh_key()
 {
     if ! [ -e $cluster_dir/identity ]; then
@@ -577,6 +592,7 @@ function create_cluster()
 {
     select_cluster_type
     read_config name "Cluster name"
+    select_cluster_sla
 
     local cluster_root_dir=clusters/$name
     cluster_dir=$cluster_root_dir/$type

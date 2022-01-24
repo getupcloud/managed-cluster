@@ -179,49 +179,64 @@ spec:
               alertname: Watchdog
             continue: false
 
-    #      # send warning alerts to Slack channel
+    #      # Ignore too noisy alerts
+    #      - receiver: blackhole
+    #        match_re:
+    #          alertname: CPUThrottlingHigh
+    #          namespace: ^(.*-system|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)$
+    #        continue: false
+
+    #########################
+    ## External alert systems
+    #########################
+
+    #      # Cronitor
+    #      #############################
+    #      - receiver: cronitor
+    #        match:
+    #          alertname: CronitorWatchdog
+    #        group_wait: 5s
+    #        group_interval: 1m
+    #        continue: false
+
+    #      # Slack
+    #      #############################
     #      - receiver: slack
     #        match_re:
     #          alertname: .*
     #        continue: true
 
-          - continue: false
-            match_re:
-              alertname: CPUThrottlingHigh
-              namespace: ^(.*-system|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)$
-            receiver: blackhole
-
-    #      # send warning alerts to MSTeams
+    #      # MSTeams
+    #      #############################
     #      - receiver: msteams
     #        match_re:
-    #          label_name}: ${label_value}
     #         alertname: .*
     #        continue: true
-    #
+
     #      # Opsgenie
+    #      #############################
     #      - receiver: opsgenie
     #        match_re:
-    #          # alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
-    #          # namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
+    #          alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
+    #          namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
     #          severity: warning
     #        continue: true
+    #      - receiver: opsgenie
+    #        match:
+    #          severity: critical
+    #        continue: false
 
     #      # PageDuty
+    #      #############################
     #      - receiver: pager_duty
     #        match_re:
     #          # alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
     #          # namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
     #          severity: warning
     #        continue: true
-
-    #      # Cronitor Watchdog alerts when no alerts are received in 5min
-    #      # It's different from a regular Watchdog alert because it continuosly
-    #      # fires and resolves, instead a constantly firing Watchdog alert.
-    #      - receiver: cronitor
+    #      - receiver: pager_duty
     #        match:
-    #          alertname: CronitorWatchdog
-    #        group_wait: 5s
-    #        group_interval: 1m
+    #          severity: critical
     #        continue: false
 
           # ignored all alerts (default)
@@ -238,17 +253,15 @@ spec:
         # does nothing
         - name: blackhole
 
-    #    # example - send critical alerts to PagerDuty
-    #    - name: pager_duty
-    #      pagerduty_configs:
-    #      - service_key: ${alertmanager_pagerduty_key}
-    #        send_resolved: true
-
+    #    # Cronitor
+    #    #############################
     #    - name: cronitor
     #      webhook_configs:
-    #      - url: https://cronitor.link/${cronitor_id}/run
+    #      - url: https://cronitor.link/${alertmanager_cronitor_id}/run
     #        send_resolved: false
 
+    #    # Slack
+    #    #############################
     #    - name: slack
     #      slack_configs:
     #      - send_resolved: true
@@ -278,9 +291,26 @@ spec:
     #          *Labels:*{{ range .Labels.SortedPairs }} `{{ .Name }}={{ .Value }}`{{ end }}
     #          {{ end }}
 
+    #    # MSTeams
+    #    #############################
     #    - name: msteams
     #      webhook_configs:
     #      - url: "http://prometheus-msteams:2000/alertmanager"
+
+    #    # Opsgenie
+    #    #############################
+    #    - name: opsgenie
+    #      opsgenie_configs:
+    #      - api_key: ${alertmanager_opsgenie_key}
+    #        # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
+    #        tags: ${cluster_name}, sla-${cluster_sla}
+
+    #    # PagerDuty
+    #    #############################
+    #    - name: pager_duty
+    #      pagerduty_configs:
+    #      - service_key: ${alertmanager_pagerduty_key}
+    #        send_resolved: true
 
         inhibit_rules:
         # Inhibit same alert with lower severity of an already firing alert

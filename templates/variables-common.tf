@@ -10,6 +10,12 @@ variable "customer" {
   type        = string
 }
 
+variable "sla" {
+  description = "Cluster SLA"
+  type        = string
+  default     = "none"
+}
+
 variable "manifests_template_vars" {
   description = "Template vars for use by cluster manifests"
   type        = any
