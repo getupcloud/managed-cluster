@@ -301,7 +301,7 @@ spec:
     #    #############################
     #    - name: opsgenie
     #      opsgenie_configs:
-    #      - api_key: ${alertmanager_opsgenie_api_ey}
+    #      - api_key: ${alertmanager_opsgenie_api_key}
     #        # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
     #        tags: ${cluster_name}, sla-${cluster_sla}
 
