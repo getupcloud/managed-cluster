@@ -31,6 +31,18 @@ variable "flux_git_repo" {
   default     = ""
 }
 
+variable "flux_wait" {
+  description = "Wait for all manifests to apply"
+  type        = bool
+  default     = true
+}
+
+variable "manifests_path" {
+  description = "Manifests dir inside GitRepository"
+  type        = string
+  default     = ""
+}
+
 variable "cronitor_api_key" {
   description = "Cronitor API key. Leave empty to destroy"
   type        = string

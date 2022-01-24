@@ -1,4 +1,14 @@
 {
+  "gke": {
+    "tfvars": {
+      "project_id": "project-1",
+      "region": "us-east1",
+      "zones": ["z1","z2"],
+      "service_account_key": "/tmp/fake.json",
+      "network": "network-123",
+      "subnetwork": "subnet-123",
+    }
+  },
   "doks": {
     "tfvars": {
       "region": "fake"

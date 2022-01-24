@@ -1,13 +1,3 @@
-variable "name" {
-  description = "Cluster name"
-  type        = string
-}
-
-variable "description" {
-  description = "Cluster description"
-  type        = string
-}
-
 variable "kubeconfig_filename" {
   description = "Kubeconfig path"
   type        = string
@@ -18,49 +8,6 @@ variable "get_kubeconfig_command" {
   description = "Command to create/update kubeconfig"
   type        = string
   default     = "true"
-}
-
-variable "flux_git_repo" {
-  description = "GitRepository URL."
-  type        = string
-  default     = ""
-}
-
-variable "flux_wait" {
-  description = "Wait for all manifests to apply"
-  type        = bool
-  default     = true
-}
-
-variable "manifests_path" {
-  description = "Manifests dir inside GitRepository"
-  type        = string
-  default     = ""
-}
-
-variable "customer_name" {
-  description = "Customer name (Informative only)"
-  type        = string
-}
-
-variable "cronitor_api_key" {
-  description = "Cronitor API key. Leave empty to destroy"
-  type        = string
-  default     = ""
-}
-
-variable "cronitor_pagerduty_key" {
-  description = "Cronitor PagerDuty key"
-  type        = string
-  default     = ""
-}
-
-variable "manifests_template_vars" {
-  description = "Template vars for use by cluster manifests"
-  type        = any
-  default = {
-    alertmanager_pagerduty_key : ""
-  }
 }
 
 variable "project_id" {
@@ -91,31 +38,29 @@ variable "node_pools" {
 variable "maintenance_exclusions" {
   description = "Description: List of maintenance exclusions. A cluster can have up to three"
   type        = list(object({ name = string, start_time = string, end_time = string }))
+  default     = []
 }
 
 variable "maintenance_start_time" {
-  description = "Time window specified for daily or recurring maintenance operations in RFC3339 format"
+  description = "Time window specified for daily or recurring maintenance operations in RFC3339 format (Ex: 05:00)"
   type        = string
+  default     = ""
 }
 
 variable "configure_ip_masq" {
-  description = " Enables the installation of ip masquerading, which is usually no longer required when using aliasied IP addresses. IP masquerading uses a kubectl call, so when you have a private cluster, you will need access to the APIs"
+  description = "Enables the installation of ip masquerading."
   type        = bool
   default     = false
 }
 
 variable "default_max_pods_per_node" {
-  description = "The maximum number of pods to schedule per node"
-  type        = int
+  description = "The maximum number of pods to schedule per node."
+  type        = number
   default     = 110
 }
 
 variable "kubernetes_version" {
-  description = "
-    The version of Kubernetes to install 
-    Options: https://cloud.google.com/kubernetes-engine/docs/release-notes#current_versions
-    Example: 1.20.11-gke.1300
-    "
+  description = "The version of Kubernetes to install."
   type        = string
   default     = "latest"
 }
@@ -134,7 +79,7 @@ variable "remove_default_node_pool" {
 
 variable "initial_node_count" {
   description = "The number of nodes to create in this cluster's default node pool."
-  type        = int
+  type        = number
   default     = 1
 }
 
@@ -166,4 +111,111 @@ variable "grant_registry_access" {
   description = "Grants created cluster-specific service account storage.objectViewer and artifactregistry.reader roles."
   type = bool
   default = false
+}
+
+variable "service_account_key" {
+  description = "Value of the keyfile for the service account to impersonate"
+  type        = string
+  default     = "/cluster/serviceaccount.json"
+}
+variable "horizontal_pod_autoscaling" {
+  description = "Whether horizontal pod autoscaling enabled"
+  type        = bool
+  default     = true
+}
+
+variable "http_load_balancing" {
+  description = "Whether http load balancing enabled"
+  type        = bool
+  default     = false
+}
+
+variable "ip_range_pods" {
+  description = "The name of the secondary subnet ip range to use for pods"
+  type        = string
+  default     = ""
+}
+
+variable "ip_range_services" {
+  description = "	The name of the secondary subnet range to use for services"
+  type        = string
+  default     = ""
+}
+
+variable "network" {
+  description = "The VPC network to host the cluster in (required)"
+  type        = string
+}
+
+variable "network_policy" {
+  description = "Whether network policy enabled"
+  type        = bool
+  default     = false
+}
+
+variable "node_pools_oauth_scopes" {
+  description = "Map of lists containing node oauth scopes by node-pool name"
+  type        = map(list(string))
+  default = {
+    all   = ["https://www.googleapis.com/auth/cloud-platform"]
+    app   = []
+    infra = []
+  }
+}
+
+variable "node_pools_labels" {
+  description = "Map of maps containing node labels by node-pool name"
+  type        = map(map(string))
+  default = {
+    all = {}
+
+    default-node-pool = {
+      default-node-pool = true
+    }
+  }
+}
+
+variable "node_pools_metadata" {
+  description = "Map of maps containing node metadata by node-pool name"
+  type        = map(map(string))
+  default = {
+    all = {}
+
+    default-node-pool = {
+      node-pool-metadata-custom-value = "my-node-pool"
+    }
+  }
+}
+
+variable "node_pools_taints" {
+  description = "Map of lists containing node taints by node-pool name"
+  type        = map(list(object({ key = string, value = string, effect = string })))
+  default = {
+    all = []
+
+    default-node-pool = [
+      {
+        key    = "default-node-pool"
+        value  = true
+        effect = "PREFER_NO_SCHEDULE"
+      },
+    ]
+  }
+}
+
+variable "node_pools_tags" {
+  description = "Map of lists containing node network tags by node-pool name"
+  type        = map(list(string))
+  default = {
+    all = []
+
+    default-node-pool = [
+      "default-node-pool",
+    ]
+  }
+}
+
+variable "subnetwork" {
+  description = "The subnetwork to host the cluster in (required)"
+  type        = string
 }

@@ -112,12 +112,6 @@ variable "tags" {
   default     = {}
 }
 
-variable "flux_wait" {
-  description = "Wait for all manifests to apply"
-  type        = bool
-  default     = true
-}
-
 variable "aws_modules" {
   description = "Configure AWS modules to install"
   type        = any
