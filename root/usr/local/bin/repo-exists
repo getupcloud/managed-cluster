@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+cd $REPO_DIR
+
+if ! gh auth status; then
+    gh auth login
+fi
+
+gh_owner=$(git_owner $origin)
+gh_name=$(git_name $origin)
+
+if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
+    warn Invalid git url: $origin
+    exit 1
+fi
+
+PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null

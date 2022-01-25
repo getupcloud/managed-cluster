@@ -14,8 +14,7 @@ cd $REPO_DIR
 #    git config --global credential.https://github.com.helper "cache --timeout=3600"
 #fi
 
-if ! has_remote upstream 2>/dev/null; then
-    info "Local repository has no upstream remote"
+if ! repo-exists 2>/dev/null; then
     ask_execute_command repo-setup
 fi
 
