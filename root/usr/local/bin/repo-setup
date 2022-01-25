@@ -29,17 +29,24 @@ if ! gh api orgs/$gh_owner/teams/$gh_team &>/dev/null; then
     gh_team=""
 fi
 
+git remote rename origin _origin
+
 if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     ask "Create repository $gh_owner/$gh_name now? [Y/n]"
     # repo doesn't exists, create now
     # origin will be added by `gh`
-    gh repo create $gh_owner/$gh_name \
+    if gh repo create $gh_owner/$gh_name \
         --confirm \
         --private=true \
         ${gh_team:+--team=$gh_team} \
         --description="${gh_description}" \
         --enable-issues=${gh_enable_issues} \
-        --enable-wiki=${gh_enable_wiki}
+        --enable-wiki=${gh_enable_wiki}; then
+        git remote remove _origin
+    else
+        git remote rename _origin origin
+        exit 1
+    fi
 fi
 
 # upload flux ssh deploy key
