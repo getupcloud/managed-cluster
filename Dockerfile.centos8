@@ -40,8 +40,6 @@ RUN cd /usr/local/bin && \
     curl -sKl https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases > /etc/profile.d/kubectl_aliases.sh && \
     curl -skL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
     curl -skL https://run.linkerd.io/install | INSTALLROOT=/usr/local bash && \
-    curl -skL https://github.com/cli/cli/releases/download/v1.13.1/gh_1.13.1_linux_amd64.tar.gz | \
-        tar xzvf - gh_1.13.1_linux_amd64/bin/gh --strip-components 2 && \
     for KUBECTL_VERSION in $KUBECTL_VERSIONS; do \
       curl -skL https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl > \
         kubectl_${KUBECTL_VERSION}; \
