@@ -29,21 +29,30 @@ if ! gh api orgs/$gh_owner/teams/$gh_team &>/dev/null; then
     gh_team=""
 fi
 
-git remote rename origin _origin
 
 if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     ask "Create repository $gh_owner/$gh_name now? [Y/n]"
+
+    if has_remote origin; then
+        git remote rename origin _origin
+    fi
+
     # repo doesn't exists, create now
     # origin will be added by `gh`
-    if gh repo create $gh_owner/$gh_name \
+    success=true
+    if ! gh repo create $gh_owner/$gh_name \
         --confirm \
         --private=true \
         ${gh_team:+--team=$gh_team} \
         --description="${gh_description}" \
         --enable-issues=${gh_enable_issues} \
         --enable-wiki=${gh_enable_wiki}; then
+        success=false
+    fi
+
+    if $success && has_remote _origin; then
         git remote remove _origin
-    else
+    elif has_remote _origin; then
         git remote rename _origin origin
         exit 1
     fi

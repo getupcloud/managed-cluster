@@ -16,7 +16,7 @@ RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
     yum clean all
 
-RUN INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v1.13.1/gh_1.13.1_linux_amd64.tar.gz \
+RUN INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel gnupg \
