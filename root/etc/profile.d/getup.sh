@@ -229,7 +229,7 @@ ask()
 
 ask_execute_command()
 {
-  read -e -p "$(prompt COLOR_GREEN "Execute \"${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}\" now? [Y/n]")" res
+  read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
   res="${res:-y}"
 
   case "${res,,}" in
