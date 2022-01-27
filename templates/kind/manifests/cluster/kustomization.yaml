@@ -14,7 +14,7 @@ patchesJson6902:
     namespace: kube-system
   patch: |-
     - op: add
-      path: /spec/template/spec/containers/0/args
+      path: /spec/template/spec/containers/0/args/-
       value: --kubelet-insecure-tls
 
 patchesStrategicMerge:
