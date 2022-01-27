@@ -18,5 +18,8 @@ patchesJson6902:
       value: --kubelet-insecure-tls
 
 patchesStrategicMerge:
-- helmrelease-ingress-nginx.yaml
 - gitrepositories.yaml
+- helmrelease-ingress-nginx.yaml
+- helmrelease-monitoring.yaml
+- helmrelease-velero-config.yaml
+- helmrelease-velero.yaml
