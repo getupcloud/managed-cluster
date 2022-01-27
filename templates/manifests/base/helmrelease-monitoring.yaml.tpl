@@ -161,9 +161,114 @@ spec:
         global:
           resolve_timeout: 6h
 
+        #################################################################
+        ## Receivers
+        #################################################################
+
+        receivers:
+        # does nothing
+        - name: blackhole
+
+        #############################
+        # Cronitor
+        #############################
+%{~ if alertmanager_cronitor_id != "" }
+        - name: cronitor
+          webhook_configs:
+          - url: https://cronitor.link/${alertmanager_cronitor_id}/run
+            send_resolved: false
+%{~ else }
+        # Set manifests_template_vars.alertmanager_cronitor_id to configure Cronitor
+%{~ endif }
+
+        #############################
+        # Slack
+        #############################
+%{~ if alertmanager_slack_channel != "" && alertmanager_slack_api_url != "" }
+        - name: slack
+          slack_configs:
+          - send_resolved: true
+            api_url: ${alertmanager_slack_api_url}
+            channel: "#${trimprefix(alertmanager_slack_channel, "#")}"
+            color: |-
+              {{- if eq .Status "firing" -}}
+                {{- if eq (index .Alerts 0).Labels.severity "critical" -}}
+                  #FF2222
+                {{- end -}}
+                {{- if eq (index .Alerts 0).Labels.severity "warning" -}}
+                  #FF8800
+                {{- end -}}
+                {{- if and (ne (index .Alerts 0).Labels.severity "critical") (ne (index .Alerts 0).Labels.severity "warning") -}}
+                  #22FF22
+                {{- end -}}
+              {{- else -}}
+                #22FF22
+              {{- end -}}
+            title: '{{ template "slack.default.title" . }}'
+            pretext: '{{ .CommonAnnotations.summary }}'
+            fallback: '{{ template "slack.default.fallback" . }}'
+            text: |-
+              {{ range .Alerts -}}
+              *Severity:* `{{ .Labels.severity | title }}` (<{{ .GeneratorURL }}|graph>)
+              *Description:* {{ .Annotations.message }}
+              *Labels:*{{ range .Labels.SortedPairs }} `{{ .Name }}={{ .Value }}`{{ end }}
+              {{ end }}
+%{~ else }
+        # Set manifests_template_vars.alertmanager_slack_channel and manifests_template_vars.alertmanager_slack_api_url to configure Slack
+%{~ endif }
+
+        #############################
+        # MSTeams
+        #############################
+%{~ if alertmanager_msteams_url != "" }
+        - name: msteams
+          webhook_configs:
+          - url: ${ alertmanager_msteams_url }
+%{~ else }
+        # Set manifests_template_vars.alertmanager_msteams_url to configure MS Teams
+        # Example: http://prometheus-msteams:2000/alertmanager
+%{~ endif }
+
+        #############################
+        # Opsgenie
+        #############################
+%{~ if alertmanager_opsgenie_api_key != "" }
+        - name: opsgenie
+          opsgenie_configs:
+          - api_key: ${alertmanager_opsgenie_api_key}
+            # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
+            tags: ${cluster_name}, sla-${cluster_sla}
+%{~ else }
+        # Set manifests_template_vars.alertmanager_opsgenie_api_key to configure Opsgenie
+%{~ endif }
+
+        #############################
+        # PagerDuty
+        #############################
+%{~ if alertmanager_pagerduty_service_key != "" }
+        - name: pagerduty
+          pagerduty_configs:
+          - service_key: ${alertmanager_pagerduty_service_key}
+            # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
+            group: sla-${cluster_sla}
+%{~ else }
+        # Set manifests_template_vars.alertmanager_pagerduty_service_key to configure PagerDuty
+%{~ endif }
+
+        inhibit_rules:
+        # Inhibit same alert with lower severity of an already firing alert
+        - equal: ['alertname']
+          source_match:
+            severity: critical
+          target_match:
+            severity: warning
+
+        #################################################################
+        ## Routes
+        #################################################################
+
         route:
-    #      receiver: slack
-          receiver: blackhole
+          receiver: ${ alertmanager_default_receiver }
           group_by: ['alertname', 'cluster_name']
           group_wait: 15s
           group_interval: 5m
@@ -179,146 +284,92 @@ spec:
               alertname: Watchdog
             continue: false
 
-    #      # Ignore too noisy alerts
-    #      - receiver: blackhole
-    #        match_re:
-    #          alertname: CPUThrottlingHigh
-    #          namespace: ^(.*-system|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)$
-    #        continue: false
+%{~ if alertmanager_ignore_alerts != [] || alertmanager_ignore_namespaces != [] }
+          # Ignore alerts and/or namespaces
+          - receiver: blackhole
+            continue: false
+            match_re:
+%{~ if alertmanager_ignore_alerts != [] }
+              alertname: "^(${ join("|", alertmanager_ignore_alerts) })$"
+%{~ endif }
+%{~ if alertmanager_ignore_namespaces != [] }
+              namespace: "^(${ join("|", alertmanager_ignore_namespaces) })$"
+%{~ endif }
+%{~ endif }
 
-    #########################
-    ## External alert systems
-    #########################
+          #########################
+          ## External alert systems
+          #########################
 
-    #      # Cronitor
-    #      #############################
-    #      - receiver: cronitor
-    #        match:
-    #          alertname: CronitorWatchdog
-    #        group_wait: 5s
-    #        group_interval: 1m
-    #        continue: false
+          #############################
+          # Cronitor
+          #############################
+%{~ if alertmanager_cronitor_id != "" }
+          - receiver: cronitor
+            match:
+              alertname: CronitorWatchdog
+            group_wait: 5s
+            group_interval: 1m
+            continue: false
+%{~ endif }
 
-    #      # Slack
-    #      #############################
-    #      - receiver: slack
-    #        match_re:
-    #          alertname: .*
-    #        continue: true
+%{~ if alertmanager_slack_channel != "" }
+          #############################
+          # Slack
+          #############################
+          - receiver: slack
+            match_re:
+              alertname: .*
+            continue: true
+%{~ endif }
 
-    #      # MSTeams
-    #      #############################
-    #      - receiver: msteams
-    #        match_re:
-    #         alertname: .*
-    #        continue: true
+%{~ if alertmanager_msteams_url != "" }
+          #############################
+          # MS Teams
+          #############################
+          - receiver: msteams
+            match_re:
+             alertname: .*
+            continue: true
+%{~ endif }
 
-    #      # Opsgenie
-    #      #############################
-    #      - receiver: opsgenie
-    #        match_re:
-    #          alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
-    #          namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
-    #          severity: warning
-    #        continue: true
-    #      - receiver: opsgenie
-    #        match:
-    #          severity: critical
-    #        continue: false
+%{~ if alertmanager_opsgenie_api_key != "" }
+          #############################
+          # Opsgenie
+          #############################
+          - receiver: opsgenie
+            match_re:
+              alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
+              namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
+              severity: warning
+            continue: true
+          - receiver: opsgenie
+            match:
+              severity: critical
+            continue: true
+%{~ endif }
 
-    #      # PageDuty
-    #      #############################
-    #      - receiver: pager_duty
-    #        match_re:
-    #          # alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
-    #          # namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
-    #          severity: warning
-    #        continue: true
-    #      - receiver: pager_duty
-    #        match:
-    #          severity: critical
-    #        continue: false
+%{~ if alertmanager_pagerduty_service_key != "" }
+          #############################
+          # PageDuty
+          #############################
+          - receiver: pagerduty
+            match_re:
+              alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
+              namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
+              severity: warning
+            continue: true
+          - receiver: pagerduty
+            match:
+              severity: critical
+            continue: true
+%{~ endif }
 
           # ignored all alerts (default)
           - receiver: blackhole
             match_re:
               alertname: .*
             continue: false
-
-        ###
-        ### Receivers
-        ###
-
-        receivers:
-        # does nothing
-        - name: blackhole
-
-    #    # Cronitor
-    #    #############################
-    #    - name: cronitor
-    #      webhook_configs:
-    #      - url: https://cronitor.link/${alertmanager_cronitor_id}/run
-    #        send_resolved: false
-
-    #    # Slack
-    #    #############################
-    #    - name: slack
-    #      slack_configs:
-    #      - send_resolved: true
-    #        api_url: https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    #        channel: "#${trimprefix(alertmanager_slack_channel, "#")}"
-    #        color: |-
-    #          {{- if eq .Status "firing" -}}
-    #            {{- if eq (index .Alerts 0).Labels.severity "critical" -}}
-    #              #FF2222
-    #            {{- end -}}
-    #            {{- if eq (index .Alerts 0).Labels.severity "warning" -}}
-    #              #FF8800
-    #            {{- end -}}
-    #            {{- if and (ne (index .Alerts 0).Labels.severity "critical") (ne (index .Alerts 0).Labels.severity "warning") -}}
-    #              #22FF22
-    #            {{- end -}}
-    #          {{- else -}}
-    #            #22FF22
-    #          {{- end -}}
-    #        title: '{{ template "slack.default.title" . }}'
-    #        pretext: '{{ .CommonAnnotations.summary }}'
-    #        fallback: '{{ template "slack.default.fallback" . }}'
-    #        text: |-
-    #          {{ range .Alerts -}}
-    #          *Severity:* `{{ .Labels.severity | title }}` (<{{ .GeneratorURL }}|graph>)
-    #          *Description:* {{ .Annotations.message }}
-    #          *Labels:*{{ range .Labels.SortedPairs }} `{{ .Name }}={{ .Value }}`{{ end }}
-    #          {{ end }}
-
-    #    # MSTeams
-    #    #############################
-    #    - name: msteams
-    #      webhook_configs:
-    #      - url: "http://prometheus-msteams:2000/alertmanager"
-
-    #    # Opsgenie
-    #    #############################
-    #    - name: opsgenie
-    #      opsgenie_configs:
-    #      - api_key: ${alertmanager_opsgenie_api_key}
-    #        # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
-    #        tags: ${cluster_name}, sla-${cluster_sla}
-
-    #    # PagerDuty
-    #    #############################
-    #    - name: pager_duty
-    #      pagerduty_configs:
-    #      - service_key: ${alertmanager_pagerduty_key}
-    #        send_resolved: true
-
-        inhibit_rules:
-        # Inhibit same alert with lower severity of an already firing alert
-        - equal: ['alertname']
-          source_match:
-            severity: critical
-          target_match:
-            severity: warning
 
     grafana:
       service:
