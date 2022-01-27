@@ -27,6 +27,8 @@ R = renamed   C = copied  U = updated but unmerged
 )"
 fi
 
-ask_execute_command git add repo.conf clusters/$name/$type
-ask_execute_command git commit clusters/$name/$type -m "Automatic commit: clusters/$name/$type"
+FILES_TO_COMMIT="repo.conf clusters/$name/$type"
+
+ask_execute_command git add $FILES_TO_COMMIT
+ask_execute_command git commit $FILES_TO_COMMIT -m "Automatic commit: clusters/$name/$type"
 ask_execute_command git push origin main
