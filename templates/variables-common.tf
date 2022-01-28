@@ -26,7 +26,7 @@ variable "manifests_template_vars" {
     alertmanager_slack_api_url : ""
     alertmanager_msteams_url : ""
     alertmanager_default_receiver : "blackhole" ## opsgenie, pagerduty, slack, blackhole
-    alertmanager_ignore_alerts : [ "CPUThrottlingHigh" ]
+    alertmanager_ignore_alerts : ["CPUThrottlingHigh"]
     alertmanager_ignore_namespaces : [
       "cert-manager", "getup", "ingress-.*", "logging", "monitoring", "velero",
       ".*-controllers", ".*-ingress", ".*istio.*", ".*-operator", ".*-provisioner", ".*-system"

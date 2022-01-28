@@ -11,5 +11,6 @@ ask_execute_command terraform init
 ask_execute_command terraform validate
 ask_execute_command terraform plan -out=$TF_PLAN_FILE
 ask_execute_command terraform apply $TF_PLAN_FILE
+ask_execute_command terraform fmt
 ask_execute_command repo-push
 ask_execute_command kubeconfig-get

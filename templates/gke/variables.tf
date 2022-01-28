@@ -28,10 +28,10 @@ variable "zones" {
 variable "node_pools" {
   description = "List of maps containing node pools"
   type        = list(map(string))
-  default = [ 
-    { 
-      "name": "default-node-pool" 
-    } 
+  default = [
+    {
+      "name" : "default-node-pool"
+    }
   ]
 }
 
@@ -85,32 +85,32 @@ variable "initial_node_count" {
 
 variable "cluster_autoscaling" {
   description = "Cluster autoscaling configuration"
-  type = object({ 
-    enabled = bool 
-    min_cpu_cores = number 
-    max_cpu_cores = number 
-    min_memory_gb = number 
-    max_memory_gb = number 
-    gpu_resources = list(object({ 
-      resource_type = string, 
-      minimum = number, 
-      maximum = number 
+  type = object({
+    enabled       = bool
+    min_cpu_cores = number
+    max_cpu_cores = number
+    min_memory_gb = number
+    max_memory_gb = number
+    gpu_resources = list(object({
+      resource_type = string,
+      minimum       = number,
+      maximum       = number
     }))
   })
-  default = { 
-    "enabled": false, 
-    "gpu_resources": [], 
-    "max_cpu_cores": 0, 
-    "max_memory_gb": 0, 
-    "min_cpu_cores": 0, 
-    "min_memory_gb": 0 
+  default = {
+    "enabled" : false,
+    "gpu_resources" : [],
+    "max_cpu_cores" : 0,
+    "max_memory_gb" : 0,
+    "min_cpu_cores" : 0,
+    "min_memory_gb" : 0
   }
 }
 
 variable "grant_registry_access" {
   description = "Grants created cluster-specific service account storage.objectViewer and artifactregistry.reader roles."
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "service_account_key" {

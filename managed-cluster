@@ -97,6 +97,9 @@ function merge_requires()
     fi
 
     sed -e "/# requires.txt placeholder.*/r $src/requires.txt" < templates/requires.tf > $dest/requires.tf
+    if type terraform &>/dev/null; then
+        terraform fmt $dest/requires.tf
+    fi
 }
 
 #function require_config()
