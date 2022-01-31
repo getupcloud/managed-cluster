@@ -63,3 +63,9 @@ variable "cronitor_pagerduty_key" {
   type        = string
   default     = ""
 }
+
+variable "kubeconfig_filename" {
+  description = "Kubeconfig path"
+  type        = string
+  default     = "/cluster/.kube/config"
+}

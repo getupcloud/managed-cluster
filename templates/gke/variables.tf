@@ -1,9 +1,3 @@
-variable "kubeconfig_filename" {
-  description = "Kubeconfig path"
-  type        = string
-  default     = "~/.kube/config"
-}
-
 variable "get_kubeconfig_command" {
   description = "Command to create/update kubeconfig"
   type        = string

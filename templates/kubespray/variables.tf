@@ -1,9 +1,3 @@
-variable "kubeconfig_filename" {
-  description = "Kubeconfig path"
-  type        = string
-  default     = "/cluster/.kube/config"
-}
-
 variable "kubespray_git_ref" {
   description = "Kubespray ref name"
   type        = string
