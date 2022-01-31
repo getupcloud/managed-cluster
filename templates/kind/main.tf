@@ -1,5 +1,5 @@
 module "kind" {
-  source = "github.com/getupcloud/terraform-cluster-kind?ref=main"
+  source = "github.com/getupcloud/terraform-cluster-kind?ref=v1.0"
 
   cluster_name            = var.name
   cluster_sla             = var.sla
