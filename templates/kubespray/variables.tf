@@ -1,7 +1,7 @@
 variable "kubespray_git_ref" {
   description = "Kubespray ref name"
   type        = string
-  default     = "remotes/origin/release-2.17"
+  default     = "refs/tags/v2.17.1"
 }
 
 variable "kubespray_dir" {
