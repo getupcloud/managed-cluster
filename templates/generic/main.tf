@@ -1,5 +1,5 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-generic?ref=main"
+  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.0"
 
   api_endpoint            = var.api_endpoint
   cluster_name            = var.name
