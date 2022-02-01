@@ -46,6 +46,12 @@ variable "flux_wait" {
   default     = true
 }
 
+variable "flux_version" {
+  description = "Flux version to install"
+  type        = string
+  default     = "v0.15.3"
+}
+
 variable "manifests_path" {
   description = "Manifests dir inside GitRepository"
   type        = string
