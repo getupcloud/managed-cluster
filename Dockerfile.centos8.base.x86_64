@@ -1,4 +1,4 @@
-FROM centos:8
+FROM quay.io/centos/centos:stream8
 
 ENV CLUSTER_DIR="/cluster" \
     REPO_DIR="/repo" \
@@ -10,23 +10,24 @@ SHELL ["/bin/bash", "-x", "-c"]
 
 COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
 
-RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
-    yum install -y dnf-utils epel-release && \
-    yum-config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo && \
-    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
-    yum clean all
-
-RUN INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --set-enabled powertools && \
+    dnf install -y epel-release epel-next-release && \
+    dnf config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo && \
+    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
+    yum update -y && \
+    yum groupinstall -y 'Development Tools' && \
+    \
+    INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
         dialog awscli httpie bind-utils httpd-tools \
-        git net-tools nmap openssl openssl-devel gnupg \
+        git net-tools nmap openssl openssl-devel \
         gettext jq rsync strace \
-        python3-pip python3-devel libffi-devel rust cargo \
-        centos-release-rabbitmq-38.noarch" && \
+        python3-pip python3-devel libffi-devel rust cargo" && \
     yum install -y $INSTALL_PACKAGES && \
-    yum groupinstall -y 'Development Tools' && \
-    yum update -y && \
     yum clean all && \
+    rm -rf /var/cache/dnf && \
     pip3 install giturlparse.py
 
 RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
