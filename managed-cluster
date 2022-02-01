@@ -1031,16 +1031,18 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-if [ -z "$command" ]; then
-    #invalid_argument "COMMAND"
+_command=${command//-/_}
+
+if [ -z "$_command" ] || [ "$(type -t command_$_command)" != function ]; then
     usage
     exit 1
 fi
 
-eval getopt_${command//-/_} "$@"
-
+if [ "$(type -t getopt_$_command)" == function ]; then
+    eval getopt_$_command "$@"
+fi
 
 $debug && set -x
 $verbose && dump_options
 
-eval command_${command//-/_}
+eval command_$_command
