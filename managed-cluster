@@ -76,13 +76,18 @@ function sync_from_template()
       return 1
     fi
 
+    local rsync_params='--exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp'
+
     if ! $force; then
+        info "Will perform following updates (if any):"
+        copy_from_template $src $dest $rsync_params --dry-run | sed -e '1d;/^$/,$d'
+
         if ! ask "Copy from $src to $dest? [Y/n]"; then
             return 0
         fi
     fi
 
-    copy_from_template $src $dest --exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp
+    copy_from_template $src $dest $rsync_params
 }
 
 # $1: templates/$type
