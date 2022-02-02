@@ -400,8 +400,10 @@ function usage()
     fi
 
     if [ -z "$command" ] || [ "$command" == "create" ]; then
-        echo "$COLOR_GREEN"
-        echo "  -> create                     Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
+        echo
         echo "     -c, --customer NAME        Customer name."
         echo "         --force                Force create even if CLUSTER-DIR exists."
         echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
@@ -415,8 +417,10 @@ function usage()
     fi
 
     if [ -z "$command" ] || [ "$command" == "start" ]; then
-        echo "$COLOR_GREEN"
-        echo "  -> start [CLUSTER-DIR] [-- params...]    Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
+        echo
         echo "         --force-docker-image-build        Force building local docker image."
         echo "     -i, --image NAME                      Image name (default: $docker_image)."
         echo "         --no-sudo                         Dont use 'sudo' to run docker."
@@ -426,22 +430,34 @@ function usage()
     fi
 
     if [ -z "$command" ] || [ "$command" == "sync-template" ]; then
-        echo "$COLOR_GREEN"
-        echo "  -> sync-template [CLUSTER-DIR]   Sync files from ./templates/\$type into CLUSTER-DIR." "$COLOR_RESET"
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> sync-template [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Sync files from ./templates/\$type into CLUSTER-DIR." "$COLOR_RESET"
+        echo
         echo "         --force                    Force template sync."
     fi
 
+    if [ -z "$command" ] || [ "$command" == "repo-pull" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Pull from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
+    fi
+
     if [ -z "$command" ] || [ "$command" == "remote-setup" ]; then
-        echo "$COLOR_GREEN"
-        echo "  -> remote-setup [OPTIONS...]    Update local repo's remote upstream." "$COLOR_RESET."
-        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> remote-setup [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Update local remote upstream." "$COLOR_RESET"
+        echo
+        echo "     -f, --flux-git-repo URL      Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
         echo "     -o, --origin REMOTE          Define ORIGIN remote address."
         echo "     -u, --upstream REMOTE        Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
     if [ -z "$command" ] || [ "$command" == "update-ssh-key" ]; then
-        echo "$COLOR_GREEN"
-        echo "  -> update-ssh-key [CLUSTER-DIR]    Creates a new ssh key (doesn't pushes to git repo)." "$COLOR_RESET"
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> update-ssh-key [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Creates a new ssh key (doesn't pushes to git repo)." "$COLOR_RESET"
+        echo
         echo "     -k, --ssh-key-type              New SSH key type (default: $ssh_key_type)."
         echo "     -l, --ssh-key-length            SSH key length, depends on ssh key type."
     fi
@@ -903,6 +919,23 @@ function command_remote_setup()
     line
     info New remotes:
     git remote -v
+}
+
+###########################
+## COMMAND: repo-pull    ##
+###########################
+
+function getopt_rp() { getopt_repo_pull "$@"; }
+function getopt_repo_pull()
+{
+    :
+}
+
+function command_rp() { command_repo_pull "$@"; }
+function command_repo_pull()
+{
+    ask_execute_command git pull upstream main --tag
+    ask_execute_command git pull origin main --tag
 }
 
 #############################
