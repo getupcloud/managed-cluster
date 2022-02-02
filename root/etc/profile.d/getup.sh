@@ -189,14 +189,21 @@ read_config()
 
 ask()
 {
-  local res
-  read -e -p "$(prompt COLOR_GREEN "$@")" res
-  res="${res:-y}"
+  unset ask_response
+  read -e -p "$(prompt COLOR_GREEN "$@")" ask_response
+  export ask_response="${ask_response:-y}"
 
-  case "${res,,}" in
+  case "${ask_response,,}" in
     y|yes|s|sim) return 0;;
     *) return 1
   esac
+}
+
+ask_any()
+{
+  unset ask_response
+  read -e -p "$(prompt COLOR_GREEN "$@")" ask_response
+  export ask_response="${ask_response}"
 }
 
 #input()
@@ -434,23 +441,29 @@ if [ -t 0 ]; then
     export PROMPT_COMMAND=do_ps1
 fi
 
+function update_globals()
+{
+    if [ -d $CLUSTER_DIR ]; then
+        export CLUSTER_CONF="$CLUSTER_DIR/cluster.conf"
+        source_env "$CLUSTER_CONF"
+    fi
+}
+
 if ! $INSIDE_CONTAINER; then
-    if [ -z "$ROOT_DIR" ]; then
+    if ! [ -v ROOT_DIR ]; then
         export ROOT_DIR=$(readlink -ne $(dirname $0))
     fi
 
     export REPO_DIR=$ROOT_DIR
-fi
-
-export REPO_CONFIG=$REPO_DIR/repo.conf
-
-source_env "$REPO_CONFIG"
-source_env $REPO_DIR/.dockerenv
-
-if [ -v CLUSTER_DIR ]; then
-    export CLUSTER_CONFIG="$CLUSTER_DIR/cluster.conf"
     export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
-
-    source_env "$CLUSTER_CONFIG"
     source_env "$PROVIDER_ENV"
+    source_env $ROOT_DIR/.dockerenv
+else
+    pathmunge $REPO_DIR after
 fi
+
+export TEMPLATES_DIR=$REPO_DIR/templates
+export REPO_CONF=$REPO_DIR/repo.conf
+
+update_globals
+source_env "$REPO_CONF"

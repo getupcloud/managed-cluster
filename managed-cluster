@@ -1,14 +1,26 @@
 #!/usr/bin/env -S bash --norc --noprofile -i
 
-${DEBUG:-false} && set -x
+${DEBUG:=false} && set -x
+: ${INSIDE_CONTAINER:=false}
 
 if [ -d /opt/homebrew/Cellar/coreutils/9.0/libexec/gnubin ]; then
     export PATH="/opt/homebrew/Cellar/coreutils/9.0/libexec/gnubin:$PATH"
 fi
 
-export ROOT_DIR=$(readlink -ne $(dirname $0))
-source $ROOT_DIR/root/etc/profile.d/getup.sh
-export PATH="$PATH:$ROOT_DIR/root/usr/local/bin/"
+if $INSIDE_CONTAINER; then
+    export ROOT_DIR=$REPO_DIR
+    source /etc/profile.d/getup.sh
+else
+    export ROOT_DIR=$(readlink -ne $(dirname $0))
+    export PATH="$PATH:$ROOT_DIR/root/usr/local/bin/"
+
+    # Globals set in getup.sh:
+    # REPO_DIR: git repo root dir, or from docker image envs
+    # REPO_CONF: file path to repo.conf
+    # CLUSTER_CONF: file path fo cluster.conf
+    # TEMPLATES_DIR: dir path to $REPO_DIR/templates/
+    source $ROOT_DIR/root/etc/profile.d/getup.sh
+fi
 
 if [ -t 0 ]; then
     COLOR_RED="$(tput setaf 1)"
@@ -39,63 +51,81 @@ function copy_from_template()
       mkdir -p "$dest"
     fi
 
-    rsync -va $rsync_params $src/ ${common_template_files[@]} "$dest"
+    rsync -va $rsync_params $src/ ${common_template_files[@]/#/$TEMPLATES_DIR/} "$dest"
 }
 
 function sync_from_template()
 {
-    local dest=$cluster_dir
-
-    if ! [ -d "$dest" ]; then
-      warn "Cluster dir not found: $dest"
+    if ! [ -d "$CLUSTER_DIR" ]; then
+      warn "Cluster dir not found: $CLUSTER_DIR"
       return 1
     fi
 
-    if ! [ -e "$ROOT_DIR/repo.conf" ]; then
-      warn "Missing $ROOT_DIR/repo.conf"
+    if ! [ -e "$REPO_CONF" ]; then
+      warn "Missing file: $REPO_CONF"
       return 1
     fi
 
-    if ! [ -e "$dest/cluster.conf" ]; then
-      warn "Missing $dest/cluster.conf"
+    if ! [ -e "$CLUSTER_CONF" ]; then
+      warn "Missing file: $CLUSTER_CONF"
       return 1
     fi
 
-    source_env $ROOT_DIR/repo.conf || return 1
-    source_env $dest/cluster.conf || return 1
+    source_env $REPO_CONF || return 1
+    source_env $CLUSTER_CONF || return 1
 
     if [ -z "$customer" ] || [ -z "$name" ] || [ -z "$type" ]; then
-      warn "Invalid $dest/cluster.conf: customer=${customer} name=${name} type=${type}"
+      warn "Invalid config: customer=${customer} name=${name} type=${type}"
       return 1
     fi
 
-    local src=templates/$type
+    local template_dir="$TEMPLATES_DIR/$type"
 
-    if ! [ -d "$src" ]; then
-      warn "Template dir not found: $src"
+    if ! [ -d "$template_dir" ]; then
+      warn "Template dir not found: $template_dir"
       return 1
     fi
 
     local rsync_params='--exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp'
+    local files_to_sync=(
+        $(copy_from_template $template_dir $CLUSTER_DIR $rsync_params --dry-run | sed -e '1d;/^$/,$d')
+    )
 
-    if ! $force; then
-        info "Will perform following updates (if any):"
-        copy_from_template $src $dest $rsync_params --dry-run | sed -e '1d;/^$/,$d'
-
-        if ! ask "Copy from $src to $dest? [Y/n]"; then
-            return 0
-        fi
+    if [ ${#files_to_sync[*]} -eq 0 ]; then
+        info Nothing to sync from $template_dir
+        return
     fi
 
-    copy_from_template $src $dest $rsync_params
+    if ! $force; then
+        info "Will update following files (if any):"
+        copy_from_template $template_dir $CLUSTER_DIR $rsync_params --dry-run | sed -e '1d;/^$/,$d'
+
+        while true; do
+            ask_any "Please choose an action [Yes/no/diff]:"
+            case ${ask_response,,} in
+                y|yes|s|sim)
+                    break
+                ;;
+                n|no|nao)
+                    return
+                ;;
+                d|diff)
+                    for file in ${files_to_sync[@]}; do
+                        diff -puN --color=always $template_dir/$file $CLUSTER_DIR/${file##*/}
+                    done | less -R
+                ;;
+                *) continue;
+            esac
+        done
+    fi
+
+    copy_from_template $template_dir $CLUSTER_DIR $rsync_params
 }
 
-# $1: templates/$type
-# $2: $cluster_dir
 function merge_requires()
 {
-    local src=$1
-    local dest=$2
+    local src=$TEMPLATES_DIR/$type
+    local dest=$CLUSTER_DIR
 
     if ! [ -e "$src/requires.txt" ]; then
         return
@@ -188,51 +218,55 @@ function select_cluster_sla()
 
 function generate_ssh_key()
 {
-    if ! [ -e $cluster_dir/identity ]; then
-        info Generating $cluster_dir/identity
-        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $cluster_dir/identity -N "" -C "$customer/$name/$type"
-        ssh-keygen -yf $cluster_dir/identity > $cluster_dir/identity.pub
+    if ! [ -e $CLUSTER_DIR/identity ]; then
+        info Generating $CLUSTER_DIR/identity
+        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $CLUSTER_DIR/identity -N "" -C "$customer/$name/$type"
+        ssh-keygen -yf $CLUSTER_DIR/identity > $CLUSTER_DIR/identity.pub
     else
-        info Using existing $cluster_dir/identity
+        info Using existing $CLUSTER_DIR/identity
     fi
 
-    info Generating $cluster_dir/known_hosts
-    ssh-keyscan github.com > $cluster_dir/known_hosts
+    info Generating $CLUSTER_DIR/known_hosts
+    ssh-keyscan github.com > $CLUSTER_DIR/known_hosts
 }
 
 function select_cluster()
 {
     local cluster_dir=""
 
-    if [ $# -eq 0 ]; then
-        local clusters=( clusters/*/*/ )
-    else
-        clusters=( $@ )
-    fi
-
-    clusters=( ${clusters[*]%/} )
-
-    export CLUSTER_CONFIG
-
-    if [ ${#clusters[*]} -eq 1 ]; then
-        CLUSTER_CONFIG=$clusters/cluster.conf
-        if ! has_valid_config $CLUSTER_CONFIG; then
-            warn Config not found: $CLUSTER_CONFIG
-            return 1
-        fi
-
-        echo -n ${clusters}
+    if $INSIDE_CONTAINER; then
+        # already set
         return
     fi
 
-    cluster_names=( ${clusters[*]#*/} )
+    if [ $# -eq 0 ]; then
+        local candidate_clusters=( clusters/*/*/ )
+    else
+        candidate_clusters=( $@ )
+    fi
+
+    candidate_clusters=( ${candidate_clusters[*]%/} )
+
+    if [ ${#candidate_clusters[*]} -eq 1 ]; then
+        export CLUSTER_DIR=$candidate_clusters
+        export CLUSTER_CONF=$CLUSTER_DIR/cluster.conf
+        if ! has_valid_config $CLUSTER_CONF; then
+            warn Config not found: $CLUSTER_CONF
+            return 1
+        fi
+
+        update_globals
+        return
+    fi
+
+    cluster_names=( ${candidate_clusters[*]#*/} )
     cluster_names=( ${cluster_names[*]%/*} )
-    cluster_types=( ${clusters[*]##*/} )
+    cluster_types=( ${candidate_clusters[*]##*/} )
 
     if type dialog &>/dev/null; then
         exec 3>.tmp
         eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
-            "$(for i in $(seq 0 $(( ${#clusters[*]} - 1 )) ); do echo -n " $i '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
+            "$(for i in $(seq 0 $(( ${#candidate_clusters[*]} - 1 )) ); do echo -n " $i '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
             '---' '---' \
             b "'Bootstrap cluster'"  >&2
             #s 'Sync from template' >&2
@@ -240,30 +274,36 @@ function select_cluster()
         rm -f .tmp
         case "$idx" in
             [0-9]*)
-                cluster_dir=${clusters[$idx]}
+                cluster_dir=${candidate_clusters[$idx]}
             ;;
             *) cluster_dir=$idx
         esac
     else
         local PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
 
-        select cluster_dir in ${clusters[*]}; do
-            CLUSTER_CONFIG=$cluster_dir/cluster.conf
+        select cluster_dir in ${candidate_clusters[*]}; do
+            export CLUSTER_CONF=$cluster_dir/cluster.conf
             if has_valid_config $cluster_dir; then
                 break
             else
-                warn Config not found: $CLUSTER_CONFIG
+                warn Config not found: $CLUSTER_CONF
             fi
         done
     fi
 
-    echo $cluster_dir
+    export CLUSTER_DIR=$cluster_dir
+    update_globals
 }
 
 function assert_cluster_dir()
 {
-    if ! [ -e "$cluster_dir/cluster.conf" ]; then
-        warn "Invalid cluster dir: $cluster_dir"
+    if [ -z "$CLUSTER_DIR" ]; then
+        warn "Missing cluster dir"
+        exit 1
+    fi
+
+    if ! [ -e "$CLUSTER_CONF" ]; then
+        warn "Invalid or missing cluster config: $CLUSTER_CONF"
         exit 1
     fi
 }
@@ -309,7 +349,7 @@ function start_container()
         --rm
         -it
         --env-file $ROOT_DIR/.dockerenv
-        -v $(readlink -ne $cluster_dir):/cluster
+        -v $(readlink -ne $CLUSTER_DIR):/cluster
         -v $ROOT_DIR:/repo
         -v $HOME:/home/_host:ro
     )
@@ -348,7 +388,9 @@ function start_container()
         fi
     fi
 
-    info Starting cluster: $cluster_dir with docker image ${docker_image}
+    check_deprecations
+
+    info Starting cluster: $CLUSTER_DIR with docker image ${docker_image}
     docker_run="docker run ${docker_run_options_defaults[@]} ${docker_image} ${docker_command}"
     info \$ $docker_run
     #echo
@@ -486,9 +528,9 @@ ssh_key_type=ecdsa
 ssh_key_length=0
 default_upstream=git@github.com:getupcloud/managed-cluster.git
 common_template_files=(
-    templates/manifests
-    templates/*.*
-    templates/.gitignore
+    manifests
+    '*.*'
+    .gitignore
 )
 
 #####################
@@ -503,7 +545,7 @@ opt_type=
 opt_sla=
 opt_flux_git_repo=
 
-function getopt_c() { getopt_create; }
+function getopt_c() { getopt_create "$@"; }
 function getopt_create()
 {
     while [ $# -gt 0 ]; do
@@ -571,12 +613,12 @@ function getopt_create()
     fi
 }
 
-function command_c() { command_create; }
+function command_c() { command_create "$@"; }
 function command_create()
 {
     set -e
 
-    if ! [ -e "$REPO_CONFIG" ]; then
+    if ! [ -e "$REPO_CONF" ]; then
         create_repo_config
     fi
 
@@ -597,7 +639,7 @@ function command_create()
 
 function create_repo_config()
 {
-    info Creating $REPO_CONFIG
+    info Creating $REPO_CONF
 
     read_config customer "Customer name"
 
@@ -620,12 +662,12 @@ function create_repo_config()
 
 function save_repo_config()
 {
-    info Saving $REPO_CONFIG
+    info Saving $REPO_CONF
 
-    set_config customer="$customer" "Customer name" $REPO_CONFIG
-    set_config upstream="$upstream" "Upstream git repo" $REPO_CONFIG
-    set_config origin="$origin" "Origin git repo" $REPO_CONFIG
-    set_config flux_git_repo="$flux_git_repo" "Git repo for default flux GitRepository" $REPO_CONFIG
+    set_config customer="$customer" "Customer name" $REPO_CONF
+    set_config upstream="$upstream" "Upstream git repo" $REPO_CONF
+    set_config origin="$origin" "Origin git repo" $REPO_CONF
+    set_config flux_git_repo="$flux_git_repo" "Git repo for default flux GitRepository" $REPO_CONF
 }
 
 function create_cluster()
@@ -634,23 +676,22 @@ function create_cluster()
     read_config name "Cluster name"
     select_cluster_sla
 
-    local cluster_root_dir=clusters/$name
-    cluster_dir=$cluster_root_dir/$type
-    export CLUSTER_CONFIG=$cluster_dir/cluster.conf
+    export CLUSTER_DIR=$ROOT_DIR/clusters/$name/$type
+    export CLUSTER_CONF=$CLUSTER_DIR/cluster.conf
 
-    mkdir -p ${cluster_dir}
+    mkdir -p ${CLUSTER_DIR}
     save_cluster_config
-    copy_from_template templates/$type $cluster_dir
-    merge_requires templates/$type $cluster_dir
+    copy_from_template $TEMPLATES_DIR/$type $CLUSTER_DIR
+    merge_requires
     generate_ssh_key
 }
 
 function save_cluster_config()
 {
-    info Saving $CLUSTER_CONFIG
-    set_config type="$type" "Cluster Type" $CLUSTER_CONFIG
-    set_config name="$name" "Cluster Name" $CLUSTER_CONFIG
-    set_config sla="$sla" "Cluster SLA" $CLUSTER_CONFIG
+    info Saving $CLUSTER_CONF
+    set_config type="$type" "Cluster Type" $CLUSTER_CONF
+    set_config name="$name" "Cluster Name" $CLUSTER_CONF
+    set_config sla="$sla" "Cluster SLA" $CLUSTER_CONF
 }
 
 ####################
@@ -665,7 +706,7 @@ docker_image=ghcr.io/getupcloud/managed-cluster:$(cat ${ROOT_DIR}/version.txt)
 force_docker_image_build=false
 sudo=sudo
 
-function getopt_s() { getopt_start; }
+function getopt_s() { getopt_start "$@"; }
 function getopt_start()
 {
     while [ $# -gt 0 ]; do
@@ -710,7 +751,7 @@ function getopt_start()
         shift
     done
 
-    cluster_dir=$(select_cluster $cluster_dir)
+    select_cluster $cluster_dir
 }
 
 function check_dependencies()
@@ -744,29 +785,29 @@ function check_deprecations()
     )
 
     for i in ${old_cluster_configs[*]}; do
-        if grep -q $i $cluster_dir/cluster.conf; then
-            warn "DEPRECATED: $cluster_dir/cluster.conf: $i: Please remove this config."
+        if grep -q $i $CLUSTER_DIR/cluster.conf; then
+            warn "DEPRECATED: $CLUSTER_DIR/cluster.conf: $i: Please remove this config."
         fi
     done
 }
 
-function command_s() { command_start; }
+function command_s() { command_start "$@"; }
 function command_start()
 {
-    check_deprecations
-
     if ! check_dependencies; then
         info "Execute 'make install' or install missing command(s) or lib(s)"
         exit 1
     fi
 
     if $standalone; then
-        cluster_dir="$PWD/standalone"
-        mkdir -p $cluster_dir
-        touch $cluster_dir/cluster.conf
-        touch $cluster_dir/terraform.tfvars
+        export CLUSTER_DIR="$PWD/standalone"
+        mkdir -p $CLUSTER_DIR
+        touch $CLUSTER_DIR/terraform.tfvars
+        touch $REPO_CONF
+        touch $CLUSTER_CONF
     fi
 
+    update_globals
     start_container
 }
 
@@ -774,7 +815,7 @@ function command_start()
 ## COMMAND: sync-template ##
 ############################
 
-function getopt_st() { getopt_sync_template; }
+function getopt_st() { getopt_sync_template "$@"; }
 function getopt_sync_template()
 {
     while [ $# -gt 0 ]; do
@@ -795,15 +836,15 @@ function getopt_sync_template()
         shift
     done
 
-    cluster_dir=$(select_cluster $cluster_dir)
+    select_cluster $cluster_dir
 }
 
-function command_st() { command_sync_template; }
+function command_st() { command_sync_template "$@"; }
 function command_sync_template()
 {
     assert_cluster_dir
     sync_from_template
-    merge_requires templates/$type $cluster_dir
+    merge_requires
 }
 
 ###########################
@@ -813,7 +854,7 @@ function command_sync_template()
 opt_upstream=
 opt_origin=
 
-function getopt_rs() { getopt_remote_setup; }
+function getopt_rs() { getopt_remote_setup "$@"; }
 function getopt_remote_setup()
 {
     while [ $# -gt 0 ]; do
@@ -840,7 +881,7 @@ function getopt_remote_setup()
     done
 }
 
-function command_rs() { command_remote_setup; }
+function command_rs() { command_remote_setup "$@"; }
 function command_remote_setup()
 {
     set -e
@@ -848,7 +889,7 @@ function command_remote_setup()
     info Current remotes:
     git remote -v
 
-    source_env $REPO_CONFIG
+    source_env $REPO_CONF
 
     echo "$opt_upstream$opt_origin$opt_flux_git_repo"
     if [ -z "$opt_upstream$opt_origin$opt_flux_git_repo" ]; then
@@ -885,7 +926,7 @@ function command_remote_setup()
 ## COMMAND: update-ssh-key ##
 #############################
 
-function getopt_usk() { getopt_update_ssh_key; }
+function getopt_usk() { getopt_update_ssh_key "$@"; }
 function getopt_update_ssh_key()
 {
     while [ $# -gt 0 ]; do
@@ -921,22 +962,22 @@ function getopt_update_ssh_key()
         ssh_key_length=${!key_len}
     fi
 
-    cluster_dir=$(select_cluster $cluster_dir)
+    select_cluster $cluster_dir
 }
 
-function command_usk() { command_update_ssh_key; }
+function command_usk() { command_update_ssh_key "$@"; }
 function command_update_ssh_key()
 {
     if ! $force; then
-        if ! ask "Generate new ssh keys now for $cluster_dir? [Y/n]"; then
+        if ! ask "Generate new ssh keys now for $CLUSTER_DIR? [Y/n]"; then
             return
         fi
     fi
 
-    if [ -e $cluster_dir/identity ]; then
-        local bkp=$cluster_dir/identity.bkp$(date +%s)
-        info Renaming existing ssh key $cluster_dir/identity to $bkp
-        mv $cluster_dir/identity $bkp
+    if [ -e $CLUSTER_DIR/identity ]; then
+        local bkp=$CLUSTER_DIR/identity.bkp$(date +%s)
+        info Renaming existing ssh key $CLUSTER_DIR/identity to $bkp
+        mv $CLUSTER_DIR/identity $bkp
     fi
 
     generate_ssh_key
@@ -949,7 +990,7 @@ function command_update_ssh_key()
 import_var_prefixes=()
 import_var_sources=()
 
-function getopt_iv() { getopt_import_variables; }
+function getopt_iv() { getopt_import_variables "$@"; }
 function getopt_import_variables()
 {
     while [ $# -gt 0 ]; do
@@ -978,7 +1019,7 @@ function prepend_prefix()
     echo "## Finished - auto-generated by $0 from $source"
 }
 
-function command_iv() { command_import_variables; }
+function command_iv() { command_import_variables "$@"; }
 function command_import_variables()
 {
     for i in $(seq 0 $(( ${#import_var_prefixes[*]} - 1 )) ); do
