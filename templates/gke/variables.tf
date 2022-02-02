@@ -147,6 +147,12 @@ variable "network_policy" {
   default     = false
 }
 
+variable "network_project_id" {
+  description = "The project id of the network"
+  type        = string
+  default     = ""
+}
+
 variable "node_pools_oauth_scopes" {
   description = "Map of lists containing node oauth scopes by node-pool name"
   type        = map(list(string))
