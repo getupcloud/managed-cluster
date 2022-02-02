@@ -21,6 +21,7 @@ module "gke" {
   master_ipv4_cidr_block     = var.master_ipv4_cidr_block
   network                    = var.network
   network_policy             = var.network_policy
+  network_project_id         = var.network_project_id
   node_pools                 = var.node_pools
   node_pools_oauth_scopes    = var.node_pools_oauth_scopes
   node_pools_labels          = var.node_pools_labels
