@@ -3,12 +3,12 @@ module "gke" {
 
   api_endpoint                = var.api_endpoint
   cluster_autoscaling         = var.cluster_autoscaling
-  cluster_name                = var.cluster_name
-  cluster_sla                 = var.cluster_sla
+  cluster_name                = var.name
+  cluster_sla                 = var.sla
   configure_ip_masq           = var.configure_ip_masq
   cronitor_api_key            = var.cronitor_api_key
   cronitor_pagerduty_key      = var.cronitor_pagerduty_key
-  customer_name               = var.customer_name
+  customer_name               = var.customer
   default_max_pods_per_node   = var.default_max_pods_per_node
   enable_private_endpoint     = var.enable_private_endpoint
   enable_private_nodes        = var.enable_private_nodes

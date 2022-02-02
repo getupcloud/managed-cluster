@@ -1,19 +1,3 @@
-variable "cluster_name" {
-  description = "Cluster name"
-  type        = string
-}
-
-variable "cluster_sla" {
-  description = "Cluster SLA"
-  type        = string
-  default     = "none"
-}
-
-variable "customer_name" {
-  description = "Customer name (Informative only)"
-  type        = string
-}
-
 variable "api_endpoint" {
   description = "Kubernetes API endpoint (Informative only)"
   type        = string
