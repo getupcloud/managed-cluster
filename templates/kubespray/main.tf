@@ -10,6 +10,7 @@ module "cluster" {
   deploy_components       = var.deploy_components
   etc_hosts               = var.etc_hosts
   flux_git_repo           = var.flux_git_repo
+  flux_wait               = var.flux_wait
   flux_version            = var.flux_version
   infra_nodes             = var.infra_nodes
   kubeconfig_filename     = var.kubeconfig_filename

@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=main"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.0"
 
   cluster_name               = var.name
   cluster_sla                = var.sla
@@ -8,11 +8,17 @@ module "gke" {
   customer_name              = var.customer
   configure_ip_masq          = var.configure_ip_masq
   default_max_pods_per_node  = var.default_max_pods_per_node
+  flux_git_repo              = var.flux_git_repo
+  flux_wait                  = var.flux_wait
+  flux_version               = var.flux_version
   horizontal_pod_autoscaling = var.horizontal_pod_autoscaling
   http_load_balancing        = var.http_load_balancing
   ip_range_pods              = var.ip_range_pods
   ip_range_services          = var.ip_range_services
+  logging_service            = var.logging_service
   manifests_template_vars    = local.manifests_template_vars
+  master_authorized_networks = var.master_authorized_networks
+  master_ipv4_cidr_block     = var.master_ipv4_cidr_block
   network                    = var.network
   network_policy             = var.network_policy
   node_pools                 = var.node_pools
@@ -23,7 +29,8 @@ module "gke" {
   node_pools_tags            = var.node_pools_tags
   project_id                 = var.project_id
   region                     = var.region
-  subnetwork                 = var.subnetwork
+  remove_default_node_pool   = var.remove_default_node_pool
   service_account_key        = var.service_account_key
+  subnetwork                 = var.subnetwork
   zones                      = var.zones
 }

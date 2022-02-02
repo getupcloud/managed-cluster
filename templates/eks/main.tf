@@ -15,6 +15,7 @@ module "eks" {
   endpoint_public_access_cidrs = var.endpoint_public_access_cidrs
   flux_git_repo                = var.flux_git_repo
   flux_wait                    = var.flux_wait
+  flux_version                 = var.flux_version
   manifests_template_vars      = local.manifests_template_vars
   node_groups_defaults         = var.node_groups_defaults
   node_groups                  = var.node_groups

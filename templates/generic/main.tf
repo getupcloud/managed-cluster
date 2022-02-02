@@ -8,6 +8,8 @@ module "cluster" {
   cronitor_pagerduty_key  = var.cronitor_pagerduty_key
   customer_name           = var.customer
   flux_git_repo           = var.flux_git_repo
+  flux_wait               = var.flux_wait
+  flux_version            = var.flux_version
   kubeconfig_filename     = var.kubeconfig_filename
   manifests_template_vars = local.manifests_template_vars
 }

@@ -9,6 +9,7 @@ module "doks" {
   do_token                = var.do_token
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
+  flux_version            = var.flux_version
   manifests_template_vars = local.manifests_template_vars
   node_pool               = var.node_pool
   node_pools              = var.node_pools
