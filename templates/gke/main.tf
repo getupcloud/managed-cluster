@@ -30,6 +30,7 @@ module "gke" {
   node_pools_tags            = var.node_pools_tags
   project_id                 = var.project_id
   region                     = var.region
+  regional                   = var.regional
   remove_default_node_pool   = var.remove_default_node_pool
   service_account_key        = var.service_account_key
   subnetwork                 = var.subnetwork

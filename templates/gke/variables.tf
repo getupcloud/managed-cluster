@@ -19,6 +19,12 @@ variable "zones" {
   type        = list(string)
 }
 
+variable "regional" {
+  description = "Whether to create a regional cluster"
+  type        = bool
+  default     = false
+}
+
 variable "node_pools" {
   description = "List of maps containing node pools"
   type        = list(map(string))
