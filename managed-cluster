@@ -12,6 +12,7 @@ if $INSIDE_CONTAINER; then
     source /etc/profile.d/getup.sh
 else
     export ROOT_DIR=$(readlink -ne $(dirname $0))
+    export REPO_DIR=$ROOT_DIR
     export PATH="$PATH:$ROOT_DIR/root/usr/local/bin/"
 
     # Globals set in getup.sh:
@@ -934,6 +935,7 @@ function getopt_repo_pull()
 function command_rp() { command_repo_pull "$@"; }
 function command_repo_pull()
 {
+    cd $REPO_DIR
     ask_execute_command git pull upstream main --tag
     ask_execute_command git pull origin main --tag
 }
