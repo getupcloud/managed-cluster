@@ -1,4 +1,5 @@
-FILE_VERSION         := $(shell cat version.txt)
+VERSION_TXT          := version.txt
+FILE_VERSION         := $(shell cat $(VERSION_TXT))
 VERSION              ?= $(FILE_VERSION)
 ARCH                 := $(shell uname -m | tr '[:upper:]' '[:lower:]')
 
@@ -9,6 +10,7 @@ IMAGE                 = $(addsuffix /,$(IMAGE_HOST))$(IMAGE_NAME)
 
 GIT_COMMIT           ?= $(shell git log --pretty=format:"%h" -n 1)
 DOCKERFILE           := Dockerfile.centos8
+DOCKERFILE_BASE      := Dockerfile.centos8.base.$(ARCH)
 DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION)
 
 SEMVER_REGEX := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
@@ -28,9 +30,9 @@ build: build-base
 	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(VERSION)
 
 build-base: check-version $(DOCKERFILE)
-	docker build . -f $(DOCKERFILE).base.$(ARCH) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(VERSION)
+	docker build . -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(VERSION)
 
-release: check-git build tag push
+release: build tag check-git push
 
 check-git:
 	@if git status --porcelain | grep . -q; then \
@@ -39,6 +41,7 @@ check-git:
 	fi
 
 tag:
+	git commit -m "Built version v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
 	git tag v$(VERSION)
 	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
 	docker tag $(IMAGE_BASE):$(VERSION) $(IMAGE_BASE):latest
