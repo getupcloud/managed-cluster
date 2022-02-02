@@ -213,3 +213,35 @@ variable "subnetwork" {
   description = "The subnetwork to host the cluster in (required)"
   type        = string
 }
+
+variable "logging_service" {
+  description = "The logging service that the cluster should write logs to. Available options include logging.googleapis.com, logging.googleapis.com/kubernetes (beta), and none"
+  type        = string
+  default     = "none"
+}
+
+variable "master_authorized_networks" {
+  description = "List of master authorized networks. If none are provided, disallow external access (except the cluster node IPs, which GKE automatically whitelists)."
+  type        = list(object({ cidr_block = string, display_name = string }))
+  default = [
+    {
+      cidr_block   = "10.0.0.0/8",
+      display_name = "private-class-a"
+    },
+    {
+      cidr_block   = "172.16.0.0/12",
+      display_name = "private-class-b"
+    },
+    {
+      cidr_block   = "192.168.0.0/16",
+      display_name = "private-class-c"
+    }
+  ]
+}
+
+variable "master_ipv4_cidr_block" {
+  description = "The IP address range for the master network. If empty, a range will be automatically chosen with the default size."
+  type        = string
+  default     = ""
+}
+
