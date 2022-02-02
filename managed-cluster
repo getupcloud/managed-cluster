@@ -30,28 +30,14 @@ if [ -t 0 ]; then
     COLOR_RESET="$(tput sgr0)"
 fi
 
-function copy_from_template()
+function copy_from_template_common()
 {
-    if [ $# -lt 2 ]; then
-      warn "Invalid or missing parameters: $0 [src-dir] [dest-dir] [rsync-params]"
-      return 1
-    fi
+    rsync -va --checksum --omit-dir-times $@ ${common_template_files[@]/#/$TEMPLATES_DIR/} $CLUSTER_DIR/
+}
 
-    local src=$1
-    local dest=$2
-    shift 2
-    local rsync_params="$@"
-
-    if ! [ -d "$src" ]; then
-      warn "Source dir not found: $src"
-      return 1
-    fi
-
-    if ! [ -d "$dest" ]; then
-      mkdir -p "$dest"
-    fi
-
-    rsync -va $rsync_params $src/ ${common_template_files[@]/#/$TEMPLATES_DIR/} "$dest"
+function copy_from_template_provider()
+{
+    rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_DIR/
 }
 
 function sync_from_template()
@@ -71,37 +57,21 @@ function sync_from_template()
       return 1
     fi
 
-    source_env $REPO_CONF || return 1
-    source_env $CLUSTER_CONF || return 1
+    local rsync_params="--out-format=%n --info=all0,name1 --exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp"
+    local files_to_sync_common=( $(copy_from_template_common $rsync_params --dry-run) )
+    local files_to_sync_provider=( $(copy_from_template_provider $rsync_params --dry-run) )
 
-    if [ -z "$customer" ] || [ -z "$name" ] || [ -z "$type" ]; then
-      warn "Invalid config: customer=${customer} name=${name} type=${type}"
-      return 1
-    fi
-
-    local template_dir="$TEMPLATES_DIR/$type"
-
-    if ! [ -d "$template_dir" ]; then
-      warn "Template dir not found: $template_dir"
-      return 1
-    fi
-
-    local rsync_params='--exclude=manifests/cluster/ --exclude=manifests/base/kustomization.yaml --exclude=\*.swp'
-    local files_to_sync=(
-        $(copy_from_template $template_dir $CLUSTER_DIR $rsync_params --dry-run | sed -e '1d;/^$/,$d')
-    )
-
-    if [ ${#files_to_sync[*]} -eq 0 ]; then
-        info Nothing to sync from $template_dir
+    if (( ${#files_to_sync_common[*]} + ${#files_to_sync_provider[*]} == 0 )); then
+        info Nothing to sync
         return
     fi
 
     if ! $force; then
-        info "Will update following files (if any):"
-        copy_from_template $template_dir $CLUSTER_DIR $rsync_params --dry-run | sed -e '1d;/^$/,$d'
+        info "Will sync files below:"
+        echo '[--common--]' ${files_to_sync_common[*]} '[--provider--]' ${files_to_sync_provider[*]} | tr ' ' '\n'
 
         while true; do
-            ask_any "Please choose an action [Yes/no/diff]:"
+            ask_any "Please choose an action [Yes/No/Diff]:"
             case ${ask_response,,} in
                 y|yes|s|sim)
                     break
@@ -110,16 +80,27 @@ function sync_from_template()
                     return
                 ;;
                 d|diff)
-                    for file in ${files_to_sync[@]}; do
-                        diff -puN --color=always $template_dir/$file $CLUSTER_DIR/${file##*/}
-                    done | less -R
+                    {
+                        for file in ${files_to_sync_common[@]}; do
+                            if [ -f "$TEMPLATES_DIR/$file" ] || [ -L "$TEMPLATES_DIR/$file" ]; then
+                                diff -puN --color=always $CLUSTER_DIR/${file} $TEMPLATES_DIR/${file}
+                            fi
+                        done
+                        for file in ${files_to_sync_provider[@]}; do
+                            if [ -f "$TEMPLATE_DIR/$file" ] || [ -L "$TEMPLATE_DIR/$file" ]; then
+                                diff -puN --color=always $CLUSTER_DIR/${file} $TEMPLATE_DIR/${file}
+                            fi
+                        done
+                    } | less -rXF
                 ;;
-                *) continue;
+                *)
+                    continue
             esac
         done
     fi
 
-    copy_from_template $template_dir $CLUSTER_DIR $rsync_params
+    copy_from_template_common $rsync_params
+    copy_from_template_provider $rsync_params
 }
 
 function merge_requires()
@@ -681,7 +662,9 @@ function create_cluster()
 
     mkdir -p ${CLUSTER_DIR}
     save_cluster_config
-    copy_from_template $TEMPLATES_DIR/$type $CLUSTER_DIR
+    update_globals
+    copy_from_template_common
+    copy_from_template_provider
     merge_requires
     generate_ssh_key
 }

@@ -447,6 +447,10 @@ function update_globals()
         export CLUSTER_CONF="$CLUSTER_DIR/cluster.conf"
         source_env "$CLUSTER_CONF"
     fi
+
+    if [ -v type ]; then
+        export TEMPLATE_DIR=$TEMPLATES_DIR/$type
+    fi
 }
 
 if ! $INSIDE_CONTAINER; then
