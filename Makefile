@@ -68,7 +68,7 @@ install:
 	fi
 	pip3 install giturlparse || pip install giturlparse
 
-test: TEST_BRANCH ?= remotes/origin/$(shell git branch --show-current)
+test: TEST_BRANCH ?= $(shell git branch --show-current)
 test: DEFAULT_TEST_PARAMS=--branch $(TEST_BRANCH)
 test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)
 test: IMAGE_HOST=
