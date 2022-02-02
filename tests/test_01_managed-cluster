@@ -50,10 +50,13 @@ assert "[ '$(cat out.txt)' -eq '$UID' ]"
 
 testing "Can sync templates"
 cp templates/$TYPE/variables.tf templates/$TYPE/variables.tf.test
+echo "# test-placeholder" >> templates/$TYPE/requires.txt
 grep -q 'TESTING LINE' templates/$TYPE/variables.tf || echo -e "\n# TESTING LINE #$$" >> templates/$TYPE/variables.tf
 run "./managed-cluster -v sync-template --force $CLUSTER_DIR"
 assert "grep -q '# TESTING LINE #$$' $CLUSTER_DIR/variables.tf"
+assert "grep -q '# test-placeholder' $CLUSTER_DIR/requires.tf"
 mv templates/$TYPE/variables.tf.test templates/$TYPE/variables.tf
+
 
 testing "Can update ssh key"
 run "./managed-cluster -v update-ssh-key -k rsa -l 2048 --force $CLUSTER_DIR"

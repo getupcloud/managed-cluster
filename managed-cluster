@@ -106,16 +106,17 @@ function sync_from_template()
 
 function merge_requires()
 {
-    local src=$TEMPLATES_DIR/$type
-    local dest=$CLUSTER_DIR
+    local requires_txt=$TEMPLATE_DIR/requires.txt
+    local source_requires_tf=$TEMPLATES_DIR/requires.tf
+    local target_requires_tf=$CLUSTER_DIR/requires.tf
 
-    if ! [ -e "$src/requires.txt" ]; then
+    if ! [ -e "$requires_txt" ]; then
         return
     fi
 
-    sed -e "/# requires.txt placeholder.*/r $src/requires.txt" < templates/requires.tf > $dest/requires.tf
+    sed -e "/# requires.txt placeholder.*/r $requires_txt" < $source_requires_tf > $target_requires_tf
     if type terraform &>/dev/null; then
-        terraform fmt $dest/requires.tf
+        terraform fmt $target_requires_tf
     fi
 }
 
