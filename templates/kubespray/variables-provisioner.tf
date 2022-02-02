@@ -140,7 +140,7 @@ variable "install_packages" {
 }
 
 variable "uninstall_packages" {
-  description = "Packages to install on nodes"
+  description = "Packages to uninstall on nodes"
   type        = list(string)
   default = [
     "firewalld",
