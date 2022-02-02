@@ -41,11 +41,14 @@ check-git:
 tag:
 	git tag v$(VERSION)
 	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
+	docker tag $(IMAGE_BASE):$(VERSION) $(IMAGE_BASE):latest
 
 push:
 	git push --tags
 	docker push $(IMAGE):$(VERSION)
 	docker push $(IMAGE):latest
+	docker push $(IMAGE_BASE):$(VERSION)
+	docker push $(IMAGE_BASE):latest
 
 $(DOCKERFILE): version.txt
 	sed -i -e "s|FROM .*|FROM $(IMAGE_BASE):$(VERSION)|" $(DOCKERFILE)
