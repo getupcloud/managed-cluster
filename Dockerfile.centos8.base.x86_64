@@ -23,7 +23,7 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel \
-        gettext jq rsync strace \
+        gettext jq rsync strace sshpass \
         python3-pip python3-devel libffi-devel rust cargo" && \
     yum install -y $INSTALL_PACKAGES && \
     yum clean all && \
