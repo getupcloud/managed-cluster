@@ -453,21 +453,22 @@ function update_globals()
     fi
 }
 
-if ! $INSIDE_CONTAINER; then
-    if ! [ -v ROOT_DIR ]; then
-        export ROOT_DIR=$(readlink -ne $(dirname $0))
-    fi
+if ! [ -v ROOT_DIR ]; then
+    export ROOT_DIR=$(readlink -ne $(dirname $0))
+fi
 
-    export REPO_DIR=$ROOT_DIR
+if $INSIDE_CONTAINER; then
+    pathmunge $REPO_DIR after
     export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
     source_env "$PROVIDER_ENV"
     source_env $ROOT_DIR/.dockerenv
 else
-    pathmunge $REPO_DIR after
+
+    export REPO_DIR=$ROOT_DIR
 fi
 
 export TEMPLATES_DIR=$REPO_DIR/templates
 export REPO_CONF=$REPO_DIR/repo.conf
 
-update_globals
 source_env "$REPO_CONF"
+update_globals
