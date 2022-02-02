@@ -30,10 +30,20 @@ build: build-base
 build-base: check-version $(DOCKERFILE)
 	docker build . -f $(DOCKERFILE).base.$(ARCH) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(VERSION)
 
+release: check-git build tag push
+
+check-git:
+	@if git status --porcelain | grep . -q; then \
+		echo Git has uncommited files. Please fix and try again; \
+		exit 1; \
+	fi
+
 tag:
+	git tag v$(VERSION)
 	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
 
-push: tag
+push:
+	git push --tags
 	docker push $(IMAGE):$(VERSION)
 	docker push $(IMAGE):latest
 
