@@ -29,7 +29,7 @@ module "gke" {
   maintenance_exclusions      = var.maintenance_exclusions
   maintenance_start_time      = var.maintenance_start_time
   manifests_path              = var.manifests_path
-  manifests_template_vars     = var.manifests_template_vars
+  manifests_template_vars     = local.manifests_template_vars
   master_authorized_networks  = var.master_authorized_networks
   master_ipv4_cidr_block      = var.master_ipv4_cidr_block
   network                     = var.network
