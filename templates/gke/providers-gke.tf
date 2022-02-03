@@ -3,8 +3,3 @@ provider "google" {
   region      = var.region
   credentials = var.service_account_key
 }
-
-provider "kubectl" {
-  config_path       = var.kubeconfig_filename
-  apply_retry_count = 2
-}
