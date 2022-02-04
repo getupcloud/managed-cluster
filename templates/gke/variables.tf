@@ -236,11 +236,13 @@ variable "network_project_id" {
 
 variable "enable_private_endpoint" {
   description = "(Beta) Whether the master's internal IP address is used as the cluster endpoint"
+  type        = bool
   default     = false
 }
 
 variable "enable_private_nodes" {
   description = "(Beta) Whether nodes have internal IP addresses only"
+  type        = bool
   default     = false
 }
 
