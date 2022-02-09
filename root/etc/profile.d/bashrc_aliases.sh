@@ -797,6 +797,12 @@ alias wksysrmsvcall='watch -n1 kubectl --namespace=kube-system delete service --
 alias wksysrmsvcl='watch -n1 kubectl --namespace=kube-system delete service -l'
 alias wksysrun='watch -n1 kubectl --namespace=kube-system run --rm --restart=Never --image-pull-policy=IfNotPresent -i -t'
 
+flux()
+{
+    echo "+ flux $@" 1>&2;
+    command flux "$@"
+}
+
 alias fgall='flux get all'
 alias fghr='flux get helmrelease'
 alias fgiall='flux get image all'

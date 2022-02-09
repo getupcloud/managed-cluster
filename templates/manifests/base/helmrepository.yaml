@@ -101,6 +101,15 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
+  name: ot-helm
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://ot-container-kit.github.io/helm-charts/
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
   name: teleport
   namespace: flux-system
 spec:
@@ -115,3 +124,21 @@ metadata:
 spec:
   interval: 1h
   url: https://kubernetes-sigs.github.io/external-dns/
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: jenkins
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.jenkins.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: openebs
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://openebs.github.io/charts
