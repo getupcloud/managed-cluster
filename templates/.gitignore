@@ -3,7 +3,8 @@
 .setup_history
 .terraform.d
 .terraform.lock.hcl
+ansible.log
 doctl
+gh
 helm
 terraform.log
-ansible.log
