@@ -69,7 +69,7 @@ function sync_from_template()
 
     if ! $force; then
         info "Will sync files below:"
-        echo '[--common--]' ${files_to_sync_common[*]} '[--provider--]' ${files_to_sync_provider[*]} | tr ' ' '\n'
+        echo "${COLOR_BOLD}++[$TEMPLATES_DIR]++${COLOR_RESET}" ${files_to_sync_common[*]} "${COLOR_BOLD}++[$TEMPLATE_DIR]++${COLOR_RESET}" ${files_to_sync_provider[*]} | tr ' ' '\n'
 
         while true; do
             ask_any "Please choose an action [Yes/No/Diff]:"
