@@ -69,7 +69,12 @@ function sync_from_template()
 
     if ! $force; then
         info "Will sync files below:"
-        echo "${COLOR_BOLD}++[$TEMPLATES_DIR]++${COLOR_RESET}" ${files_to_sync_common[*]} "${COLOR_BOLD}++[$TEMPLATE_DIR]++${COLOR_RESET}" ${files_to_sync_provider[*]} | tr ' ' '\n'
+        echo
+        echo "${COLOR_BOLD}--[ Updates from $TEMPLATES_DIR ]--${COLOR_RESET}"
+        echo ${files_to_sync_common[*]} | sed -e "s/\s/\n/g" #| sed -e "s/^/+ /"
+        echo
+        echo "${COLOR_BOLD}--[ Updates from $TEMPLATE_DIR ]--${COLOR_RESET}"
+        echo ${files_to_sync_provider[*]} | sed -e "s/\s/\n/g" #| sed -e "s/^//"
 
         while true; do
             ask_any "Please choose an action [Yes/No/Diff]:"
