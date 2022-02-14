@@ -88,8 +88,10 @@ COPY Dockerfile.* /
 
 ARG GIT_COMMIT
 ARG VERSION
+ARG RELEASE
 
 RUN echo $VERSION > /.version && \
+    echo $RELEASE > /.release && \
     echo $GIT_COMMIT > /.gitcommit && \
     rsync /etc/skel/ /root/ && \
     chmod -R +x /etc/profile.d/ && \

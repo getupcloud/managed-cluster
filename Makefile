@@ -1,6 +1,7 @@
 VERSION_TXT          := version.txt
 FILE_VERSION         := $(shell cat $(VERSION_TXT))
 VERSION              ?= $(FILE_VERSION)
+RELEASE              ?= v$(VERSION)
 ARCH                 := $(shell uname -m | tr '[:upper:]' '[:lower:]')
 
 IMAGE_HOST           ?= ghcr.io
@@ -11,7 +12,7 @@ IMAGE                 = $(addsuffix /,$(IMAGE_HOST))$(IMAGE_NAME)
 GIT_COMMIT           ?= $(shell git log --pretty=format:"%h" -n 1)
 DOCKERFILE           := Dockerfile.centos8
 DOCKERFILE_BASE      := Dockerfile.centos8.base.$(ARCH)
-DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION)
+DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION) --build-arg RELEASE=$(RELEASE)
 
 SEMVER_REGEX := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
 SHELL         = /bin/bash
@@ -27,10 +28,10 @@ check-version:
 	fi
 
 build: build-base
-	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(VERSION)
+	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE)
 
 build-base: check-version $(DOCKERFILE)
-	docker build . -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(VERSION)
+	docker build . -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE)
 
 release: build tag check-git push
 
@@ -41,17 +42,17 @@ check-git:
 	fi
 
 tag:
-	git commit -m "Built version v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
-	git tag v$(VERSION)
-	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
-	docker tag $(IMAGE_BASE):$(VERSION) $(IMAGE_BASE):latest
+	git commit -m "Built release v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
+	git tag $(RELEASE)
+	docker tag $(IMAGE):$(RELEASE) $(IMAGE):latest
+	docker tag $(IMAGE_BASE):$(RELEASE) $(IMAGE_BASE):latest
 
 push:
-	git push origin release-v$(VERSION)
+	git push origin release-$(RELEASE)
 	git push --tags
-	docker push $(IMAGE):$(VERSION)
+	docker push $(IMAGE):$(RELEASE)
 	docker push $(IMAGE):latest
-	docker push $(IMAGE_BASE):$(VERSION)
+	docker push $(IMAGE_BASE):$(RELEASE)
 	docker push $(IMAGE_BASE):latest
 
 $(DOCKERFILE): version.txt
@@ -74,7 +75,8 @@ install:
 
 test: TEST_BRANCH ?= $(shell git branch --show-current)
 test: DEFAULT_TEST_PARAMS=--branch $(TEST_BRANCH)
-test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)
+test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)-test
+test: RELEASE=v$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: IMAGE_HOST=
 test:
 	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
