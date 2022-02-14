@@ -55,7 +55,7 @@ push:
 	docker push $(IMAGE_BASE):$(RELEASE)
 	docker push $(IMAGE_BASE):latest
 
-$(DOCKERFILE): version.txt
+$(DOCKERFILE):
 	sed -i -e "s|FROM .*|FROM $(IMAGE_BASE):$(RELEASE)|" $(DOCKERFILE)
 
 fmt:
