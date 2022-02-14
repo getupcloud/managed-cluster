@@ -33,6 +33,9 @@ build: build-base
 build-base: check-version $(DOCKERFILE)
 	docker build . -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE)
 
+print-release:
+	@echo $(RELEASE)
+
 release: build tag check-git push
 
 check-git:

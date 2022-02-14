@@ -708,7 +708,7 @@ standalone=false
 docker_command="" # /bin/bash
 port_range=32000-32010
 run_as_root=false
-docker_image=ghcr.io/getupcloud/managed-cluster:$(cat ${ROOT_DIR}/version.txt)
+docker_image=ghcr.io/getupcloud/managed-cluster:$(make print-release)
 force_docker_image_build=false
 sudo=sudo
 
