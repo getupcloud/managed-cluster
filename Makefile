@@ -56,7 +56,7 @@ push:
 	docker push $(IMAGE_BASE):latest
 
 $(DOCKERFILE): version.txt
-	sed -i -e "s|FROM .*|FROM $(IMAGE_BASE):$(VERSION)|" $(DOCKERFILE)
+	sed -i -e "s|FROM .*|FROM $(IMAGE_BASE):$(RELEASE)|" $(DOCKERFILE)
 
 fmt:
 	terraform fmt -recursive
