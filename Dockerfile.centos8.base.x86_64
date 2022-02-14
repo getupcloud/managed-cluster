@@ -16,19 +16,22 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
     dnf config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo && \
     dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
     rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
-    yum update -y && \
-    yum groupinstall -y 'Development Tools' && \
+    dnf update -y && \
+    dnf groupinstall -y 'Development Tools' && \
     \
     INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel \
-        gettext jq rsync strace sshpass fzf pv \
+        gettext jq rsync strace sshpass pv \
         python3-pip python3-devel libffi-devel rust cargo" && \
-    yum install -y $INSTALL_PACKAGES && \
-    yum clean all && \
+    dnf install -y $INSTALL_PACKAGES && \
+    dnf clean all && \
     rm -rf /var/cache/dnf && \
-    pip3 install giturlparse.py
+    pip3 install giturlparse.py && \
+    curl -Lv https://github.com/junegunn/fzf/releases/download/0.29.0/fzf-0.29.0-linux_amd64.tar.gz \
+        | sudo tar xzvf - -C /usr/local/bin
+
 
 RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
         unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
