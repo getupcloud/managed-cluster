@@ -19,4 +19,5 @@ module "cluster" {
   master_nodes            = var.master_nodes
   ssh_private_key         = var.ssh_private_key
   ssh_user                = var.ssh_user
+  ssh_password            = var.ssh_password
 }
