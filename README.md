@@ -18,19 +18,7 @@ $ cd managed-cluster-evilcorp
 Bootstrap an initial config for a new cluster named `production`:
 
 ```sh
-$ ./bootstrap
-Reading config from temporary file: ./.cluster.conf
-Customer name: evilcorp                                  <------ Customer name goes here
-Cluster name: production                                 <------ Cluster name goes here
-1) doks
-2) eks
-3) generic
-4) kind
-5) kubespray
-6) oke
-Select cluster type: 2                                   <------ Select cluster type
-
-... lots of outputs here ...
+$ ./managed-cluster create
 ```
 
 All cluster configs will be stored in an exclusive directory `./clusters/${CUSTOMER_NAME}/${CLUSTER_NAME}`.
@@ -40,7 +28,7 @@ All cluster configs will be stored in an exclusive directory `./clusters/${CUSTO
 We are now ready to create our cluster. Let's start the installer container.
 
 ```sh
-$ ./start
+$ ./managed-cluster start
 ```
 
 There are two volumes mapped from local host into container's filesystem:
