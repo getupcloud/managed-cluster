@@ -50,10 +50,13 @@ if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
         success=false
     fi
 
-    if $success && has_remote _origin; then
-        git remote remove _origin
-    elif has_remote _origin; then
-        git remote rename _origin origin
+    if ! has_remote origin; then
+        if has_remote _origin; then
+            git remote rename _origin origin
+        fi
+    fi
+
+    if ! $success; then
         exit 1
     fi
 fi
