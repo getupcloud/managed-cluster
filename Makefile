@@ -52,6 +52,7 @@ tag:
 
 push:
 	git push origin main:release-$(RELEASE)
+	git push origin main
 	git push --tags
 	docker push $(IMAGE):$(RELEASE)
 	docker push $(IMAGE):latest
