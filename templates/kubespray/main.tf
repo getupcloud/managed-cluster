@@ -13,6 +13,7 @@ module "cluster" {
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
   infra_nodes             = var.infra_nodes
+  install_packages        = var.install_packages
   kubeconfig_filename     = var.kubeconfig_filename
   kubespray_git_ref       = var.kubespray_git_ref
   manifests_template_vars = local.manifests_template_vars
@@ -20,4 +21,5 @@ module "cluster" {
   ssh_private_key         = var.ssh_private_key
   ssh_user                = var.ssh_user
   ssh_password            = var.ssh_password
+  uninstall_packages      = var.uninstall_packages
 }
