@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
 - helmrelease-cert-manager.yaml
 - helmrelease-cert-manager-config.yaml
+- helmrelease-falco.yaml
 - helmrelease-ingress-nginx.yaml
 - helmrelease-loki.yaml
 - helmrelease-monitoring.yaml
