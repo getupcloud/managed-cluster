@@ -83,6 +83,5 @@ test: TEST_BRANCH ?= $(shell git branch --show-current)
 test: DEFAULT_TEST_PARAMS=--branch $(TEST_BRANCH)
 test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: RELEASE=v$(FILE_VERSION)-$(GIT_COMMIT)-test
-test: IMAGE_HOST=
 test:
 	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)

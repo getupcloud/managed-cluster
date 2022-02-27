@@ -182,6 +182,8 @@ fi
 
 testing "Starting $VERSION tests on branch $branch [$PWD]"
 
+make
+
 export types
 export branch
 
