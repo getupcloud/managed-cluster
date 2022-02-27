@@ -358,22 +358,6 @@ function start_container()
 
     if $force_docker_image_build; then
         make
-    else
-        if docker inspect ${docker_image} &>/dev/null; then
-            if [ Dockerfile.centos8 -nt Dockerfile.centos8.base ]; then
-                local dockerfile_modified_ts=$(stat --format %Y Dockerfile.centos8)
-            else
-                local dockerfile_modified_ts=$(stat --format %Y Dockerfile.centos8.base)
-            fi
-            local image_created=$(docker inspect ${docker_image} -f '{{.Created}}')
-            local image_created_ts=$(date --date="$image_created" +%s)
-
-            if (( dockerfile_modified_ts > image_created_ts )); then
-                if ask "Docker image ${docker_image} is outdated. Build now? [Y/n]"; then
-                    make
-                fi
-            fi
-        fi
     fi
 
     check_deprecations
@@ -708,7 +692,7 @@ standalone=false
 docker_command="" # /bin/bash
 port_range=32000-32010
 run_as_root=false
-docker_image=ghcr.io/getupcloud/managed-cluster:$(make print-release)
+docker_image=ghcr.io/getupcloud/managed-cluster:$(make --no-print-directory print-release)
 force_docker_image_build=false
 sudo=sudo
 
