@@ -297,8 +297,8 @@ repo_match()
 
 update_ca_certificates()
 {
-    if [ -e $CLUSTERDIR/cacerts.crt ]; then
-        cp -f $CLUSTERDIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
+    if [ -e $CLUSTER_DIR/cacerts.crt ]; then
+        cp -f $CLUSTER_DIR/cacerts.crt /usr/local/share/ca-certificates/cacerts.crt
         update-ca-certificates
     fi
 }
