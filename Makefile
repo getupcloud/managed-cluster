@@ -37,6 +37,7 @@ print-release:
 	@echo $(RELEASE)
 
 release: build tag check-git push
+	@echo Finished $(RELEASE) release
 
 check-git:
 	@if git status --porcelain | grep . -q; then \
