@@ -10,7 +10,7 @@ spec:
       chart: teleport-kube-agent
       sourceRef:
         kind: HelmRepository
-        name: teleport-agent
+        name: teleport
   install:
     createNamespace: true
     disableWait: true
