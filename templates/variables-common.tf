@@ -76,7 +76,7 @@ variable "kubeconfig_filename" {
   default     = "/cluster/.kube/config"
 }
 
-variable "teleport_auth_key " {
+variable "teleport_auth_key" {
   description = "Teleport Agent Auth Key"
   type        = string
   default     = ""
