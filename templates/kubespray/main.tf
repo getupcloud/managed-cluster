@@ -22,6 +22,6 @@ module "cluster" {
   ssh_private_key         = var.ssh_private_key
   ssh_user                = var.ssh_user
   ssh_password            = var.ssh_password
-  teleport_auth_key       = var.teleport_auth_key
+  teleport_auth_token     = var.teleport_auth_token
   uninstall_packages      = var.uninstall_packages
 }
