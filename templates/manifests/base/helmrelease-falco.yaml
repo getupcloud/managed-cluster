@@ -44,6 +44,7 @@ metadata:
   name: falco-exporter
   namespace: flux-system
 spec:
+  suspend: true
   chart:
     spec:
       chart: falco-exporter
