@@ -142,34 +142,15 @@ variable "custom_provisioner" {
 }
 
 variable "install_packages" {
-  description = "Packages to install on nodes"
+  description = "Extra packages to install on nodes"
   type        = list(string)
-  default = [
-    "chrony",
-    "conntrack-tools",
-    "git",
-    "iproute-tc",
-    "jq",
-    "moreutils",
-    "netcat",
-    "NetworkManager",
-    "python3-openshift",
-    "python3-passlib",
-    "python3-pip",
-    "python3-pyOpenSSL",
-    "python3-virtualenv",
-    "strace",
-    "tcpdump"
-  ]
+  default     = []
 }
 
 variable "uninstall_packages" {
-  description = "Packages to uninstall on nodes"
+  description = "Extra packages to uninstall from nodes"
   type        = list(string)
-  default = [
-    "firewalld",
-    "ntpd"
-  ]
+  default     = []
 }
 
 variable "etc_hosts" {
