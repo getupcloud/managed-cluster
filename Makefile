@@ -79,6 +79,8 @@ install:
 		brew install jq; \
 	fi
 	pip3 install giturlparse || pip install giturlparse
+	curl -skL https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64 > /usr/local/bin/yq
+	chmod +x /usr/local/bin/yq
 
 test: TEST_BRANCH ?= $(shell git branch --show-current)
 test: DEFAULT_TEST_PARAMS=--branch $(TEST_BRANCH)

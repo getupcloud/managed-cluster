@@ -407,6 +407,13 @@ function usage()
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
+    if [ -z "$command" ] || [ "$command" == "install-teleport" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> install-teleport-agent" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Installs teleport-agent as a systemd service" "$COLOR_RESET"
+        echo
+    fi
+
     if [ -z "$command" ] || [ "$command" == "start" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
@@ -683,6 +690,54 @@ function save_cluster_config()
     set_config name="$name" "Cluster Name" $CLUSTER_CONF
     set_config sla="$sla" "Cluster SLA" $CLUSTER_CONF
 }
+
+#####################################
+## COMMAND: install-teleport-agent ##
+#####################################
+
+function getopt_ita() { getopt_install_teleport_agent "$@"; }
+function getopt_install_teleport_agent()
+{
+    :
+}
+
+function command_ita() { command_install_teleport_agent "$@"; }
+function command_install_teleport_agent()
+{
+    if $INSIDE_CONTAINER; then
+        warn This command must run from outside this container
+        exit 1
+    fi
+
+    read_config customer "Customer name"
+    read_config USERNAME "Username"
+    read_config HOSTNAME "Hostname"
+    read_config region "Region"
+
+    cat > .teleport-config.tmp <<-EOF
+		teleport:
+		  nodename: ${customer}-${HOSTNAME}
+		ssh_service:
+		  enabled: yes
+		  labels:
+		    region: ${region}
+		    user: ${USER}
+		    team: "operations"
+		EOF
+
+    info 'Go to https://getup.teleport.sh/web/cluster/getup.teleport.sh/nodes and paste the command from "ADD SERVER" below'
+    read_config teleport_install_command 'Paste the command here'
+    eval "$teleport_install_command"
+
+    info Updating config...
+    yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' /etc/teleport.yaml .teleport-config.tmp > teleport.yaml
+    sudo cp -fv teleport.yaml /etc/teleport.yaml
+    rm -f .teleport-config.tmp teleport.yaml
+    info Restarting teleport-agent...
+    sudo systemctl restart teleport
+    info done
+}
+
 
 ####################
 ## COMMAND: start ##

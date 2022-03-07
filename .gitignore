@@ -3,6 +3,8 @@
 **/.kube/*
 **/.setup_history
 #cluster.conf
+.teleport-config.tmp
+teleport.yaml
 standalone
 .dockerenv
 .cluster.conf
