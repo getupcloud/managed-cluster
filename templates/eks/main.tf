@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.7"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.10"
 
   auth_iam_roles               = var.auth_iam_roles
   auth_iam_users               = var.auth_iam_users
@@ -22,5 +22,6 @@ module "eks" {
   region                       = var.region
   subnet_ids                   = var.subnet_ids
   tags                         = var.tags
+  teleport_auth_token     = var.teleport_auth_token
   vpc_id                       = var.vpc_id
 }
