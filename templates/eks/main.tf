@@ -22,6 +22,6 @@ module "eks" {
   region                       = var.region
   subnet_ids                   = var.subnet_ids
   tags                         = var.tags
-  teleport_auth_token     = var.teleport_auth_token
+  teleport_auth_token          = var.teleport_auth_token
   vpc_id                       = var.vpc_id
 }
