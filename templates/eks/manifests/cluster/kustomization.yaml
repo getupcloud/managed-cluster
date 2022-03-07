@@ -6,3 +6,4 @@ resources:
 - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
 patchesStrategicMerge: []
+# - helmrelease-falco.yaml

@@ -4,6 +4,7 @@ metadata:
   name: falco
   namespace: flux-system
 spec:
+  suspend: true
   chart:
     spec:
       chart: falco
