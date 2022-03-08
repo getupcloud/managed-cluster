@@ -254,12 +254,13 @@ function select_cluster()
     if type dialog &>/dev/null; then
         exec 3>.tmp
         eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
-            "$(for i in $(seq 0 $(( ${#candidate_clusters[*]} - 1 )) ); do echo -n " $i '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
+            "$(for i in $(seq 1 $(( ${#candidate_clusters[*]} )) ); do echo -n " $i '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
             '---' '---' \
             b "'Bootstrap cluster'"  >&2
             #s 'Sync from template' >&2
         idx=$(<.tmp)
         rm -f .tmp
+        let idx--
         case "$idx" in
             [0-9]*)
                 cluster_dir=${candidate_clusters[$idx]}
