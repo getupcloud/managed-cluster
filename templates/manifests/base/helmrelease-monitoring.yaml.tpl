@@ -501,9 +501,6 @@ spec:
       nodeSelector:
         role: infra
 
-      collectors:
-        verticalpodautoscalers: false
-
     kubeScheduler:
       enabled: false
 
