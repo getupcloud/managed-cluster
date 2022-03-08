@@ -6,7 +6,7 @@ ENV \
     GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
     HCL2JSON_VERSION="v0.3.3" \
     KIND_VERSION="v0.11.1" \
-    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage kurt" \
+    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage kurt modify-secret" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.2" \
     KREW_ROOT="/opt/krew" \
@@ -22,7 +22,8 @@ ENV \
     TF_LOG_PATH="${CLUSTER_DIR}/terraform.log" \
     TF_PLAN_FILE="${CLUSTER_DIR}/terraform.tfplan" \
     TF_VARS_FILE="${CLUSTER_DIR}/terraform.tfvars" \
-    VELERO_VERSION="1.6.2"
+    VELERO_VERSION="1.6.2" \
+    PATH="$PATH:$KREW_ROOT/bin"
 
 RUN cd /usr/local/bin && \
     curl -skLO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
