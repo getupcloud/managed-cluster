@@ -83,6 +83,11 @@ spec:
           cpu: 100m
           memory: 512Mi
 
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: "20%"
+
       serviceMonitor:
         enabled: true
         interval: 60s
