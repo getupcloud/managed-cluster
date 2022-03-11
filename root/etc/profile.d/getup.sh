@@ -343,6 +343,23 @@ run_as_user()
     done
     shopt -u dotglob
 
+    # copy generated identity file if host's user has no private key
+    if [ -d $HOME/.ssh ] && [ -e $CLUSTER_DIR/identity ]; then
+        local key_type=$(ssh-keygen -yf $CLUSTER_DIR/identity | cut -f 1 -d' ')
+
+        case "$key_type" in
+            ecdsa*) private_key_path=$HOME/.ssh/id_ecdsa;;
+            ssh-rsa) private_key_path=$HOME/.ssh/id_rsa;;
+            ssh-dss) private_key_path=$HOME/.ssh/id_dsa
+        esac
+
+        if ! [ -e "$private_key_path" ]; then
+            cp $CLUSTER_DIR/identity $private_key_path
+            ssh-keygen -yf $CLUSTER_DIR/identity > ${private_key_path}.pub
+            chmod 400 $private_key_path
+        fi
+    fi
+
     if [ -d $HOME/.kube ]; then
         rm -rf $HOME/.kube
     fi
