@@ -475,6 +475,10 @@ spec:
     nodeExporter:
       enabled: true
 
+
+    prometheus-node-exporter:
+      #priorityClassName: high-priority
+
       resources:
         limits:
           cpu: 15m
@@ -483,8 +487,10 @@ spec:
           cpu: 15m
           memory: 40Mi
 
-    prometheus-node-exporter:
-      #priorityClassName: high-priority
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: "20%"
 
       # This only appends `processes` subsystem
       extraArgs:
