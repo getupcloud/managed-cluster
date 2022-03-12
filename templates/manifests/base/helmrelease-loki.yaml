@@ -27,6 +27,12 @@ spec:
     loki:
       config:
         auth_enabled: false
+        ingester_config:
+          chunk_encoding: lz4
+          chunk_idle_period: 10m
+          chunk_retain_period: 0s
+          wal:
+            flush_on_shutdown: true
         limits_config:
           max_entries_limit_per_query: 100000
         chunk_store_config:
