@@ -6,6 +6,37 @@ kubectl()
     command kubectl "$@"
 }
 
+# kubect debug node $1
+function kdbgn()
+{
+  if [ $# -eq 0 ]; then
+    local node=$(
+      FZF_DEFAULT_COMMAND='kubectl get nodes -o=name|cut -f2 -d/' \
+      fzf --ansi --no-preview)
+  else
+    node="$1"
+  fi
+  [ -n "$node" ] || return
+  kubectl debug -it node/"$node" --image=alpine -- chroot /host
+}
+
+# kubectl get secret | base64 -d
+function kgsecdec()
+{
+    local secret=$1
+    shift
+
+    if [ $# -eq 0 ]; then
+      local entry=$(
+        FZF_DEFAULT_COMMAND="kubectl get secret -o jsonpath={.data} $secret|jq 'keys|.[]' -r" \
+        fzf --ansi --no-preview)
+    else
+      local entry="$1"
+    fi
+
+    kubectl get secret -o jsonpath={.data.${entry//./\\.}} $secret "$@" | base64 -d
+}
+
 # alias | sed -ne "s/^alias \(k[^=]\+\)='\(kubectl\)\(.*\)/alias w\1='watch -n1 \2\3/p"
 alias wka='watch -n1 kubectl apply --recursive -f'
 alias wkak='watch -n1 kubectl apply -k'
