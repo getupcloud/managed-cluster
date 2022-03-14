@@ -1,199 +1,199 @@
----
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
-  name: loki
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: loki-stack
-      sourceRef:
-        kind: HelmRepository
-        name: grafana
-      version: 2.4.1
-  dependsOn:
-  - name: monitoring
-  install:
-    createNamespace: true
-    disableWait: false
-    remediation:
-      retries: -1
-  interval: 5m
-  releaseName: loki
-  storageNamespace: logging
-  targetNamespace: logging
-  values:
-    loki:
-      config:
-        auth_enabled: false
-        ingester_config:
-          chunk_encoding: lz4
-          chunk_idle_period: 10m
-          chunk_retain_period: 0s
-          wal:
-            flush_on_shutdown: true
-        limits_config:
-          max_entries_limit_per_query: 100000
-        chunk_store_config:
-          max_look_back_period: 720h
-        table_manager:
-          retention_deletes_enabled: true
-          retention_period: 720h
-
-      ingress:
-        enabled: false
-
-      updateStrategy:
-        type: RollingUpdate
-
-      tolerations:
-      - effect: NoSchedule
-        key: dedicated
-        value: infra
-      - effect: NoSchedule
-        key: CriticalAddonsOnly
-
-      nodeSelector:
-        role: infra
-
-      resources:
-        limits:
-          cpu: 1
-          memory: 2Gi
-        requests:
-          cpu: 100m
-          memory: 1Gi
-
-      #priorityClassName: high-priority
-
-      persistence:
-        enabled: true
-        # storageClassName: gp2
-        size: 100Gi
-
-      serviceMonitor:
-        enabled: true
-        interval: 60s
-
-    promtail:
-      tolerations:
-      - operator: Exists
-        effect: NoSchedule
-
-      resources:
-        limits:
-          cpu: 1
-          memory: 1Gi
-        requests:
-          cpu: 100m
-          memory: 512Mi
-
-      updateStrategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxUnavailable: "20%"
-
-      serviceMonitor:
-        enabled: true
-        interval: 60s
-
-      volumes:
-      - name: containers
-        hostPath:
-          path: /var/lib/containers
-      - name: docker
-        hostPath:
-          path: /var/lib/docker/containers
-      - name: pods
-        hostPath:
-          path: /var/log/pods
-      #
-      # OCI OKE
-      #
-      #- hostPath:
-      #    path: /u01
-      #  name: u01
-
-      volumeMounts:
-      - name: containers
-        mountPath: /var/lib/containers
-        readOnly: true
-      - name: docker
-        mountPath: /var/lib/docker/containers
-        readOnly: true
-      - name: pods
-        mountPath: /var/log/pods
-        readOnly: true
-      #
-      # OCI OKE
-      #
-      #- mountPath: /u01
-      #  name: u01
-      #  readOnly: true
-
-    grafana:
-      enabled: false
-      #adminPassword: admin
-      #adminUser: admin
-      #ingress:
-      #  ingressClassName: nginx
-      #  annotations:
-      #    kubernetes.io/ingress.class: nginx
-      #  enabled: true
-      #  hosts:
-      #  - grafana.example.com
-
-    fluent-bit:
-      enabled: false
-
-    prometheus:
-      enabled: false
-
-#---
-#apiVersion: helm.toolkit.fluxcd.io/v2beta1
-#kind: HelmRelease
-#metadata:
-#  name: loki-canary
-#  namespace: flux-system
-#spec:
-#  chart:
-#    spec:
-#      chart: loki-canary
-#      sourceRef:
-#        kind: HelmRepository
-#        name: grafana
-#      version: 0.4.0
-#  dependsOn:
-#  - name: monitoring
-#  install:
-#    createNamespace: true
-#    disableWait: false
-#    remediation:
-#      retries: -1
-#  interval: 5m
-#  releaseName: loki-canary
-#  storageNamespace: logging
-#  targetNamespace: logging
-#  values:
-#    lokiAddress: loki:3100
-#
-#    extraArgs:
-#    - -labelname=pod
-#    - -labelvalue=$(POD_NAME)
-#    - -wait=5m0s
-#
-#    serviceMonitor:
-#      enabled: true
-#
-#    resources:
-#      limits:
-#        cpu: 100m
-#        memory: 64Mi
-#      requests:
-#        cpu: 10m
-#        memory: 32Mi
-#
-#    tolerations:
-#    - operator: Exists
-#      effect: NoSchedule
+###---
+###apiVersion: helm.toolkit.fluxcd.io/v2beta1
+###kind: HelmRelease
+###metadata:
+###  name: loki
+###  namespace: flux-system
+###spec:
+###  chart:
+###    spec:
+###      chart: loki-stack
+###      sourceRef:
+###        kind: HelmRepository
+###        name: grafana
+###      version: 2.4.1
+###  dependsOn:
+###  - name: monitoring
+###  install:
+###    createNamespace: true
+###    disableWait: false
+###    remediation:
+###      retries: -1
+###  interval: 5m
+###  releaseName: loki
+###  storageNamespace: logging
+###  targetNamespace: logging
+###  values:
+###    loki:
+###      config:
+###        auth_enabled: false
+###        ingester_config:
+###          chunk_encoding: lz4
+###          chunk_idle_period: 10m
+###          chunk_retain_period: 0s
+###          wal:
+###            flush_on_shutdown: true
+###        limits_config:
+###          max_entries_limit_per_query: 100000
+###        chunk_store_config:
+###          max_look_back_period: 720h
+###        table_manager:
+###          retention_deletes_enabled: true
+###          retention_period: 720h
+###
+###      ingress:
+###        enabled: false
+###
+###      updateStrategy:
+###        type: RollingUpdate
+###
+###      tolerations:
+###      - effect: NoSchedule
+###        key: dedicated
+###        value: infra
+###      - effect: NoSchedule
+###        key: CriticalAddonsOnly
+###
+###      nodeSelector:
+###        role: infra
+###
+###      resources:
+###        limits:
+###          cpu: 1
+###          memory: 2Gi
+###        requests:
+###          cpu: 100m
+###          memory: 1Gi
+###
+###      #priorityClassName: high-priority
+###
+###      persistence:
+###        enabled: true
+###        # storageClassName: gp2
+###        size: 100Gi
+###
+###      serviceMonitor:
+###        enabled: true
+###        interval: 60s
+###
+###    promtail:
+###      tolerations:
+###      - operator: Exists
+###        effect: NoSchedule
+###
+###      resources:
+###        limits:
+###          cpu: 1
+###          memory: 1Gi
+###        requests:
+###          cpu: 100m
+###          memory: 512Mi
+###
+###      updateStrategy:
+###        type: RollingUpdate
+###        rollingUpdate:
+###          maxUnavailable: "20%"
+###
+###      serviceMonitor:
+###        enabled: true
+###        interval: 60s
+###
+###      volumes:
+###      - name: containers
+###        hostPath:
+###          path: /var/lib/containers
+###      - name: docker
+###        hostPath:
+###          path: /var/lib/docker/containers
+###      - name: pods
+###        hostPath:
+###          path: /var/log/pods
+###      #
+###      # OCI OKE
+###      #
+###      #- hostPath:
+###      #    path: /u01
+###      #  name: u01
+###
+###      volumeMounts:
+###      - name: containers
+###        mountPath: /var/lib/containers
+###        readOnly: true
+###      - name: docker
+###        mountPath: /var/lib/docker/containers
+###        readOnly: true
+###      - name: pods
+###        mountPath: /var/log/pods
+###        readOnly: true
+###      #
+###      # OCI OKE
+###      #
+###      #- mountPath: /u01
+###      #  name: u01
+###      #  readOnly: true
+###
+###    grafana:
+###      enabled: false
+###      #adminPassword: admin
+###      #adminUser: admin
+###      #ingress:
+###      #  ingressClassName: nginx
+###      #  annotations:
+###      #    kubernetes.io/ingress.class: nginx
+###      #  enabled: true
+###      #  hosts:
+###      #  - grafana.example.com
+###
+###    fluent-bit:
+###      enabled: false
+###
+###    prometheus:
+###      enabled: false
+###
+####---
+####apiVersion: helm.toolkit.fluxcd.io/v2beta1
+####kind: HelmRelease
+####metadata:
+####  name: loki-canary
+####  namespace: flux-system
+####spec:
+####  chart:
+####    spec:
+####      chart: loki-canary
+####      sourceRef:
+####        kind: HelmRepository
+####        name: grafana
+####      version: 0.4.0
+####  dependsOn:
+####  - name: monitoring
+####  install:
+####    createNamespace: true
+####    disableWait: false
+####    remediation:
+####      retries: -1
+####  interval: 5m
+####  releaseName: loki-canary
+####  storageNamespace: logging
+####  targetNamespace: logging
+####  values:
+####    lokiAddress: loki:3100
+####
+####    extraArgs:
+####    - -labelname=pod
+####    - -labelvalue=$(POD_NAME)
+####    - -wait=5m0s
+####
+####    serviceMonitor:
+####      enabled: true
+####
+####    resources:
+####      limits:
+####        cpu: 100m
+####        memory: 64Mi
+####      requests:
+####        cpu: 10m
+####        memory: 32Mi
+####
+####    tolerations:
+####    - operator: Exists
+####      effect: NoSchedule
