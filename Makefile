@@ -40,14 +40,18 @@ release: fmt build tag check-git push
 	@echo Finished $(RELEASE) release
 
 check-git:
-	@if git status --porcelain | grep . -q; then \
+	@if git status --porcelain | grep '^[^?]' -q; then \
 		echo Git has uncommited files. Please fix and try again; \
 		exit 1; \
 	fi
 
-tag:
+tag: tag-git tag-image
+
+tag-git:
 	git commit -m "Built release v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
 	git tag $(RELEASE)
+
+tag-image:
 	docker tag $(IMAGE):$(RELEASE) $(IMAGE):latest
 	docker tag $(IMAGE_BASE):$(RELEASE) $(IMAGE_BASE):latest
 
