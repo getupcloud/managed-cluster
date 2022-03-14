@@ -51,10 +51,14 @@ tag:
 	docker tag $(IMAGE):$(RELEASE) $(IMAGE):latest
 	docker tag $(IMAGE_BASE):$(RELEASE) $(IMAGE_BASE):latest
 
-push:
+push: push-git push-image
+
+push-git:
 	git push origin main:release-$(RELEASE)
 	git push origin main
 	git push --tags
+
+push-image:
 	docker push $(IMAGE):$(RELEASE)
 	docker push $(IMAGE):latest
 	docker push $(IMAGE_BASE):$(RELEASE)
