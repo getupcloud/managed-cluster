@@ -468,6 +468,9 @@ function update_globals()
     if [ -v type ]; then
         export TEMPLATE_DIR=$TEMPLATES_DIR/$type
     fi
+    if ! [ -v TELEPORT_PROXY ]; then
+        export TELEPORT_PROXY=getup.teleport.sh
+    fi
 }
 
 if ! [ -v ROOT_DIR ]; then
@@ -480,7 +483,6 @@ if $INSIDE_CONTAINER; then
     source_env "$PROVIDER_ENV"
     source_env $ROOT_DIR/.dockerenv
 else
-
     export REPO_DIR=$ROOT_DIR
 fi
 

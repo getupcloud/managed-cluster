@@ -251,7 +251,10 @@ function select_cluster()
     cluster_names=( ${cluster_names[*]%/*} )
     cluster_types=( ${candidate_clusters[*]##*/} )
 
-    if type dialog &>/dev/null; then
+    if type fzf; then
+        cluster_dir=$(printf '%s\n' ${candidate_clusters[*]} | awk '{print FNR, $0}' |
+            fzf -1 --ansi --no-preview --cycle --reverse --header='---[ Select Cluster ]---' | awk '{print $2}')
+    elif type dialog &>/dev/null; then
         exec 3>.tmp
         eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
             "$(for i in $(seq 0 ${#candidate_clusters[*]} ); do echo -n " $((i + 1)) '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
@@ -346,6 +349,14 @@ function start_container()
     if [ -e /var/run/docker.sock ]; then
         docker_run_options_defaults+=(
             -v /var/run/docker.sock:/var/run/docker.sock
+        )
+    fi
+
+    if [ -e "$SSH_AUTH_SOCK" ]; then
+        docker_run_options_defaults+=(
+            -v "$SSH_AUTH_SOCK:$SSH_AUTH_SOCK"
+            --env "SSH_AGENT_PID:$SSH_AGENT_PID"
+            --env "SSH_AUTH_SOCK:$SSH_AUTH_SOCK"
         )
     fi
 

@@ -48,5 +48,6 @@ module "gke" {
   remove_default_node_pool    = var.remove_default_node_pool
   service_account_key         = var.service_account_key
   subnetwork                  = var.subnetwork
+  teleport_auth_token         = var.teleport_auth_token
   zones                       = var.zones
 }
