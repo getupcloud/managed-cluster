@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.4"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.6"
 
   api_endpoint                = var.api_endpoint
   cluster_autoscaling         = var.cluster_autoscaling
