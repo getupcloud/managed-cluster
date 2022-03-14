@@ -5,7 +5,6 @@ metadata:
   name: loki
   namespace: flux-system
 spec:
-  suspend: true
   chart:
     spec:
       chart: loki
@@ -42,11 +41,6 @@ spec:
     ingress:
       enabled: false
 
-    updateStrategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: "20%"
-
     tolerations:
     - effect: NoSchedule
       key: dedicated
@@ -82,7 +76,6 @@ metadata:
   name: promtail
   namespace: flux-system
 spec:
-  suspend: true
   chart:
     spec:
       chart: promtail
@@ -90,6 +83,8 @@ spec:
         kind: HelmRepository
         name: grafana
       version: 3.11.0
+  dependsOn:
+  - name: loki
   install:
     createNamespace: true
     disableWait: false
@@ -118,7 +113,7 @@ spec:
         memory: 2Gi
       requests:
         cpu: 100m
-        memory: 512Mi
+        memory: 64Mi
 
     updateStrategy:
       type: RollingUpdate
