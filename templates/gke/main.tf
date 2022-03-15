@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.7"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.8"
 
   api_endpoint                = var.api_endpoint
   cluster_autoscaling         = var.cluster_autoscaling
@@ -49,5 +49,6 @@ module "gke" {
   service_account_key         = var.service_account_key
   subnetwork                  = var.subnetwork
   teleport_auth_token         = var.teleport_auth_token
+  use_kubeconfig              = var.use_kubeconfig
   zones                       = var.zones
 }
