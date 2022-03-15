@@ -10,4 +10,5 @@ module "kind" {
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
   manifests_template_vars = local.manifests_template_vars
+  use_kubeconfig          = var.use_kubeconfig
 }

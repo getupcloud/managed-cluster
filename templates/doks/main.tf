@@ -17,5 +17,6 @@ module "doks" {
   spaces_access_id        = var.spaces_access_id
   spaces_buckets          = var.spaces_buckets
   spaces_secret_key       = var.spaces_secret_key
+  use_kubeconfig          = var.use_kubeconfig
   vpc_uuid                = var.vpc_uuid
 }

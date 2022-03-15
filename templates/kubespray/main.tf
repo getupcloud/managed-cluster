@@ -24,4 +24,5 @@ module "cluster" {
   ssh_password            = var.ssh_password
   teleport_auth_token     = var.teleport_auth_token
   uninstall_packages      = var.uninstall_packages
+  use_kubeconfig          = var.use_kubeconfig
 }

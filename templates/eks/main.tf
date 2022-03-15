@@ -23,5 +23,6 @@ module "eks" {
   subnet_ids                   = var.subnet_ids
   tags                         = var.tags
   teleport_auth_token          = var.teleport_auth_token
+  use_kubeconfig               = var.use_kubeconfig
   vpc_id                       = var.vpc_id
 }
