@@ -1,5 +1,5 @@
 module "doks" {
-  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.2"
+  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.3"
 
   cronitor_api_key        = var.cronitor_api_key
   cronitor_pagerduty_key  = var.cronitor_pagerduty_key
