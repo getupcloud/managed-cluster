@@ -1,0 +1,32 @@
+#!/bin/bash
+
+INSTALLER_URL=https://github.com/openshift/okd/releases/download/4.10.0-0.okd-2022-03-07-131213/openshift-install-linux-4.10.0-0.okd-2022-03-07-131213.tar.gz
+INSTALLER_TAR=${INSTALLER_URL##*/}
+
+if ! [ -e $INSTALLER_TAR ]; then
+    curl -LO $INSTALLER_URL
+    tar xzvf ${INSTALLER_URL##*/}
+fi
+
+if ! [ -e pull-secret.json ]; then
+    echo Go to https://console.redhat.com/openshift/install/pull-secret and retrieve a new pull-secret.
+    echo Paste pull-secret for RedHat registries:
+    cat > pull-secret.json
+    echo Created file pull-secret.json
+fi
+
+if ! [ -d okd ]; then
+    ./openshift-install create install-config --dir okd || exit
+fi
+
+vim okd/install-config.yaml
+cp -vf okd/install-config.yaml okd/install-config.yaml.backup.$(date +%Y%M%d-%H%M%S)
+
+read -p "Ready to install? [Y/n]" ask
+ask=${ask,,}
+case "${ask:0:1}" in
+    y|s) : ;;
+    *) exit
+esac
+
+./openshift-install create cluster --dir okd --log-level=debug
