@@ -15,14 +15,27 @@ if ! [ -e pull-secret.json ]; then
     echo Created file pull-secret.json
 fi
 
+if ! [ -e ~/.aws/credentials ]; then
+    for var in AWS_ACCESS_KEY_ID: AWS_SECRET_ACCESS_KEY:-s AWS_DEFAULT_REGION:; do
+       opt=${var##*:}
+       var=${var%:*}
+        if ! [ -v "${!var}" ]; then
+            read $opt -p "$var: " value
+           export $var="${value}"
+           [ "$opt" == -s ] && echo
+        fi
+    done
+fi
+
 if ! [ -d okd ]; then
     ./openshift-install create install-config --dir okd || exit
 fi
 
 vim okd/install-config.yaml
-cp -vf okd/install-config.yaml okd/install-config.yaml.backup.$(date +%Y%M%d-%H%M%S)
+cp -vf okd/install-config.yaml okd/install-config.yaml.backup.$(date +%Y%m%d-%H%M%S)
 
 read -p "Ready to install? [Y/n]" ask
+[ -z "$ask" ] && ask=y
 ask=${ask,,}
 case "${ask:0:1}" in
     y|s) : ;;

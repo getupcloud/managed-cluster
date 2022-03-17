@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bash --norc --noprofile -i
+#!/usr/bin/env bash
 
 ${DEBUG:=false} && set -x
 : ${INSIDE_CONTAINER:=false}
