@@ -1,1 +1,2 @@
-openshift-install openshift-install-linux-4.10.0-0.okd-2022-03-07-131213.tar.gz
+openshift-install
+openshift-install-linux-*
