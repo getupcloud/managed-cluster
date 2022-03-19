@@ -6,7 +6,7 @@ ENV \
     GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
     HCL2JSON_VERSION="v0.3.3" \
     KIND_VERSION="v0.11.1" \
-    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage kurt modify-secret" \
+    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage kurt modify-secret explore" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.2" \
     KREW_ROOT="/opt/krew" \
@@ -32,7 +32,7 @@ RUN cd /usr/local/bin && \
     curl -skL https://github.com/mikefarah/yq/releases/download/v4.13.2/yq_linux_amd64 > yq && \
     KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')-$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/' -e 's/aarch64/arm64/') && \
     curl -skL https://kind.sigs.k8s.io/dl/v0.11.1/kind-${KERNEL_MACHINE} > kind && \
-    curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.3/hcl2json_linux_amd64 > hcl2json && \
+    curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.4/hcl2json_linux_amd64 > hcl2json && \
     curl -skL https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.3/aws-iam-authenticator_0.5.3_linux_amd64 > \
       aws-iam-authenticator && \
     curl -skL https://github.com/derailed/k9s/releases/download/v0.24.14/k9s_Linux_x86_64.tar.gz | tar xzvf - k9s && \
