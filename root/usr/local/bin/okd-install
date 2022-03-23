@@ -27,7 +27,7 @@ if ! [ -e ~/.aws/credentials ]; then
     done
 fi
 
-if ! [ -d okd ]; then
+if ! [ -e okd/instal-config.yaml ]; then
     ./openshift-install create install-config --dir okd || exit
 fi
 
