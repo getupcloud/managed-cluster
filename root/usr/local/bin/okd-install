@@ -1,20 +1,26 @@
 #!/bin/bash
 
+source /etc/profile.d/getup.sh
+
+set -x
+
 cd $CLUSTER_DIR
 
 INSTALLER_URL=https://github.com/openshift/okd/releases/download/4.10.0-0.okd-2022-03-07-131213/openshift-install-linux-4.10.0-0.okd-2022-03-07-131213.tar.gz
-INSTALLER_TAR=${INSTALLER_URL##*/}
+INSTALLER_TAR=/tmp/${INSTALLER_URL##*/}
+INSTALLER_BIN=$HOME/.local/bin/openshift-installer
 
-if ! [ -e $INSTALLER_TAR ]; then
-    curl -LO $INSTALLER_URL
-    tar xzvf ${INSTALLER_URL##*/}
+if ! [ -e "$INSTALLER_BIN" ]; then
+    info Downloading OKD installer...
+    curl -Ls $INSTALLER_URL \
+        | tar xzvf - -C $HOME/.local/bin openshift-installer
 fi
 
 if ! [ -e pull-secret.json ]; then
-    echo Go to https://console.redhat.com/openshift/install/pull-secret and retrieve a new pull-secret.
-    echo Paste pull-secret for RedHat registries:
+    info "Go to https://console.redhat.com/openshift/install/pull-secret and retrieve a new pull-secret."
+    info "Paste pull-secret for RedHat registries:"
     cat > pull-secret.json
-    echo Created file pull-secret.json
+    info "Created file pull-secret.json"
 fi
 
 if ! [ -e "$AWS_SHARED_CREDENTIALS_FILE" ]; then
@@ -30,18 +36,18 @@ if ! [ -e "$AWS_SHARED_CREDENTIALS_FILE" ]; then
 fi
 
 if ! [ -e okd/instal-config.yaml ]; then
-    ./openshift-install create install-config --dir okd || exit
+    openshift-install create install-config --dir okd
 fi
 
 vim okd/install-config.yaml
 cp -vf okd/install-config.yaml okd/install-config.yaml.backup.$(date +%Y%m%d-%H%M%S)
 
-read -p "Ready to install? [Y/n]" ask
-[ -z "$ask" ] && ask=y
+read -p "Ready to install? [Y/n]" ask && [ -z "$ask" ] && ask=y
 ask=${ask,,}
 case "${ask:0:1}" in
     y|s) : ;;
     *) exit
 esac
 
-./openshift-install create cluster --dir okd --log-level=debug
+openshift-install create cluster --dir okd --log-level=debug
+kubeconfig-get
