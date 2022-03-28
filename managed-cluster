@@ -206,16 +206,34 @@ function select_cluster_sla()
 
 function generate_ssh_key()
 {
-    if ! [ -e $CLUSTER_DIR/identity ]; then
-        info Generating $CLUSTER_DIR/identity
-        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $CLUSTER_DIR/identity -N "" -C "$customer/$name/$type"
-        ssh-keygen -yf $CLUSTER_DIR/identity > $CLUSTER_DIR/identity.pub
+    local _key_priv=$CLUSTER_DIR/identity
+    local _key_pub=$CLUSTER_DIR/identity.pub
+    local _kh=$CLUSTER_DIR/known_hosts
+
+    if ! [ -e $_key_priv ]; then
+        info Generating $_key_priv
+        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $_key_priv -N "" -C "$customer/$name/$type"
     else
-        info Using existing $CLUSTER_DIR/identity
+        info Using existing $_key_priv
     fi
 
-    info Generating $CLUSTER_DIR/known_hosts
-    ssh-keyscan github.com > $CLUSTER_DIR/known_hosts
+    if ! [ -e $_key_pub ]; then
+        ssh-keygen -yf $_key_priv > $_key_pub
+    fi
+
+    info Generating $_kh for $ssh_host
+    ssh-keyscan $ssh_host > $_kh
+
+    if $opt_local_git_repo; then
+        info Updating local ssh config
+        local _key_pub_data=$(cut -f1-2 -d' ' $_key_pub)
+        local _key_fp=$(ssh-keygen -l -E md5 -f $_key_pub | cut -f2 -d' ')
+        if ! grep -q "$_key_pub_data" ~/.ssh/authorized_keys; then
+            info "Appending ssh key ($_key_fp) to $HOME/.ssh/authorized_keys"
+            cat $_key_pub >> $HOME/.ssh/authorized_keys
+            chmod 600 $HOME/.ssh/authorized_keys
+        fi
+    fi
 }
 
 function select_cluster()
@@ -410,8 +428,10 @@ function usage()
         echo "     -c, --customer NAME        Customer name."
         echo "         --force                Force create even if CLUSTER-DIR exists."
         echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "         --local-git-repo       Force flux-git-repo to '$local_git_repo'. Implies -f and -H. (default: false)"
         echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
         echo "     -l, --ssh-key-length       SSH key length, depends on ssh key type."
+        echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
         echo "     -n, --name NAME            Unique name for new cluster."
         echo "     -o, --origin REMOTE        Define ORIGIN remote address."
         echo "     -s, --sla VALUE            Cluster SLA: high, low, none (default: $opt_sla)."
@@ -508,7 +528,7 @@ function invalid_argument()
 function dump_options()
 {
     echo Current options:
-    for i in command debug verbose force ssh_key_type ssh_key_length \
+    for i in command debug verbose force ssh_key_type ssh_key_length ssh_host \
         standalone docker_command port_range run_as_root \
         force_docker_image_build cluster_dir \
         import_var_prefixes import_var_sources
@@ -533,6 +553,11 @@ ssh_key_length_dsa=1024
 ssh_key_length_ecdsa=521
 ssh_key_type=ecdsa
 ssh_key_length=0
+ssh_host=github.com
+local_git_repo_user=$USER
+local_git_repo_address=$(ip r | awk '/^default/{print $5}' | xargs ip -4 -o a show dev | awk '{print $4}' | cut -f1 -d /) 2>/dev/null
+local_git_repo_path=$PWD
+local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}${local_git_repo_path}/.git"
 default_upstream=git@github.com:getupcloud/managed-cluster.git
 common_template_files=(
     manifests
@@ -551,6 +576,7 @@ opt_name=
 opt_type=
 opt_sla=
 opt_flux_git_repo=
+opt_local_git_repo=false
 
 function getopt_c() { getopt_create "$@"; }
 function getopt_create()
@@ -567,6 +593,12 @@ function getopt_create()
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 opt_flux_git_repo=$1
+            ;;
+            --local-git-repo)
+                opt_local_git_repo=true
+                opt_flux_git_repo="$local_git_repo"
+                ssh_host="$local_git_repo_address"
+                info "Using flux git repo: $local_git_repo"
             ;;
             -o|--origin)
                 [ $# -lt 2 ] && invalid_argument $1
@@ -602,6 +634,11 @@ function getopt_create()
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 ssh_key_length=$1
+            ;;
+            -H|--ssh-host)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                ssh_host=$1
             ;;
             -s|--sla)
                 [ $# -lt 2 ] && invalid_argument $1
