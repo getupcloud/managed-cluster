@@ -117,7 +117,7 @@ variable "aws_modules" {
   type        = any
   default = {
     "certmanager" : {
-      "enabled" : true,
+      "enabled" : false,
       "hosted_zone_id" : ""
     }
     "cluster-autoscaler" : {
