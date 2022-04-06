@@ -21,7 +21,7 @@ Bootstrap an initial config for a new cluster named `production`:
 $ ./managed-cluster create
 ```
 
-All cluster configs will be stored in an exclusive directory `./clusters/${CUSTOMER_NAME}/${CLUSTER_NAME}`.
+All cluster configs will be stored in an exclusive directory `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}`.
 
 ## Start installer container
 
@@ -33,7 +33,7 @@ $ ./managed-cluster start
 
 There are two volumes mapped from local host into container's filesystem:
 
-- `./clusters/${CUSTOMER_NAME}/${CLUSTER_NAME}` -> `/cluster`
+- `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}` -> `/cluster`
 - `./` -> `/repo`
 
 A new `/cluster/terraform.tfvars` will be generated case none is found.
@@ -53,10 +53,10 @@ $ terraform-apply
 
 After terraform finishes, you will be asked to create a github repo and push this repo into it.
 
-Flux will be installed and configured to sync from `${GITHUB_REPO}/clusters/${CUSTOMER_NAME}/${CLUSTER_NAME}/manifests/cluster/kustomization.yaml`.
+Flux will be installed and configured to sync from `${GITHUB_REPO}/clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}/manifests/cluster/kustomization.yaml`.
 
 ## Updating the cluster
 
 In order to update any config, simply `terraform-edit` and then `terraform-apply`.
 
-You are free to edit/add/remove anything from `/cluster` (or `clusters/${CUSTOMER_NAME}/${CLUSTER_NAME}` if you are from out of the container).
+You are free to edit/add/remove anything from `/cluster` (or `clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}` if you are from out of the container).
