@@ -419,6 +419,7 @@ spec:
           isDefault: false
           jsonData:
             maxLines: 100000
+            manageAlerts: false
         - name: prometheus
           type: prometheus
           url: http://monitoring-prometheus:9090/
