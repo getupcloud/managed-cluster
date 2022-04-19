@@ -1,8 +1,10 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.14"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.15"
 
+  account_id                   = var.account_id
   auth_iam_roles               = var.auth_iam_roles
   auth_iam_users               = var.auth_iam_users
+  auth_map_roles               = var.auth_map_roles
   aws_access_key_id            = var.aws_access_key_id
   aws_modules                  = var.aws_modules
   aws_secret_access_key        = var.aws_secret_access_key

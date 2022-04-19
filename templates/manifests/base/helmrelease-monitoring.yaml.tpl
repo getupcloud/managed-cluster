@@ -55,10 +55,10 @@ spec:
       ingress:
         enabled: false
         annotations:
-          kubernetes.io/ingress.class: nginx
-          nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
-          nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
-          nginx.ingress.kubernetes.io/auth-type: basic
+    #      kubernetes.io/ingress.class: nginx
+    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+    #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - prometheus.example.com
@@ -144,11 +144,11 @@ spec:
       ingress:
         enabled: false
         annotations:
-          kubernetes.io/ingress.class: nginx
-          nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
-          nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
-          nginx.ingress.kubernetes.io/auth-type: basic
-          #cert-manager.io/cluster-issuer: letsencrypt-staging-http01
+    #      kubernetes.io/ingress.class: nginx
+    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+    #      nginx.ingress.kubernetes.io/auth-type: basic
+    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - alertmanager.example.com
     #    tls:
@@ -448,10 +448,10 @@ spec:
       ingress:
         enabled: false
         annotations:
-          kubernetes.io/ingress.class: nginx
-          nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
-          nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
-          nginx.ingress.kubernetes.io/auth-type: basic
+    #      kubernetes.io/ingress.class: nginx
+    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+    #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - grafana.example.com

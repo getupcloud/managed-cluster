@@ -269,13 +269,13 @@ function select_cluster()
     cluster_names=( ${cluster_names[*]%/*} )
     cluster_types=( ${candidate_clusters[*]##*/} )
 
-    if type fzf; then
+    if type fzf &>/dev/null; then
         cluster_dir=$(printf '%s\n' ${candidate_clusters[*]} | awk '{print FNR, $0}' |
             fzf -1 --ansi --no-preview --cycle --reverse --header='---[ Select Cluster ]---' | awk '{print $2}')
     elif type dialog &>/dev/null; then
         exec 3>.tmp
         eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
-            "$(for i in $(seq 0 ${#candidate_clusters[*]} ); do echo -n " $((i + 1)) '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
+            "$(for i in $(seq 0 $(( ${#candidate_clusters[*]} - 1 )) ); do echo -n " $((i + 1)) '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
             '---' '---' \
             b "'Bootstrap cluster'"  >&2
             #s 'Sync from template' >&2
