@@ -38,7 +38,7 @@ spec:
     kind: GitRepository
     name: ${ git_repository_name }
 
-%{ if length(key(try(kustomize_controller_service_account_annotations, {}))) != 0 }
+%{ if length(keys(try(kustomize_controller_service_account_annotations, {}))) != 0 }
 ---
 apiVersion: v1
 kind: ServiceAccount
