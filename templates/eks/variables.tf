@@ -12,6 +12,12 @@ variable "aws_secret_access_key" {
   default     = null
 }
 
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+  default     = ""
+}
+
 variable "region" {
   description = "AWS Region"
   type        = string
@@ -86,6 +92,16 @@ variable "auth_iam_roles" {
   default     = ["getupcloud"]
 }
 
+variable "auth_map_roles" {
+  description = "Additional IAM roles to add to the aws-auth configmap."
+  type = list(object({
+    rolearn  = string
+    username = string
+    groups   = list(string)
+  }))
+  default = []
+}
+
 variable "eks_addons" {
   description = "Manages an EKS add-on"
   type        = any
@@ -108,6 +124,12 @@ variable "endpoint_public_access_cidrs" {
 
 variable "tags" {
   description = "AWS tags to apply to resources"
+  type        = any
+  default     = {}
+}
+
+variable "aws_default_tags" {
+  description = "AWS tags to apply to all resources via provider"
   type        = any
   default     = {}
 }

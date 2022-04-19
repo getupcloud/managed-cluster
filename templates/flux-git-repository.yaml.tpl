@@ -8,7 +8,7 @@ spec:
   interval: ${ reconcile_interval }
   url: ${ git_repo }
   ref:
-    branch: main
+    branch: ${ git_branch }
   secretRef:
     name: ${ git_repository_name }
 ---
@@ -33,7 +33,18 @@ spec:
   path: ${ manifests_path }/cluster
   prune: true
   decryption:
-    provider: sops  
+    provider: sops
   sourceRef:
     kind: GitRepository
     name: ${ git_repository_name }
+
+%{ if length(key(try(kustomize_controller_service_account_annotations, {}))) != 0 }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kustomize-controller
+  namespace: ${ namespace }
+  annotations:
+    ${ indent(4, yamlencode(kustomize_controller_service_account_annotations)) }
+%{ endif }
