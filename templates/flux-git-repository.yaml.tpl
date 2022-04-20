@@ -38,7 +38,7 @@ spec:
     kind: GitRepository
     name: ${ git_repository_name }
 
-%{ if length(keys(try(kustomize_controller_service_account_annotations, {}))) != 0 }
+%{ if kustomize_controller_irsa_arn != "" }
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -46,5 +46,5 @@ metadata:
   name: kustomize-controller
   namespace: ${ namespace }
   annotations:
-    ${ indent(4, yamlencode(kustomize_controller_service_account_annotations)) }
+    eks.amazonaws.com/role-arn: ${ kustomize_controller_irsa_arn }
 %{ endif }
