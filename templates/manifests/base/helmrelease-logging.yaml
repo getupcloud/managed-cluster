@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana
-      version: 2.10.1
+      version: 2.10.3
   install:
     createNamespace: true
     disableWait: false
@@ -37,6 +37,24 @@ spec:
       table_manager:
         retention_deletes_enabled: true
         retention_period: 720h
+      ruler:
+        storage:
+          type: local
+          local:
+            directory: /rules
+        rule_path: /tmp/scratch
+        alertmanager_url: http://monitoring-kube-prometheus-alertmanager.svc.monitoring:9093
+        ring:
+          kvstore:
+            store: inmemory
+        enable_api: true
+
+    alerting_groups:
+    - name: Missing Log Lines for 30m
+      rules:
+      - alert: NoLogLinesForTooLong
+        expr: sum(count_over_time({namespace="logging"}[30s])) == 0
+        for: 30m
 
     ingress:
       enabled: false
