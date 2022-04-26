@@ -236,7 +236,12 @@ ask_any()
 
 ask_execute_command()
 {
-  read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
+  if [ $BASH_VERSINFO -lt 5 ];
+    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
+  else
+    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
+  fi
+
   res="${res:-y}"
 
   case "${res,,}" in
