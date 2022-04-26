@@ -169,3 +169,12 @@ metadata:
 spec:
   interval: 1h
   url: https://falcosecurity.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: kong
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.konghq.com
