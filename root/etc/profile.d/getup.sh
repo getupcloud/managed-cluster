@@ -236,7 +236,7 @@ ask_any()
 
 ask_execute_command()
 {
-  if [ $BASH_VERSINFO -lt 5 ];
+  if [ $BASH_VERSINFO -lt 5 ]; then
     read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
   else
     read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
