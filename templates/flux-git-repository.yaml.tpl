@@ -38,7 +38,7 @@ spec:
     kind: GitRepository
     name: ${ git_repository_name }
 
-%{ if kustomize_controller_irsa_arn != "" }
+%{ if try(kustomize_controller_irsa_arn, "") != "" }
 ---
 apiVersion: v1
 kind: ServiceAccount
