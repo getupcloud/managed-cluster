@@ -418,7 +418,7 @@ spec:
           access: proxy
           isDefault: false
           jsonData:
-            maxLines: 100000
+            maxLines: 5000
             manageAlerts: false
         - name: prometheus
           type: prometheus
@@ -439,6 +439,7 @@ spec:
           disable_login_form: false
           disable_signout_menu: false
         auth.basic:
+          # enabled=true is required by grafana config-reloader
           enabled: true
         # Admin user/pass comes from a secret
         #security:
