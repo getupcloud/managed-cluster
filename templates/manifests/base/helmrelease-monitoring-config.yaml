@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
-      version: 1.0.0
+      version: 1.1.0
   install:
     createNamespace: true
     disableWait: false
@@ -33,3 +33,5 @@ spec:
         basic_username: "monitoring"
         basic_password: "monitoring"
 
+    rabbitmq:
+      enabled: true
