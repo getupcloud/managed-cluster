@@ -420,6 +420,7 @@ spec:
           jsonData:
             maxLines: 5000
             manageAlerts: false
+            timeout: 60
         - name: prometheus
           type: prometheus
           url: http://monitoring-prometheus:9090/
