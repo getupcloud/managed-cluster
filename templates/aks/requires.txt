@@ -1,3 +1,4 @@
 azurerm = {
-   version = "~> 3.3.0"
+   # from https://github.com/Azure/terraform-azurerm-aks/blob/master/versions.tf
+   version = "~> 2.46"
 }
