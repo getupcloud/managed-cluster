@@ -36,7 +36,7 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt commit-version check-git build tag push
+release: fmt build tag check-git push
 	@echo Finished $(RELEASE) release
 
 check-git:
@@ -47,10 +47,8 @@ check-git:
 
 tag: tag-git tag-image
 
-commit-version:
-	git commit -m "Built release v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
-
 tag-git:
+	git commit -m "Built release v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
 	git tag $(RELEASE)
 
 tag-image:
