@@ -36,7 +36,7 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt build tag check-git push
+release: fmt check-git build tag push
 	@echo Finished $(RELEASE) release
 
 check-git:
