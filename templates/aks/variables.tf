@@ -263,7 +263,7 @@ variable "node_resource_group" {
 
 variable "default_node_pool" {
   description = "AKS default node pool. Reserved for AKs stuff."
-  type = any
+  type        = any
   default = {
     agents_pool_name          = "system"
     agents_type               = "VirtualMachineScaleSets"
@@ -284,7 +284,7 @@ variable "default_node_pool" {
 
 variable "node_pools" {
   description = "AKS node pools. Will merge with var.default_node_pool"
-  type = any
+  type        = any
   default = {
     infra = {
       agents_min_count = 2
