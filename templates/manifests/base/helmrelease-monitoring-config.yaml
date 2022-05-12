@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
-      version: 1.1.0
+      version: 2.0.2
   install:
     createNamespace: true
     disableWait: false
@@ -21,17 +21,38 @@ spec:
   targetNamespace: monitoring
   values:
     cronitor:
-      enabled: false
-      id: ""
+      prometheusRules:
+        enabled: true
 
-    backup:
-      velero:
-        enabled: false
-
-    ingress:
-      auth:
-        basic_username: "monitoring"
-        basic_password: "monitoring"
+    velero:
+      prometheusRules:
+        enabled: true
 
     rabbitmq:
-      enabled: true
+      prometheusRules:
+        enabled: false
+
+    loki:
+      prometheusRules:
+        enabled: true
+        canary:
+          enabled: false
+      ingress:
+        basicAuth:
+          enabled: false
+          secretName: loki-basic-auth
+          secretNamespace: logging
+          username: "logging"
+          password: "logging"
+
+    prometheusStack:
+      prometheusRules:
+        enabled: true
+      ingress:
+        basicAuth:
+          enabled: false
+          secretName: monitoring-basic-auth
+          secretNamespace: monitoring
+          username: "monitoring"
+          password: "monitoring"
+
