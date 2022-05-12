@@ -42,8 +42,8 @@ spec:
           enabled: false
           secretName: loki-basic-auth
           secretNamespace: logging
-          username: "logging"
-          password: "logging"
+          #username: "logging"
+          #password: "logging"
 
     prometheusStack:
       prometheusRules:
@@ -53,6 +53,6 @@ spec:
           enabled: false
           secretName: monitoring-basic-auth
           secretNamespace: monitoring
-          username: "monitoring"
-          password: "monitoring"
+          #username: "monitoring"
+          #password: "monitoring"
 
