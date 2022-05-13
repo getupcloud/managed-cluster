@@ -1,5 +1,5 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v2.15"
+  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v2.17"
 
   app_nodes               = var.app_nodes
   cluster_name            = var.name
@@ -22,6 +22,8 @@ module "cluster" {
   ssh_private_key         = var.ssh_private_key
   ssh_user                = var.ssh_user
   ssh_password            = var.ssh_password
+  systemctl_enable        = var.systemctl_enable
+  systemctl_disable       = var.systemctl_disable
   teleport_auth_token     = var.teleport_auth_token
   uninstall_packages      = var.uninstall_packages
   use_kubeconfig          = var.use_kubeconfig

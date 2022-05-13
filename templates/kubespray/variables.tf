@@ -158,3 +158,18 @@ variable "etc_hosts" {
   type        = map(string)
   default     = {}
 }
+
+variable "systemctl_enable" {
+  description = "Services to enable on nodes"
+  type        = list(string)
+  default = [
+    "chronyd",
+    "iscsid"
+  ]
+}
+
+variable "systemctl_disable" {
+  description = "Services to disable on nodes"
+  type        = list(string)
+  default     = []
+}
