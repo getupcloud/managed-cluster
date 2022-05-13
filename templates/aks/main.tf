@@ -1,4 +1,4 @@
-module "eks" {
+module "aks" {
   source = "github.com/getupcloud/terraform-cluster-aks?ref=main"
 
   cluster_name            = var.name
