@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.22"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.23"
 
   account_id                   = var.account_id
   auth_iam_roles               = var.auth_iam_roles
