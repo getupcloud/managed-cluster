@@ -11,8 +11,12 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kyverno
+      version: v2.3.3
   install:
     disableWait: true
+    remediation:
+      retries: -1
+  upgrade:
     remediation:
       retries: -1
   interval: 5m
@@ -34,8 +38,12 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kyverno
+      version: v.2.3.4
   install:
     disableWait: true
+    remediation:
+      retries: -1
+  upgrade:
     remediation:
       retries: -1
   interval: 5m
