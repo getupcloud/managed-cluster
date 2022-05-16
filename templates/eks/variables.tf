@@ -148,6 +148,9 @@ variable "aws_modules" {
     "velero" : {
       "enabled" : true
     }
+    "loki" : {
+      "enabled" : true
+    }
     "ecr" : {
       "enabled" : false
     }
