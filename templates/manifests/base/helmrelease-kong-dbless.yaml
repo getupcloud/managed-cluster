@@ -11,10 +11,12 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kong
+      version: 2.8.0
   install:
     disableWait: true
     remediation:
       retries: -1
+    createNamespace: true
   upgrade:
     remediation:
       retries: -1
