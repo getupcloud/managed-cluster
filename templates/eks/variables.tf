@@ -139,16 +139,12 @@ variable "aws_modules" {
   type        = any
   default = {
     "certmanager" : {
-      "enabled" : false,
-      "hosted_zone_id" : ""
+      "enabled" : false
     }
     "cluster-autoscaler" : {
       "enabled" : true
     }
     "velero" : {
-      "enabled" : true
-    }
-    "loki" : {
       "enabled" : true
     }
     "ecr" : {
@@ -164,8 +160,13 @@ variable "aws_modules" {
       "enabled" : false
     }
     "external-dns" : {
-      "enabled" : false,
-      "hosted_zone_ids" : []
+      "enabled" : false
+    }
+    "kms" : {
+      "enabled" : false
+    }
+    "loki" : {
+      "enabled" : true
     }
   }
 }
