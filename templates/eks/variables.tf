@@ -38,7 +38,7 @@ variable "node_groups_defaults" {
   description = "AWS EKS default node_groups definition"
   type        = any
   default = {
-    instance_types   = []
+    instance_types   = ["m5.xlarge"]
     desired_capacity = 1
     min_capacity     = 1
     max_capacity     = 1
