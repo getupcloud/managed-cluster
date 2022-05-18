@@ -4,21 +4,6 @@
 #  name: velero
 #  namespace: flux-system
 #spec:
-#  chart:
-#    spec:
-#      chart: velero
-#      sourceRef:
-#        kind: HelmRepository
-#        name: velero
-#      version: 2.23.5
-#  install:
-#    createNamespace: true
-#    disableWait: false
-#    remediation:
-#      retries: -1
-#  interval: 5m
-#  storageNamespace: velero
-#  targetNamespace: velero
 #  values:
 #    initContainers:
 #    - name: velero-plugin-for-aws
@@ -32,42 +17,30 @@
 #
 #      backupStorageLocation:
 #        name: default
-#        prefix: velero/${cluster_name}-${suffix}
-#        bucket: ### TODO: UPDATE HERE ###
+#        prefix: velero/${cluster_name}-${suffix}   ### TODO: UPDATE HERE ###
+#        bucket:                                    ### TODO: UPDATE HERE ###
 #        config:
-#          region: ### TODO: UPDATE HERE ###
+#          region:                                  ### TODO: UPDATE HERE ###
 #
 #      volumeSnapshotLocation:
 #        name: default
 #        config:
-#          region: ### TODO: UPDATE HERE ###
+#          region:                                  ### TODO: UPDATE HERE ###
 #
+#    # Auth via accesskey
 #    credentials:
 #      useSecret: true
 #      secretContents:
 #        cloud: |-
 #          [default]
-#          aws_access_key_id= ### TODO: UPDATE HERE ###
-#          aws_secret_access_key= ### TODO: UPDATE HERE ###
-#          aws_region= ### TODO: UPDATE HERE ###
+#          aws_access_key_id=                       ### TODO: UPDATE HERE ###
+#          aws_secret_access_key=                   ### TODO: UPDATE HERE ###
+#          aws_region=                              ### TODO: UPDATE HERE ###
 #
-#    tolerations:
-#    - effect: NoSchedule
-#      key: dedicated
-#      value: infra
-#    - effect: NoSchedule
-#      key: CriticalAddonsOnly
-#
-#    nodeSelector:
-#      role: infra
-#
-#    resources:
-#      requests:
-#        memory: 256Mi
-#        cpu: 100m
-#      limits:
-#        memory: 1Gi
-#        cpu: 500m
-#
-#    metrics:
-#      enabled: true
+#    # Auth via IRSA
+#    serviceAccount:
+#      server:
+#        create: true
+#        name: velero
+#        annotations:
+#          eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME} ### TODO: UPDATE HERE ###
