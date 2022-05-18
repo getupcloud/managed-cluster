@@ -1030,8 +1030,15 @@ function command_rp() { command_repo_pull "$@"; }
 function command_repo_pull()
 {
     cd $REPO_DIR
-    ask_execute_command git pull upstream main --tag
-    ask_execute_command git pull origin main --tag
+    for remote in origin upstream; do
+        if ! git remote get-url $remote 2>/dev/null; then
+            warn "Missing remote: $remote. Execute \`$0 remote-setup\` and try again."
+            exit 1
+        fi
+    done
+
+    ask_execute_command git pull upstream main --tags
+    ask_execute_command git pull origin main --tags
 }
 
 #############################
