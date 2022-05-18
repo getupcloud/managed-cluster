@@ -19,6 +19,7 @@ spec:
   interval: 5m
   storageNamespace: monitoring
   targetNamespace: monitoring
+  relelaseName: monitoring-config
   values:
     cronitor:
       prometheusRules:

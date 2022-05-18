@@ -19,6 +19,7 @@ spec:
   interval: 5m
   storageNamespace: velero
   targetNamespace: velero
+  releaseName: velero
   values:
     configuration:
       backupStorageLocation:
