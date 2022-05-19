@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
 - ../base/
-- https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+- helmrelease-metrics-server.yaml
+- helmrelease-aws-load-balancer-controller.yaml
 
 patchesStrategicMerge: []
 # - helmrelease-falco.yaml

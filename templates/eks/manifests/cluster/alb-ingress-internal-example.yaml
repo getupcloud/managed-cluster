@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/group.name: lbprd1
+    alb.ingress.kubernetes.io/load-balancer-name: lbprd1
+    alb.ingress.kubernetes.io/scheme: internal
+    ### WITH CERTIFICATE ONLY IN AWS/ACM
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
+    ### IF WANT , FORCE SSL REDIRECT
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+  name: web
+  namespace: default
+spec:
+  ingressClassName: alb
+  rules:
+    - host: adonai.domain.com
+      http:
+        paths:
+          - path: /bar
+            pathType: Exact
+            backend:
+              service:
+                name:  teste
+                port:
+                  number: 80
+          - path: /foo
+            pathType: Exact
+            backend:
+              service:
+                name:  teste
+                port:
+                  number: 80
+  ### IF WANT USE ALB CERTIFICATE DISCOVERY IN AWS/ACM INFORM tls.[hosts] bellow
+  tls:
+  - hosts:
+    - adonai.domain.com
+
