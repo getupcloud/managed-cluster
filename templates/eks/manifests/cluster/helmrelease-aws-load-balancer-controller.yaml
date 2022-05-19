@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: eks
-      version: 0.1.2
+      version: 1.4.1
   install:
     disableWait: true
     remediation:
