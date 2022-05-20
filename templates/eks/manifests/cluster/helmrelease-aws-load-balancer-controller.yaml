@@ -1,0 +1,62 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: aws-load-balancer-controller
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: aws-load-balancer-controller
+      sourceRef:
+        kind: HelmRepository
+        name: eks
+      version: 1.4.1
+  install:
+    disableWait: true
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: aws-load-balancer-controller
+  storageNamespace: kube-system
+  targetNamespace: kube-system
+  values:
+
+    replicaCount: 2
+    
+    ### NOME DO CLUSTER
+    clusterName: teste
+    
+    serviceAccount:
+      create: true
+      annotations:
+        ### ROLE AmazonEKSLoadBalancerControllerRole
+        eks.amazonaws.com/role-arn: arn:aws:iam::XXXXXXXXXXXX:role/AmazonEKSLoadBalancerControllerRole
+      name:
+      automountServiceAccountToken: true
+    
+    # Enable cert-manager
+    enableCertManager: true
+    
+    ingressClass: alb
+    
+    # Set the controller log level - info(default), debug (default "info")
+    logLevel:
+    
+    # defaultTags are the tags to apply to all AWS resources managed by this controller
+    defaultTags: {}
+      # default_tag1: value1
+      # default_tag2: value2
+    
+    # externalManagedTags is the list of tag keys on AWS resources that will be managed externally
+    externalManagedTags: []
+    
+    serviceMonitor:
+      # Specifies whether a service monitor should be created
+      enabled: false
+      # Labels to add to the service account
+      additionalLabels: {}
+      # Prometheus scrape interval
+      interval: 1m
