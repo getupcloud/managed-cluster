@@ -2,11 +2,11 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
-  name: eks
+  name: metrics-server
   namespace: flux-system
 spec:
   interval: 1h
-  url: https://aws.github.io/eks-charts
+  url: https://kubernetes-sigs.github.io/metrics-server/
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
