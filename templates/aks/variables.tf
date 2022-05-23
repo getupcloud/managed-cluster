@@ -13,7 +13,7 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "cluster_log_analytics_workspace_name" {
+variable "log_analytics_workspace_name" {
   description = "(Optional) The name of the Analytics workspace"
   type        = string
   default     = null
@@ -66,7 +66,7 @@ variable "tags" {
   default     = {}
 }
 
-variable "enable_log_analytics_workspace" {
+variable "log_analytics_workspace_enabled" {
   type        = bool
   description = "Enable the creation of azurerm_log_analytics_workspace and azurerm_log_analytics_solution or not"
   default     = true
@@ -90,9 +90,15 @@ variable "enable_http_application_routing" {
   default     = false
 }
 
-variable "enable_azure_policy" {
-  description = "Enable Azure Policy Addon."
+variable "http_application_routing_enabled" {
   type        = bool
+  description = "(Optional) Should HTTP Application Routing be enabled?"
+  default     = false
+}
+
+variable "azure_policy_enabled" {
+  type        = bool
+  description = "(Optional) Should the Azure Policy Add-On be enabled? For more details please visit [Understand Azure Policy for Azure Kubernetes Service](https://docs.microsoft.com/en-ie/azure/governance/policy/concepts/rego-for-aks)"
   default     = false
 }
 
@@ -162,31 +168,31 @@ variable "network_policy" {
   default     = "calico"
 }
 
-variable "net_profile_dns_service_ip" {
+variable "dns_service_ip" {
   description = "(Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created."
   type        = string
   default     = "10.0.0.10"
 }
 
-variable "net_profile_docker_bridge_cidr" {
+variable "docker_bridge_cidr" {
   description = "(Optional) IP address (in CIDR notation) used as the Docker bridge IP address on nodes. Changing this forces a new resource to be created."
   type        = string
   default     = "172.17.0.0/16"
 }
 
-variable "net_profile_outbound_type" {
+variable "outbound_type" {
   description = "(Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer."
   type        = string
   default     = "loadBalancer"
 }
 
-variable "net_profile_pod_cidr" {
+variable "pod_cidr" {
   description = " (Optional) The CIDR to use for pod IP addresses. This field can only be set when network_plugin is set to kubenet. Changing this forces a new resource to be created."
   type        = string
   default     = "192.168.0.0/16"
 }
 
-variable "net_profile_service_cidr" {
+variable "service_cidr" {
   description = "(Optional) The Network Range used by the Kubernetes service. Changing this forces a new resource to be created."
   type        = string
   default     = "10.0.0.0/16"
@@ -205,7 +211,7 @@ variable "orchestrator_version" {
 }
 
 
-variable "enable_ingress_application_gateway" {
+variable "ingress_application_gateway_enabled" {
   description = "Whether to deploy the Application Gateway ingress controller to this Kubernetes Cluster?"
   type        = bool
   default     = false
@@ -234,15 +240,16 @@ variable "ingress_application_gateway_subnet_id" {
   type        = string
   default     = null
 }
+
 variable "identity_type" {
-  description = "(Optional) The type of identity used for the managed cluster. Conflict with `client_id` and `client_secret`. Possible values are `SystemAssigned` and `UserAssigned`. If `UserAssigned` is set, a `user_assigned_identity_id` must be set as well."
   type        = string
+  description = "(Optional) Specifies the type of Managed Service Identity that should be configured on this Kubernetes Cluster. Possible values are SystemAssigned, UserAssigned, SystemAssigned, UserAssigned (to enable both)."
   default     = "SystemAssigned"
 }
 
-variable "user_assigned_identity_id" {
-  description = "(Optional) The ID of a user assigned identity."
-  type        = string
+variable "identity_ids" {
+  type        = list(string)
+  description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster. This is required when type is set to UserAssigned or SystemAssigned, UserAssigned."
   default     = null
 }
 
@@ -263,28 +270,28 @@ variable "node_resource_group" {
 
 variable "default_node_pool" {
   description = "AKS default node pool. Reserved for AKs stuff."
-  type        = any
   default = {
-    agents_pool_name          = "system"
-    agents_type               = "VirtualMachineScaleSets"
-    enable_auto_scaling       = true
-    agents_min_count          = 1
-    agents_max_count          = 2
-    agents_size               = "Standard_D2s_v3"
-    agents_max_pods           = 110
-    agents_labels             = {}
-    agents_tags               = {}
-    agents_availability_zones = []
-    os_disk_size_gb           = 50
-    enable_node_public_ip     = false
-    enable_host_encryption    = true
-    vnet_subnet_id            = null
+    name                   = "system"
+    type                   = "VirtualMachineScaleSets"
+    enable_auto_scaling    = true
+    min_count              = 1
+    max_count              = 2
+    vm_size                = "Standard_D2s_v3"
+    max_pods               = 110
+    node_labels            = {}
+    node_taints            = []
+    node_tags              = {}
+    zones                  = []
+    os_disk_size_gb        = 50
+    os_disk_type           = null
+    enable_node_public_ip  = false
+    enable_host_encryption = true
+    vnet_subnet_id         = null
   }
 }
 
 variable "node_pools" {
   description = "AKS node pools. Will merge with var.default_node_pool"
-  type        = any
   default = {
     infra = {
       agents_min_count = 2
@@ -387,15 +394,17 @@ variable "key_vault_secrets_provider_enabled" {
 }
 
 variable "key_vault_secrets_provider" {
-  description = "Config for Key Vault Secret Provider"
-  type = object({
+  type = list(object({
     secret_rotation_enabled  = bool
     secret_rotation_interval = string
-  })
-  default = {
-    secret_rotation_enabled  = true
-    secret_rotation_interval = "2m"
-  }
+  }))
+  description = "(Optional) A key_vault_secrets_provider block. For more details, please visit [Azure Keyvault Secrets Provider for AKS](https://docs.microsoft.com/en-us/azure/aks/csi-secrets-store-driver)."
+  default = [
+    {
+      secret_rotation_enabled  = true
+      secret_rotation_interval = "2m"
+    }
+  ]
 }
 
 ## Maintenance Windows ###############################################
