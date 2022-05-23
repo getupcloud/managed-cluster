@@ -33,12 +33,16 @@ fi
 
 function copy_from_template_common()
 {
-    rsync -va --checksum --omit-dir-times $@ ${common_template_files[@]/#/$TEMPLATES_DIR/} $CLUSTER_DIR/
+    local cmd="rsync -va --checksum --omit-dir-times $@ ${common_template_files[@]/#/$TEMPLATES_DIR/} $CLUSTER_DIR/"
+    info "--> $cmd"
+    $cmd
 }
 
 function copy_from_template_provider()
 {
-    rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_DIR/
+    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_DIR/"
+    info "--> $cmd"
+    $cmd
 }
 
 function sync_from_template()
