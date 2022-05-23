@@ -1031,7 +1031,7 @@ function command_repo_pull()
 {
     cd $REPO_DIR
     for remote in origin upstream; do
-        if ! git remote get-url $remote 2>/dev/null; then
+        if ! git remote get-url $remote &>/dev/null; then
             info "Missing remote: $remote"
             ask_execute_command $0 remote-setup
             break
