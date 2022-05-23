@@ -84,12 +84,6 @@ variable "enable_kube_dashboard" {
   default     = false
 }
 
-variable "enable_http_application_routing" {
-  description = "Enable HTTP Application Routing Addon (forces recreation)."
-  type        = bool
-  default     = false
-}
-
 variable "http_application_routing_enabled" {
   type        = bool
   description = "(Optional) Should HTTP Application Routing be enabled?"
@@ -251,12 +245,6 @@ variable "identity_ids" {
   type        = list(string)
   description = "(Optional) Specifies a list of User Assigned Managed Identity IDs to be assigned to this Kubernetes Cluster. This is required when type is set to UserAssigned or SystemAssigned, UserAssigned."
   default     = null
-}
-
-variable "enable_host_encryption" {
-  description = "Enable Host Encryption for default node pool. Encryption at host feature must be enabled on the subscription: https://docs.microsoft.com/azure/virtual-machines/linux/disks-enable-host-based-encryption-cli"
-  type        = bool
-  default     = false
 }
 
 variable "node_resource_group" {
