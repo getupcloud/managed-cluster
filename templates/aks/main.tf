@@ -22,7 +22,6 @@ module "aks" {
   admin_username      = var.admin_username
   client_id           = var.client_id
   client_secret       = var.client_secret
-  ad_tenant_id        = var.ad_tenant_id
   cluster_name        = var.name
   kubernetes_version  = var.kubernetes_version
   network_plugin      = var.network_policy == "azure" ? "azure" : var.network_plugin
@@ -48,6 +47,7 @@ module "aks" {
 
   enable_role_based_access_control = var.enable_role_based_access_control
   rbac_aad_managed                 = var.rbac_aad_managed
+  rbac_aad_tenant_id               = var.rbac_aad_tenant_id
   # managed
   rbac_aad_admin_group_names      = var.rbac_aad_admin_group_names
   rbac_aad_admin_group_object_ids = var.rbac_aad_admin_group_object_ids

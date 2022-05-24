@@ -3,12 +3,6 @@ variable "subscription_id" {
   type        = string
 }
 
-variable "ad_tenant_id" {
-  description = "Azure AD Tenant ID"
-  type        = string
-  default     = null
-}
-
 variable "rbac_aad_admin_group_names" {
   description = "Group name of groups with admin access."
   type        = list(string)
