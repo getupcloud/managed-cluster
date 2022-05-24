@@ -53,6 +53,18 @@ variable "private_dns_zone_id" {
   default     = null
 }
 
+variable "public_network_access_enabled" {
+  type        = bool
+  description = "(Optional) Whether public network access is allowed for this Kubernetes Cluster. Defaults to true. When public_network_access_enabled is set to true, 0.0.0.0/32 must be added to api_server_authorized_ip_ranges"
+  default     = true
+}
+
+variable "api_server_authorized_ip_ranges" {
+  type        = set(string)
+  description = "(Optional) The IP ranges to allow for incoming traffic to the server nodes."
+  default     = ["0.0.0.0/32"]
+}
+
 variable "sku_tier" {
   type        = string
   description = "The SKU Tier that should be used for this Kubernetes Cluster. Possible values are 'Free' and 'Paid'."

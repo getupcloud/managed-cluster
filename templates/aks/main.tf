@@ -31,6 +31,7 @@ module "aks" {
   tags                = var.tags
 
   private_cluster_enabled                           = var.private_cluster_enabled
+  api_server_authorized_ip_ranges                   = var.api_server_authorized_ip_ranges
   private_dns_zone_enabled                          = var.private_dns_zone_enabled
   private_dns_zone_id                               = var.private_dns_zone_id
   private_dns_zone_name                             = var.private_dns_zone_name
