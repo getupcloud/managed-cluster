@@ -9,6 +9,12 @@ variable "rbac_aad_admin_group_names" {
   default     = ["AKS-cluster-admins"]
 }
 
+variable "identity" {
+  type        = string
+  description = "(Optional) Specifies a User Assigned Managed Identity Name to be assigned to this Kubernetes Cluster. This is required when type is set to UserAssigned or SystemAssigned, UserAssigned."
+  default     = null
+}
+
 variable "enable_kube_dashboard" {
   description = "Enable Kubernetes Dashboard."
   type        = bool

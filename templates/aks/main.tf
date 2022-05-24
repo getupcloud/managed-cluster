@@ -13,16 +13,13 @@ module "aks" {
   use_kubeconfig          = var.use_kubeconfig
   azure_modules           = var.azure_modules
 
-  acr_name                             = var.acr_name
-  acr_resource_group_name              = var.acr_resource_group_name
-  acr_role_definition_name             = var.acr_role_definition_name
-  acr_skip_service_principal_aad_check = var.acr_skip_service_principal_aad_check
-  acr_subscription_id                  = var.acr_subscription_id
-
   admin_username      = var.admin_username
   client_id           = var.client_id
   client_secret       = var.client_secret
   cluster_name        = var.name
+  identity_type       = var.identity_type
+  identity_ids        = var.identity_ids
+  identity            = var.identity
   kubernetes_version  = var.kubernetes_version
   network_plugin      = var.network_policy == "azure" ? "azure" : var.network_plugin
   network_policy      = var.network_policy
@@ -55,7 +52,12 @@ module "aks" {
   rbac_aad_client_app_id     = var.rbac_aad_client_app_id
   rbac_aad_server_app_id     = var.rbac_aad_server_app_id
   rbac_aad_server_app_secret = var.rbac_aad_server_app_secret
-  identity_ids               = var.identity_ids
+
+  acr_name                             = var.acr_name
+  acr_resource_group_name              = var.acr_resource_group_name
+  acr_role_definition_name             = var.acr_role_definition_name
+  acr_skip_service_principal_aad_check = var.acr_skip_service_principal_aad_check
+  acr_subscription_id                  = var.acr_subscription_id
 
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   key_vault_secrets_provider         = var.key_vault_secrets_provider
