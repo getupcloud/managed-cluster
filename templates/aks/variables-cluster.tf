@@ -3,16 +3,22 @@ variable "subscription_id" {
   type        = string
 }
 
-variable "enable_kube_dashboard" {
-  description = "Enable Kubernetes Dashboard."
-  type        = bool
-  default     = false
+variable "ad_tenant_id" {
+  description = "Azure AD Tenant ID"
+  type        = string
+  default     = null
 }
 
 variable "rbac_aad_admin_group_names" {
   description = "Group name of groups with admin access."
   type        = list(string)
   default     = ["AKS-cluster-admins"]
+}
+
+variable "enable_kube_dashboard" {
+  description = "Enable Kubernetes Dashboard."
+  type        = bool
+  default     = false
 }
 
 ## Node Pools ########################################################
@@ -27,6 +33,7 @@ variable "default_node_pool" {
     max_pods                     = 110
     min_count                    = 1
     name                         = "system"
+    node_count                   = null
     node_labels                  = {}
     node_taints                  = []
     node_tags                    = {}

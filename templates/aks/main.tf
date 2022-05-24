@@ -19,21 +19,22 @@ module "aks" {
   acr_skip_service_principal_aad_check = var.acr_skip_service_principal_aad_check
   acr_subscription_id                  = var.acr_subscription_id
 
-  admin_username          = var.admin_username
-  client_id            = var.client_id
-  client_secret        = var.client_secret
-  cluster_name            = var.name
-  kubernetes_version   = var.kubernetes_version
-  network_plugin     = var.network_policy == "azure" ? "azure" : var.network_plugin
-  network_policy     = var.network_policy
-  prefix               = var.prefix
-  public_ssh_key          = var.public_ssh_key
-  resource_group_name     = var.resource_group_name
-  subscription_id         = var.subscription_id
-  sku_tier                = var.sku_tier
-  tags                    = var.tags
+  admin_username      = var.admin_username
+  client_id           = var.client_id
+  client_secret       = var.client_secret
+  ad_tenant_id        = var.ad_tenant_id
+  cluster_name        = var.name
+  kubernetes_version  = var.kubernetes_version
+  network_plugin      = var.network_policy == "azure" ? "azure" : var.network_plugin
+  network_policy      = var.network_policy
+  prefix              = var.prefix
+  public_ssh_key      = var.public_ssh_key
+  resource_group_name = var.resource_group_name
+  subscription_id     = var.subscription_id
+  sku_tier            = var.sku_tier
+  tags                = var.tags
 
-  private_cluster_enabled = var.private_cluster_enabled
+  private_cluster_enabled                           = var.private_cluster_enabled
   private_dns_zone_enabled                          = var.private_dns_zone_enabled
   private_dns_zone_id                               = var.private_dns_zone_id
   private_dns_zone_name                             = var.private_dns_zone_name
@@ -48,13 +49,13 @@ module "aks" {
   enable_role_based_access_control = var.enable_role_based_access_control
   rbac_aad_managed                 = var.rbac_aad_managed
   # managed
-  rbac_aad_admin_group_names       = var.rbac_aad_admin_group_names
-  rbac_aad_admin_group_object_ids  = var.rbac_aad_admin_group_object_ids
+  rbac_aad_admin_group_names      = var.rbac_aad_admin_group_names
+  rbac_aad_admin_group_object_ids = var.rbac_aad_admin_group_object_ids
   # unmanaged
-  rbac_aad_client_app_id           = var.rbac_aad_client_app_id
-  rbac_aad_server_app_id           = var.rbac_aad_server_app_id
-  rbac_aad_server_app_secret       = var.rbac_aad_server_app_secret
-  identity_ids        = var.identity_ids
+  rbac_aad_client_app_id     = var.rbac_aad_client_app_id
+  rbac_aad_server_app_id     = var.rbac_aad_server_app_id
+  rbac_aad_server_app_secret = var.rbac_aad_server_app_secret
+  identity_ids               = var.identity_ids
 
   key_vault_secrets_provider_enabled = var.key_vault_secrets_provider_enabled
   key_vault_secrets_provider         = var.key_vault_secrets_provider
@@ -72,5 +73,4 @@ module "aks" {
 
   allowed_maintenance_windows     = var.allowed_maintenance_windows
   not_allowed_maintenance_windows = var.not_allowed_maintenance_windows
-
 }
