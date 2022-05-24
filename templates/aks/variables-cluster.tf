@@ -45,9 +45,9 @@ variable "node_pools" {
   description = "AKS node pools. Will merge with var.default_node_pool"
   default = {
     infra = {
-      min_count = 2
-      max_count = 2
-      node_taints    = ["dedicated=infra:NoSchedule"]
+      min_count   = 2
+      max_count   = 2
+      node_taints = ["dedicated=infra:NoSchedule"]
     }
     app = {
       min_count = 2
