@@ -20,24 +20,25 @@ variable "rbac_aad_admin_group_names" {
 variable "default_node_pool" {
   description = "AKS default node pool. Reserved for AKs stuff."
   default = {
-    enable_auto_scaling    = true
-    enable_host_encryption = true
-    enable_node_public_ip  = false
-    max_count              = 2
-    max_pods               = 110
-    min_count              = 1
-    name                   = "system"
-    node_labels            = {}
-    node_taints            = []
-    node_tags              = {}
-    os_disk_size_gb        = 50
-    os_disk_type           = null
-    os_sku                 = null
-    orchestrator_version   = null
-    type                   = "VirtualMachineScaleSets"
-    vm_size                = "Standard_D2s_v3"
-    vnet_subnet_id         = null
-    zones                  = []
+    enable_auto_scaling          = true
+    enable_host_encryption       = true
+    enable_node_public_ip        = false
+    max_count                    = 2
+    max_pods                     = 110
+    min_count                    = 1
+    name                         = "system"
+    node_labels                  = {}
+    node_taints                  = []
+    node_tags                    = {}
+    only_critical_addons_enabled = true
+    orchestrator_version         = null
+    os_disk_size_gb              = 50
+    os_disk_type                 = null
+    os_sku                       = null
+    type                         = "VirtualMachineScaleSets"
+    vm_size                      = "Standard_D2s_v3"
+    vnet_subnet_id               = null
+    zones                        = []
   }
 }
 
