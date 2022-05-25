@@ -11,7 +11,7 @@ variable "rbac_aad_admin_group_names" {
 
 variable "identity_name" {
   type        = string
-  description = "(Optional) Specifies a User Assigned Managed Identity Name to be assigned to this Kubernetes Cluster. This is required when type is set to UserAssigned or SystemAssigned, UserAssigned."
+  description = "(Optional) Specifies a User Assigned Managed Identity Name to be assigned to this Kubernetes Cluster. This is required when type is set to 'UserAssigned' or 'SystemAssigned, UserAssigned'."
   default     = null
 }
 
