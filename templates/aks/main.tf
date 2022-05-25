@@ -19,7 +19,7 @@ module "aks" {
   cluster_name        = var.name
   identity_type       = var.identity_type
   identity_ids        = var.identity_ids
-  identity            = var.identity
+  identity_name       = var.identity_name
   kubernetes_version  = var.kubernetes_version
   network_plugin      = var.network_policy == "azure" ? "azure" : var.network_plugin
   network_policy      = var.network_policy
