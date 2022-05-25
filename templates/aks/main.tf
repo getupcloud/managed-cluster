@@ -13,22 +13,23 @@ module "aks" {
   use_kubeconfig          = var.use_kubeconfig
   azure_modules           = var.azure_modules
 
-  admin_username      = var.admin_username
-  client_id           = var.client_id
-  client_secret       = var.client_secret
-  cluster_name        = var.name
-  identity_type       = var.identity_type
-  identity_ids        = var.identity_ids
-  identity_name       = var.identity_name
-  kubernetes_version  = var.kubernetes_version
-  network_plugin      = var.network_policy == "azure" ? "azure" : var.network_plugin
-  network_policy      = var.network_policy
-  prefix              = var.prefix
-  public_ssh_key      = var.public_ssh_key
-  resource_group_name = var.resource_group_name
-  subscription_id     = var.subscription_id
-  sku_tier            = var.sku_tier
-  tags                = var.tags
+  admin_username       = var.admin_username
+  azure_policy_enabled = var.azure_policy_enabled
+  client_id            = var.client_id
+  client_secret        = var.client_secret
+  cluster_name         = var.name
+  identity_type        = var.identity_type
+  identity_ids         = var.identity_ids
+  identity_name        = var.identity_name
+  kubernetes_version   = var.kubernetes_version
+  network_plugin       = var.network_policy == "azure" ? "azure" : var.network_plugin
+  network_policy       = var.network_policy
+  prefix               = var.prefix
+  public_ssh_key       = var.public_ssh_key
+  resource_group_name  = var.resource_group_name
+  subscription_id      = var.subscription_id
+  sku_tier             = var.sku_tier
+  tags                 = var.tags
 
   private_cluster_enabled                           = var.private_cluster_enabled
   api_server_authorized_ip_ranges                   = var.api_server_authorized_ip_ranges
