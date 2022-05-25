@@ -47,7 +47,6 @@ module "aks" {
   node_subnet_name    = var.node_subnet_name
   node_vnet_name      = var.node_vnet_name
 
-
   enable_role_based_access_control = var.enable_role_based_access_control
   rbac_aad_managed                 = var.rbac_aad_managed
   rbac_aad_tenant_id               = var.rbac_aad_tenant_id
