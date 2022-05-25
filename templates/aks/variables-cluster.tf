@@ -21,6 +21,18 @@ variable "enable_kube_dashboard" {
   default     = false
 }
 
+variable "node_subnet_name" {
+  description = "Subnet where all nodepools must exist."
+  type        = string
+  default     = null
+}
+
+variable "node_vnet_name" {
+  description = "Vnet where all nodepools must exist."
+  type        = string
+  default     = null
+}
+
 ## Node Pools ########################################################
 
 variable "default_node_pool" {
