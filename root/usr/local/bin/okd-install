@@ -6,9 +6,19 @@ set -x
 
 cd $CLUSTER_DIR
 
-INSTALLER_URL=https://github.com/openshift/okd/releases/download/4.10.0-0.okd-2022-03-07-131213/openshift-install-linux-4.10.0-0.okd-2022-03-07-131213.tar.gz
+OC_URL=https://github.com/openshift/okd/releases/download/4.10.0-0.okd-2022-05-07-021833/openshift-client-linux-4.10.0-0.okd-2022-05-07-021833.tar.gz
+OC_TAR=/tmp/${OC_URL##*/}
+OC_BIN=$HOME/.local/bin/oc
+
+INSTALLER_URL=https://github.com/openshift/okd/releases/download/4.10.0-0.okd-2022-05-07-021833/openshift-install-linux-4.10.0-0.okd-2022-05-07-021833.tar.gz
 INSTALLER_TAR=/tmp/${INSTALLER_URL##*/}
 INSTALLER_BIN=$HOME/.local/bin/openshift-installer
+
+if ! [ -e "$OC_BIN" ]; then
+    info Downloading OC ...
+    curl -Ls $OC_URL \
+        | tar xzvf - -C $HOME/.local/bin oc
+fi
 
 if ! [ -e "$INSTALLER_BIN" ]; then
     info Downloading OKD installer...
