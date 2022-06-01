@@ -1,3 +1,5 @@
+openshift-install
+openshift-install-linux-*
 .kube
 .local
 .setup_history
