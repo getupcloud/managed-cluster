@@ -1,5 +1,5 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.4"
+  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.9"
 
   api_endpoint            = var.api_endpoint
   cluster_name            = var.name
@@ -13,4 +13,3 @@ module "cluster" {
   kubeconfig_filename     = var.kubeconfig_filename
   manifests_template_vars = local.manifests_template_vars
   use_kubeconfig          = var.use_kubeconfig
-}
