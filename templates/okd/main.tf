@@ -11,8 +11,9 @@ module "cluster" {
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
+  install_on_okd          = true
   kubeconfig_filename     = var.kubeconfig_filename
   manifests_template_vars = local.manifests_template_vars
+  teleport_auth_token     = var.teleport_auth_token
   use_kubeconfig          = true
-  install_on_okd          = true
 }
