@@ -12,5 +12,6 @@ module "cluster" {
   flux_version            = var.flux_version
   kubeconfig_filename     = var.kubeconfig_filename
   manifests_template_vars = local.manifests_template_vars
+  teleport_auth_token     = var.teleport_auth_token
   use_kubeconfig          = var.use_kubeconfig
 }
