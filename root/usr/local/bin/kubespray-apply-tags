@@ -2,7 +2,7 @@
 
 set -eu
 
-export ROOT_DIR=$(readlink -ne $(dirname $0))
+export ROOT_DIR=$(readlink -nf $(dirname $0))
 
 source /etc/profile.d/getup.sh
 

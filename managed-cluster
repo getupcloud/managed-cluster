@@ -11,7 +11,7 @@ if $INSIDE_CONTAINER; then
     export ROOT_DIR=$REPO_DIR
     source /etc/profile.d/getup.sh
 else
-    export ROOT_DIR=$(readlink -ne $(dirname $0))
+    export ROOT_DIR=$(readlink -nf $(dirname $0))
     export REPO_DIR=$ROOT_DIR
     export PATH="$PATH:$ROOT_DIR/root/usr/local/bin/"
 
@@ -363,7 +363,7 @@ function start_container()
         --rm
         -it
         --env-file $ROOT_DIR/.dockerenv
-        -v $(readlink -ne $CLUSTER_DIR):/cluster
+        -v $(readlink -nf $CLUSTER_DIR):/cluster
         -v $ROOT_DIR:/repo
         -v $HOME:/home/_host:ro
     )
@@ -401,6 +401,22 @@ function start_container()
     info \$ $docker_run
     #echo
     eval $sudo $docker_run
+}
+
+function get_local_ip()
+{
+    ip r \
+        | awk '/^default/{print $5}' \
+        | head -n1 \
+        | xargs ip -4 -o a show dev \
+        | awk '{print $4}' \
+        | cut -f1 -d / 2>/dev/null \
+    || netstat -nr \
+        | awk '/^default/{print $4}' \
+        | head -n1 \
+        | xargs ifconfig \
+        | awk '/inet /{print $2}' 2>/dev/null \
+    || echo 0.0.0.0
 }
 
 ###########
@@ -559,7 +575,7 @@ ssh_key_type=ecdsa
 ssh_key_length=0
 ssh_host=github.com
 local_git_repo_user=$USER
-local_git_repo_address=$(ip r | awk '/^default/{print $5}' | head -n1 | xargs ip -4 -o a show dev | awk '{print $4}' | cut -f1 -d /) 2>/dev/null
+local_git_repo_address=$(get_local_ip)
 local_git_repo_path=$PWD
 local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}${local_git_repo_path}/.git"
 default_upstream=git@github.com:getupcloud/managed-cluster.git

@@ -479,7 +479,7 @@ function update_globals()
 }
 
 if ! [ -v ROOT_DIR ]; then
-    export ROOT_DIR=$(readlink -ne $(dirname $0))
+    export ROOT_DIR=$(readlink -nf $(dirname $0))
 fi
 
 if $INSIDE_CONTAINER; then
