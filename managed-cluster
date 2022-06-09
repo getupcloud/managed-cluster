@@ -405,18 +405,20 @@ function start_container()
 
 function get_local_ip()
 {
-    ip r \
-        | awk '/^default/{print $5}' \
-        | head -n1 \
-        | xargs ip -4 -o a show dev \
-        | awk '{print $4}' \
-        | cut -f1 -d / 2>/dev/null \
-    || netstat -nr \
-        | awk '/^default/{print $4}' \
-        | head -n1 \
-        | xargs ifconfig \
-        | awk '/inet /{print $2}' 2>/dev/null \
-    || echo 0.0.0.0
+    if which ip &>/dev/null; then
+        ip r \
+            | awk '/^default/{print $5}' \
+            | head -n1 \
+            | xargs ip -4 -o a show dev \
+            | awk '{print $4}' \
+            | cut -f1 -d /
+    else
+        netstat -nr \
+            | awk '/^default/{print $4}' \
+            | head -n1 \
+            | xargs ifconfig \
+            | awk '/inet /{print $2}'
+    fi
 }
 
 ###########
@@ -575,7 +577,7 @@ ssh_key_type=ecdsa
 ssh_key_length=0
 ssh_host=github.com
 local_git_repo_user=$USER
-local_git_repo_address=$(get_local_ip)
+local_git_repo_address=$(get_local_ip 2>/dev/null)
 local_git_repo_path=$PWD
 local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}${local_git_repo_path}/.git"
 default_upstream=git@github.com:getupcloud/managed-cluster.git
