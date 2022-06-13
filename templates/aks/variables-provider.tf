@@ -17,12 +17,6 @@ variable "tags" {
 }
 
 # Cluster settings
-variable "cluster_name" {
-  type        = string
-  description = "(Optional) The name for the AKS deployment. This variable overwrites the 'prefix' variable."
-  default     = null
-}
-
 variable "kubernetes_version" {
   type        = string
   description = "(Optional) Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region."
