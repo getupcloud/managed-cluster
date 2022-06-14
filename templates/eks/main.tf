@@ -10,6 +10,7 @@ module "eks" {
   aws_secret_access_key        = var.aws_secret_access_key
   cluster_name                 = var.name
   cluster_sla                  = var.sla
+  cronitor_enabled             = var.cronitor_enabled
   cronitor_api_key             = var.cronitor_api_key
   cronitor_pagerduty_key       = var.cronitor_pagerduty_key
   customer_name                = var.customer

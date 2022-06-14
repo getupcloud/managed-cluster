@@ -58,6 +58,12 @@ variable "manifests_path" {
   default     = ""
 }
 
+variable "cronitor_enabled" {
+  description = "Creates and enables Cronitor monitor."
+  type        = bool
+  default     = true
+}
+
 variable "cronitor_api_key" {
   description = "Cronitor API key. Leave empty to destroy"
   type        = string
