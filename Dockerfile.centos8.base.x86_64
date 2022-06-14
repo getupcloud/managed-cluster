@@ -3,7 +3,8 @@ FROM quay.io/centos/centos:stream8
 ENV CLUSTER_DIR="/cluster" \
     REPO_DIR="/repo" \
     INSIDE_CONTAINER=true \
-    TERM="xterm-256color"
+    TERM="xterm-256color" \
+    PATH=$PATH:/opt/krew/bin
 
 SHELL ["/bin/bash", "-x", "-c"]
 
@@ -20,7 +21,7 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
     \
     INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
-        dialog awscli httpie bind-utils httpd-tools iproute tree \
+        dialog httpie bind-utils httpd-tools iproute tree \
         git net-tools nmap openssl openssl-devel bc \
         gettext jq rsync strace sshpass pv procps-ng \
         python3-pip python3-devel libffi-devel rust cargo" && \
@@ -44,3 +45,9 @@ RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/in
         --exec-dir /usr/local/bin/ \
         --script-dir /usr/local/bin/ \
         --rc-file-path /etc/profile.d/oci.sh
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    sudo ./aws/install && \
+    rm -rf aws awscliv2.zip && \
+    aws --version

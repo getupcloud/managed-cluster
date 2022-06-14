@@ -82,7 +82,7 @@ spec:
             memory: 1Gi
 
         externalLabels:
-          cluster: cluster
+          cluster: ${customer_name}/${cluster_name}
         prometheusExternalLabelName: cluster
 
         ruleNamespaceSelector: {}
@@ -237,7 +237,16 @@ spec:
           opsgenie_configs:
           - api_key: ${alertmanager_opsgenie_api_key}
             # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
-            tags: ${cluster_name}, sla-${cluster_sla}
+            tags: ${customer_name}, ${cluster_name}, sla-${cluster_sla}
+%{~ if cluster_sla == "high" }
+            priority: P2
+%{~ else}
+%{~   if cluster_sla == "low" }
+            priority: P4
+%{~   else }
+            priority: P5
+%{~   endif }
+%{~ endif }
 %{~ else }
         # Set manifests_template_vars.alertmanager_opsgenie_api_key to configure Opsgenie
 %{~ endif }
