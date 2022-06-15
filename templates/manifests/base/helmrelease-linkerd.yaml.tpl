@@ -49,6 +49,18 @@ volumes:
 - '*'
 %{~ endif }
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    linkerd.io/inject: disabled
+  labels:
+    linkerd.io/control-plane-ns: linkerd
+    linkerd.io/is-control-plane: "true"
+    config.linkerd.io/admission-webhooks: disabled
+  name: linkerd
+
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -71,10 +83,12 @@ spec:
   releaseName: linkerd
   storageNamespace: linkerd
   targetNamespace: linkerd
+%{~ if try(modules.linkerd-cni.enabled, false) }
   dependsOn:
   - name: linkerd-cni
+%{~ endif }
   values:
-    namespace: linkerd
+    installNamespace: false
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
     cniEnabled: ${ modules.linkerd-cni.enabled }
     identityTrustAnchorsPEM: |-
@@ -90,6 +104,14 @@ spec:
 %{~ endif }
 
 %{~ if try(modules.linkerd-cni.enabled, false) }
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    linkerd.io/inject: disabled
+  name: linkerd-cni
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -114,7 +136,7 @@ spec:
   storageNamespace: linkerd-cni
   targetNamespace: linkerd-cni
   values:
-    namespace: linkerd-cni
+    installNamespace: false
     destCNIBinDir: /var/lib/cni/bin
     destCNINetDir: /etc/kubernetes/cni/net.d
     tolerations:
