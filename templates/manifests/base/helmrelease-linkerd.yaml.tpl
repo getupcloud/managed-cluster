@@ -96,7 +96,7 @@ spec:
           crtPEM: |-
             ${indent(12, linkerd_issuer_crt)}
           keyPEM: |-
-            ${indent(12, .linkerd_issuer_key)}
+            ${indent(12, linkerd_issuer_key)}
         crtExpiry: |-
           ${indent(10, linkerd_issuer_crt_expiry)}
 %{ endif }
