@@ -67,7 +67,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: linkerd
-  namespace: linkerd
+  namespace: flux-system
 spec:
   chart:
     spec:
@@ -116,7 +116,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: linkerd-cni
-  namespace: linkerd-cni
+  namespace: flux-system
 spec:
   chart:
     spec:
