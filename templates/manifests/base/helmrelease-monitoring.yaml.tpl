@@ -237,7 +237,7 @@ spec:
           opsgenie_configs:
           - api_key: ${alertmanager_opsgenie_api_key}
             # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
-            tags: ${customer_name}, ${cluster_name}, sla-${cluster_sla}
+            tags: ${customer_name}, ${cluster_name}, ${cluster_type}, sla-${cluster_sla}
 %{~ if cluster_sla == "high" }
             priority: P2
 %{~ else}

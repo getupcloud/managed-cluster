@@ -4,7 +4,7 @@ module "cluster" {
   api_endpoint            = var.api_endpoint
   cluster_name            = var.name
   cluster_sla             = var.sla
-  cluster_type            = "okd"
+  cluster_type            = local.cluster_type
   cronitor_api_key        = var.cronitor_api_key
   cronitor_pagerduty_key  = var.cronitor_pagerduty_key
   customer_name           = var.customer
