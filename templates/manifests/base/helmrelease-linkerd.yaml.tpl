@@ -89,16 +89,16 @@ spec:
     cniEnabled: ${ modules.linkerd-cni.enabled }
     installNamespace: false
     identityTrustAnchorsPEM: |-
-      ${indent(6, modules.linkerd.linkerd_ca_crt)}
+      ${indent(6, linkerd_ca_crt)}
     identity:
       issuer:
         tls:
           crtPEM: |-
-            ${indent(12, modules.linkerd.linkerd_issuer_crt)}
+            ${indent(12, linkerd_issuer_crt)}
           keyPEM: |-
-            ${indent(12, modules.linkerd.linkerd_issuer_key)}
+            ${indent(12, .linkerd_issuer_key)}
         crtExpiry: |-
-          ${indent(10, modules.linkerd.linkerd_issuer_crt_expiry)}
+          ${indent(10, linkerd_issuer_crt_expiry)}
 %{ endif }
 
 %{ if try(modules.linkerd-cni.enabled, false) }
