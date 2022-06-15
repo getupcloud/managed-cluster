@@ -14,6 +14,7 @@ module "cluster" {
   install_on_okd          = true
   kubeconfig_filename     = var.kubeconfig_filename
   manifests_template_vars = local.manifests_template_vars
+  generic_modules         = local.generic_modules
   teleport_auth_token     = var.teleport_auth_token
   use_kubeconfig          = true
 }
