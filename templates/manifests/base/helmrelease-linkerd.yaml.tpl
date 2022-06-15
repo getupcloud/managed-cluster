@@ -1,5 +1,5 @@
 %{~ if try(modules.linkerd.enabled, false) }
-%{~ if cluster_type == "okd" }
+%{~ if cluster_type == "okd" ~}
 ---
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
@@ -89,14 +89,14 @@ spec:
     cniEnabled: ${ modules.linkerd-cni.enabled }
     installNamespace: false
     identityTrustAnchorsPEM: |-
-      ${indent(6, linkerd_ca_crt)}
+      ${indent(6, trimspace(linkerd_ca_crt))}
     identity:
       issuer:
         tls:
           crtPEM: |-
-            ${indent(12, linkerd_issuer_crt)}
+            ${indent(12, trimspace(linkerd_issuer_crt))}
           keyPEM: |-
-            ${indent(12, linkerd_issuer_key)}
+            ${indent(12, trimspace(linkerd_issuer_key))}
         crtExpiry: ${linkerd_issuer_crt_expiry}
 %{~ endif }
 
