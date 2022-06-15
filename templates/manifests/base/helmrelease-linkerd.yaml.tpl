@@ -87,6 +87,7 @@ spec:
   targetNamespace: linkerd
   values:
     cniEnabled: ${ modules.linkerd-cni.enabled }
+    clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
     installNamespace: false
     identityTrustAnchorsPEM: |-
       ${indent(6, trimspace(linkerd_ca_crt))}
