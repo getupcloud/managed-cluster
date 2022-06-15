@@ -56,7 +56,6 @@ metadata:
   annotations:
     linkerd.io/inject: disabled
   labels:
-    kubernetes.io/metadata.name: linkerd
     linkerd.io/control-plane-ns: linkerd
     linkerd.io/is-control-plane: "true"
     config.linkerd.io/admission-webhooks: disabled
@@ -85,6 +84,8 @@ spec:
   releaseName: linkerd
   storageNamespace: linkerd
   targetNamespace: linkerd
+  dependsOn:
+  - name: linkerd-cni
   values:
     cniEnabled: ${ modules.linkerd-cni.enabled }
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
@@ -108,8 +109,6 @@ kind: Namespace
 metadata:
   annotations:
     linkerd.io/inject: disabled
-  labels:
-    kubernetes.io/metadata.name: linkerd-cni
   name: linkerd-cni
 
 ---
