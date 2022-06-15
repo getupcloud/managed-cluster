@@ -14,11 +14,15 @@ variable "okd_modules_defaults" {
   description = "Configure OKD modules to install (defaults)"
   type = object({
     linkerd = object({ enabled = bool })
+    linkerd-cni = object({ enabled = bool })
   })
 
   default = {
-    linkerd = {
-      enabled = false
+    linkerd : {
+      enabled : false
+    }
+    linkerd-cni : {
+      enabled : false
     }
   }
 }
