@@ -1,5 +1,5 @@
-%{ if try(modules.linkerd.enabled, false) }
-%{ if cluster_type == "okd" }
+%{~ if try(modules.linkerd.enabled, false) }
+%{~ if cluster_type == "okd" }
 ---
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
@@ -42,12 +42,12 @@ users:
 - system:serviceaccount:linkerd:linkerd-identity
 - system:serviceaccount:linkerd:linkerd-proxy-injector
 - system:serviceaccount:linkerd:linkerd-heartbeat
-%{ if try(modules.linkerd-cni.enabled, false) }
+%{~ if try(modules.linkerd-cni.enabled, false) }
 - system:serviceaccount:linkerd-cni:linkerd-cni
-%{ endif }
+%{~ endif }
 volumes:
 - '*'
-%{ endif }
+%{~ endif }
 
 ---
 apiVersion: v1
@@ -97,11 +97,10 @@ spec:
             ${indent(12, linkerd_issuer_crt)}
           keyPEM: |-
             ${indent(12, linkerd_issuer_key)}
-        crtExpiry: |-
-          ${indent(10, linkerd_issuer_crt_expiry)}
-%{ endif }
+        crtExpiry: ${linkerd_issuer_crt_expiry}
+%{~ endif }
 
-%{ if try(modules.linkerd-cni.enabled, false) }
+%{~ if try(modules.linkerd-cni.enabled, false) }
 ---
 apiVersion: v1
 kind: Namespace
@@ -141,4 +140,4 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
-%{ endif }
+%{~ endif }
