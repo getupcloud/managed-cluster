@@ -193,7 +193,10 @@ spec:
       retries: -1
   interval: 30m
   releaseName: linkerd-viz
-  storageNamespace: linkerd-viz
+  ##
+  ## We need all labels from chart's template for linkerd-viz namespace
+  ##
+  storageNamespace: flux-system
   targetNamespace: linkerd-viz
   dependsOn:
   - name: linkerd
