@@ -461,13 +461,6 @@ function usage()
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "install-teleport" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> install-teleport-agent" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Installs teleport-agent as a systemd service" "$COLOR_RESET"
-        echo
-    fi
-
     if [ -z "$command" ] || [ "$command" == "start" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
@@ -481,18 +474,18 @@ function usage()
         echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
     fi
 
+    if [ -z "$command" ] || [ "$command" == "repo-pull" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Pull from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
+    fi
+
     if [ -z "$command" ] || [ "$command" == "sync-template" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> sync-template [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Sync files from ./templates/\$type into CLUSTER-DIR." "$COLOR_RESET"
         echo
         echo "         --force                    Force template sync."
-    fi
-
-    if [ -z "$command" ] || [ "$command" == "repo-pull" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Pull from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
     fi
 
     if [ -z "$command" ] || [ "$command" == "remote-setup" ]; then
@@ -512,6 +505,13 @@ function usage()
         echo
         echo "     -k, --ssh-key-type              New SSH key type (default: $ssh_key_type)."
         echo "     -l, --ssh-key-length            SSH key length, depends on ssh key type."
+    fi
+
+    if [ -z "$command" ] || [ "$command" == "install-teleport" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> install-teleport-agent" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Installs teleport-agent as a systemd service" "$COLOR_RESET"
+        echo
     fi
 
 #    if [ -z "$command" ] || [ "$command" == "import-variables" ]; then
