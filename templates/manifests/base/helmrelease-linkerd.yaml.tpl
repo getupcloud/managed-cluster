@@ -169,14 +169,6 @@ spec:
 ## Linkerd Viz
 ##
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    linkerd.io/inject: disabled
-  name: linkerd-viz
-
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -196,13 +188,13 @@ spec:
     remediation:
       retries: -1
   interval: 30m
-  releaseName: linkerd-cni
-  storageNamespace: linkerd-cni
-  targetNamespace: linkerd-cni
+  releaseName: linkerd-viz
+  storageNamespace: linkerd-viz
+  targetNamespace: linkerd-viz
   dependsOn:
   - name: linkerd
   values:
-    installNamespace: false
+    installNamespace: true
     nodeSelector:
       role: infra
     tolerations:
