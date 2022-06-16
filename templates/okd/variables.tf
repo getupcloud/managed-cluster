@@ -20,12 +20,21 @@ variable "okd_modules_defaults" {
   default = {
     linkerd : {
       enabled : false
+      nodeSelector : {
+        role : "infra"
+      }
     }
     linkerd-viz : {
       enabled : false
+      nodeSelector : {
+        role : "infra"
+      }
     }
     linkerd-cni : {
       enabled : false
+      nodeSelector : {
+        role : "infra"
+      }
     }
   }
 }

@@ -111,8 +111,10 @@ spec:
           keyPEM: |-
             ${indent(12, trimspace(linkerd_issuer_key))}
         crtExpiry: ${linkerd_issuer_crt_expiry}
+%{~   if length(modules.linkerd.nodeSelector) > 0}
     nodeSelector:
-      role: infra
+      ${indent(6, yamlencode(modules.linkerd.nodeSelector))}
+%{~   endif }
     tolerations:
     - effect: NoSchedule
       operator: Exists
@@ -157,8 +159,10 @@ spec:
     installNamespace: false
     destCNIBinDir: /var/lib/cni/bin
     destCNINetDir: /etc/kubernetes/cni/net.d
+%{~   if length(modules.linkerd.nodeSelector) > 0}
     nodeSelector:
-      role: infra
+      ${indent(6, yamlencode(modules.linkerd-cni.nodeSelector))}
+%{~   endif }
     tolerations:
     - effect: NoSchedule
       operator: Exists
@@ -195,8 +199,10 @@ spec:
   - name: linkerd
   values:
     installNamespace: true
+%{~   if length(modules.linkerd-viz.nodeSelector) > 0 }
     nodeSelector:
-      role: infra
+      ${indent(6, yamlencode(modules.linkerd-viz.nodeSelector))}
+%{~   endif }
     tolerations:
     - effect: NoSchedule
       operator: Exists
