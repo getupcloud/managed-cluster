@@ -21,6 +21,9 @@ variable "okd_modules_defaults" {
     linkerd : {
       enabled : false
     }
+    linkerd-viz : {
+      enabled : false
+    }
     linkerd-cni : {
       enabled : false
     }

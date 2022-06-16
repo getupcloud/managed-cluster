@@ -1,5 +1,5 @@
 %{~ if try(modules.linkerd.enabled, false) }
-%{~ if cluster_type == "okd" ~}
+%{~   if cluster_type == "okd" ~}
 ---
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
@@ -42,12 +42,22 @@ users:
 - system:serviceaccount:linkerd:linkerd-identity
 - system:serviceaccount:linkerd:linkerd-proxy-injector
 - system:serviceaccount:linkerd:linkerd-heartbeat
-%{~ if try(modules.linkerd-cni.enabled, false) }
+%{~     if try(modules.linkerd-cni.enabled, false) }
+- system:serviceaccount:linkerd-cni:default
 - system:serviceaccount:linkerd-cni:linkerd-cni
-%{~ endif }
+%{~     endif }
+%{~     if try(modules.linkerd-viz.enabled, false) }
+%{~       for sa in ["default", "grafana", "metrics-api", "prometheus", "tap", "tap-injector", "web"] }
+- system:serviceaccount:linkerd-viz:${sa}
+%{~       endfor }
+%{~     endif }
 volumes:
 - '*'
-%{~ endif }
+%{~   endif }
+
+##
+## Linkerd Control Plane
+##
 ---
 apiVersion: v1
 kind: Namespace
@@ -83,10 +93,10 @@ spec:
   releaseName: linkerd
   storageNamespace: linkerd
   targetNamespace: linkerd
-%{~ if try(modules.linkerd-cni.enabled, false) }
+%{~   if try(modules.linkerd-cni.enabled, false) }
   dependsOn:
   - name: linkerd-cni
-%{~ endif }
+%{~   endif }
   values:
     installNamespace: false
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
@@ -101,9 +111,17 @@ spec:
           keyPEM: |-
             ${indent(12, trimspace(linkerd_issuer_key))}
         crtExpiry: ${linkerd_issuer_crt_expiry}
+    nodeSelector:
+      role: infra
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
 %{~ endif }
 
 %{~ if try(modules.linkerd-cni.enabled, false) }
+##
+## Linkerd CNI (required for OKD)
+##
 ---
 apiVersion: v1
 kind: Namespace
@@ -139,6 +157,54 @@ spec:
     installNamespace: false
     destCNIBinDir: /var/lib/cni/bin
     destCNINetDir: /etc/kubernetes/cni/net.d
+    nodeSelector:
+      role: infra
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+%{~ endif }
+
+%{~ if try(modules.linkerd-viz.enabled, false) }
+##
+## Linkerd Viz
+##
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    linkerd.io/inject: disabled
+  name: linkerd-viz
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkerd-viz
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: linkerd-viz
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+      version: 2.11.2
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 30m
+  releaseName: linkerd-cni
+  storageNamespace: linkerd-cni
+  targetNamespace: linkerd-cni
+  dependsOn:
+  - name: linkerd
+  values:
+    installNamespace: false
+    nodeSelector:
+      role: infra
     tolerations:
     - effect: NoSchedule
       operator: Exists
