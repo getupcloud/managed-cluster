@@ -5,6 +5,7 @@ resources:
 - ../base/
 - helmrelease-metrics-server.yaml
 - helmrelease-aws-load-balancer-controller.yaml
+- helmrelease-aws-efs-csi-driver.yaml
 
 patchesStrategicMerge: []
 # - helmrelease-falco.yaml
