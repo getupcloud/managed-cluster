@@ -30,7 +30,7 @@ spec:
       serviceAccount:
         annotations:
           eks.amazonaws.com/role-arn: ${aws_eks_efs_irsa_arn}
-%{ if length(aws_eks_efs_storage_class_file_system_id)) }
+%{~ if length(aws_eks_efs_storage_class_file_system_id) }
     storageClasses:
     - name: efs-sc
       annotations:
@@ -47,4 +47,4 @@ spec:
         basePath: "/dynamic_provisioning"
       reclaimPolicy: Delete
       volumeBindingMode: Immediate
-%{ endif }
+%{~ endif }
