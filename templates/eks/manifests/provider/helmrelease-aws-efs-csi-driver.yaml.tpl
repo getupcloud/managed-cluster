@@ -1,3 +1,4 @@
+%{ if try(modules.efs.enabled, false) ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -47,4 +48,5 @@ spec:
         basePath: "/dynamic_provisioning"
       reclaimPolicy: Delete
       volumeBindingMode: Immediate
+%{~ endif }
 %{~ endif }
