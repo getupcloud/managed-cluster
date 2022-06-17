@@ -26,11 +26,11 @@ spec:
     controller:
       serviceAccount:
         annotations:
-          eks.amazonaws.com/role-arn: ${try(modules_output.aws_eks_efs.irsa_arn, "")}
+          eks.amazonaws.com/role-arn: ${try(modules_output.efs.irsa_arn, "")}
     node:
       serviceAccount:
         annotations:
-          eks.amazonaws.com/role-arn: ${try(modules_output.aws_eks_efs.irsa_arn, "")}
+          eks.amazonaws.com/role-arn: ${try(modules_output.efs.irsa_arn, "")}
 %{~ if length(try(modules.efs.file_system_id, "")) > 0 }
     storageClasses:
     - name: efs-sc
