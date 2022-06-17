@@ -193,6 +193,7 @@ variable "aws_modules_defaults" {
   default = {
     alb = {
       enabled = false
+      file_system_id = string
     }
     certmanager = {
       enabled         = false
@@ -206,6 +207,7 @@ variable "aws_modules_defaults" {
     }
     efs = {
       enabled = false
+      file_system_id = ""
     }
     external-dns = {
       enabled         = false
