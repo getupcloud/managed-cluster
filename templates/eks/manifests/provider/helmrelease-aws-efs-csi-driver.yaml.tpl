@@ -26,12 +26,12 @@ spec:
     controller:
       serviceAccount:
         annotations:
-          eks.amazonaws.com/role-arn: ${aws_eks_efs_irsa_arn}
+          eks.amazonaws.com/role-arn: ${try(modules_output.aws_eks_efs.irsa_arn, "")}
     node:
       serviceAccount:
         annotations:
-          eks.amazonaws.com/role-arn: ${aws_eks_efs_irsa_arn}
-%{~ if length(aws_eks_efs_storage_class_file_system_id) }
+          eks.amazonaws.com/role-arn: ${try(modules_output.aws_eks_efs.irsa_arn, "")}
+%{~ if length(try(modules.efs.file_system_id, "")) > 0 }
     storageClasses:
     - name: efs-sc
       annotations:
@@ -41,7 +41,7 @@ spec:
       - tls
       parameters:
         provisioningMode: efs-ap
-        fileSystemId: fs-05f3047c6163443d9
+        fileSystemId: ${try(modules.efs.file_system_id, "")}
         directoryPerms: "700"
         gidRangeStart: "1000"
         gidRangeEnd: "2000"
