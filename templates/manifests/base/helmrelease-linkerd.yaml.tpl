@@ -102,15 +102,15 @@ spec:
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
     cniEnabled: ${ modules.linkerd-cni.enabled }
     identityTrustAnchorsPEM: |-
-      ${indent(6, trimspace(linkerd_ca_crt))}
+      ${indent(6, trimspace(try(modules_output.linkerd.linkerd_ca_crt, "")))}
     identity:
       issuer:
         tls:
           crtPEM: |-
-            ${indent(12, trimspace(linkerd_issuer_crt))}
+            ${indent(12, trimspace(try(modules_output.linkerd.linkerd_issuer_crt, "")))}
           keyPEM: |-
-            ${indent(12, trimspace(linkerd_issuer_key))}
-        crtExpiry: ${linkerd_issuer_crt_expiry}
+            ${indent(12, trimspace(try(modules_output.linkerd.linkerd_issuer_key, "")))}
+        crtExpiry: ${try(modules_output.linkerd.linkerd_issuer_crt_expiry, "")}
 %{~   if length(modules.linkerd.nodeSelector) > 0}
     nodeSelector:
       ${indent(6, yamlencode(modules.linkerd.nodeSelector))}
