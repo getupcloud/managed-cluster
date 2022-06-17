@@ -46,7 +46,7 @@ spec:
         gidRangeStart: "1000"
         gidRangeEnd: "2000"
         basePath: "/dynamic_provisioning"
-      reclaimPolicy: Delete
+      reclaimPolicy: Retain
       volumeBindingMode: Immediate
 %{~ endif }
 %{~ endif }
