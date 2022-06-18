@@ -6,6 +6,7 @@ resources:
 - helmrelease-cert-manager-config.yaml
 - helmrelease-falco.yaml
 - helmrelease-ingress-nginx.yaml
+- helmrelease-kube-opex-analytics.yaml
 - helmrelease-logging.yaml
 - helmrelease-linkerd.yaml
 - helmrelease-loki.yaml
