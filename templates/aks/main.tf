@@ -41,11 +41,12 @@ module "aks" {
   private_dns_zone_skip_service_principal_aad_check = var.private_dns_zone_skip_service_principal_aad_check
   private_dns_zone_subscription_id                  = var.private_dns_zone_subscription_id
 
-  default_node_pool   = var.default_node_pool
-  node_pools          = var.node_pools
-  node_resource_group = var.node_resource_group
-  node_subnet_name    = var.node_subnet_name
-  node_vnet_name      = var.node_vnet_name
+  default_node_pool        = var.default_node_pool
+  node_pools               = var.node_pools
+  node_resource_group      = var.node_resource_group
+  node_vnet_resource_group = var.node_vnet_resource_group
+  node_subnet_name         = var.node_subnet_name
+  node_vnet_name           = var.node_vnet_name
 
   enable_role_based_access_control = var.enable_role_based_access_control
   rbac_aad_managed                 = var.rbac_aad_managed
