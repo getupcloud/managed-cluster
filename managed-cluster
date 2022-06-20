@@ -1089,7 +1089,7 @@ function check_update()
         if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
             has_updates=true
             if ask "Updates available from $(git_remote upstream) (v${latest_remote_version}). Download now? [Y/n]"; then
-                command_repo_pull_upstream
+                command_repo_pull_remote upstream
             fi
         fi
     fi
