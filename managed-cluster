@@ -1085,7 +1085,7 @@ function check_update()
 
     # check if upstream has a newer version than our local latest version and asks to download it.
     if [ "$(git_remote upstream)" == "$default_upstream" ]; then
-        local latest_remote_version=$(timeout 3 curl -s https://raw.githubusercontent.com/getupcloud/managed-cluster/main/version.txt)
+        local latest_remote_version=$(timeout 3 curl -s  -H 'cache-control: no-cache' https://raw.githubusercontent.com/getupcloud/managed-cluster/main/version.txt)
         if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
             has_updates=true
             if ask "Updates available from $(git_remote upstream) (v${latest_remote_version}). Download now? [Y/n]"; then
