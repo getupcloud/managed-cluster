@@ -159,6 +159,12 @@ variable "rbac_aad_admin_group_object_ids" {
 }
 
 # Network settings
+variable "node_vnet_resource_group" {
+  type        = string
+  description = "(Optional) Resource Group of vnet"
+  default     = null
+}
+
 variable "network_plugin" {
   type        = string
   description = "(Optional) Network plugin to use for networking. Currently supported values are azure and kubenet. Changing this forces a new resource to be created."
