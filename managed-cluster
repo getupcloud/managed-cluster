@@ -427,8 +427,8 @@ function get_local_ip()
 
 function usage()
 {
+    echo "Managed Cluster v$current_version"
     echo "Usage: $0 COMMAND [OPTIONS...] "
-    echo
     echo "Creates and manage CLUSTER-DIR (./clusters/\$name/\$type/) from outside manager container."
     if [ -z "$command" ]; then
         echo
@@ -565,6 +565,7 @@ function dump_options()
 ##########
 
 # defaults
+current_version=$(get_current_version)
 command=''
 cluster_dir=""
 debug=false
@@ -730,6 +731,7 @@ function save_repo_config()
 {
     info Saving $REPO_CONF
 
+    set_config version="$current_version" "Installer version" $REPO_CONF
     set_config customer="$customer" "Customer name" $REPO_CONF
     set_config upstream="$upstream" "Upstream git repo" $REPO_CONF
     set_config origin="$origin" "Origin git repo" $REPO_CONF
@@ -1066,6 +1068,42 @@ function command_repo_pull()
     done
 }
 
+function check_update()
+{
+    info Checking for updates...
+    if [ -z "$version" ]; then
+        set_config version="$current_version" "Installer version" $REPO_CONF
+    fi
+
+    local has_updates=false
+    local latest_local_version=$(get_latest_version)
+
+    # check if upstream has a newer version than our local latest version and asks to download it.
+    if [ $(git_remote upstream) == "$default_upstream" ]; then
+        local latest_remote_version=$(timeout 3 curl -s https://raw.githubusercontent.com/getupcloud/managed-cluster/main/version.txt)
+        if [ $(fmt_version $latest_remote_version) -gt $(fmt_version $latest_local_version) ]; then
+            has_updates=true
+            if ask "Updates available from $(git_remote upstream) (v${latest_remote_version}). Download now? [Y/n]"; then
+                ask_execute_command $0 repo-pull
+            fi
+        fi
+    fi
+
+    local latest_local_version=$(get_latest_version)
+
+    if [ $(fmt_version $latest_local_version) -gt $(fmt_version $version) ]; then
+        has_updates=true
+        if ask "Upgrade to version v${latest_local_version}? [Y/n]"; then
+            ask_execute_command git merge v${latest_local_version}
+            ask_execute_command $0 sync-template
+        fi
+    fi
+
+    if ! $has_updates; then
+        info No updates available. Starting version ${version}...
+    fi
+}
+
 #############################
 ## COMMAND: update-ssh-key ##
 #############################
@@ -1222,6 +1260,8 @@ if [ -z "$_command" ] || [ "$(type -t command_$_command)" != function ]; then
     usage
     exit 1
 fi
+
+check_update
 
 if [ "$(type -t getopt_$_command)" == function ]; then
     eval getopt_$_command "$@"

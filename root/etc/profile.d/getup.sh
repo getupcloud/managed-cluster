@@ -300,6 +300,26 @@ repo_match()
     [ "$repo1_owner_name" == "$repo2_owner_name" ]
 }
 
+get_current_version()
+{
+    cat $REPO_DIR/version.txt
+}
+
+list_versions()
+{
+    GIT_DIR=${REPO_DIR:-.}/.git git tag | grep '^v[0-9]' | cut -c 2- | sort  -V -r
+}
+
+get_latest_version()
+{
+    list_versions | head -1
+}
+
+fmt_version()
+{
+    printf "%03d" ${1//./ }
+}
+
 update_ca_certificates()
 {
     if [ -e $CLUSTER_DIR/cacerts.crt ]; then
