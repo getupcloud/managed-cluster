@@ -1100,6 +1100,7 @@ function check_update()
         has_updates=true
         if ask "Upgrade to version v${latest_local_version}? [Y/n]"; then
             ask_execute_command git merge v${latest_local_version}
+            set_config version="$latest_local_version" "Installer version" $REPO_CONF
         fi
     fi
 
