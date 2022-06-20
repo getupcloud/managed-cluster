@@ -1069,8 +1069,8 @@ function command_repo_pull()
 function command_repo_pull_remote()
 {
     local remote=$(git remote get-url $1 2>/dev/null || echo '<none>'
-    info "--> remote:" $remote)
-    ask_execute_command git pull $remote main --tags
+    info "--> remote:" $i: $remote)
+    ask_execute_command git pull $1 main --tags
 }
 
 function check_update()
