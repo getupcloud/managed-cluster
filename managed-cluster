@@ -1069,16 +1069,16 @@ function command_repo_pull()
 function repo_pull_remote()
 {
     local remote=$1
-    local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>'
-    info "--> pull remote:" $remote: $remote_url)
+    local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>')
+    info "--> pull remote:" $remote: $remote_url
     ask_execute_command git pull $remote main --tags
 }
 
 function repo_fetch_remote()
 {
     local remote=$1
-    local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>'
-    info "--> fetch remote:" $remote: $remote_url)
+    local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>')
+    info "--> fetch remote:" $remote: $remote_url
     ask_execute_command git fetch $remote main --tags
 }
 
