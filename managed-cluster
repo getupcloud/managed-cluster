@@ -1069,8 +1069,15 @@ function command_repo_pull()
 function command_repo_pull_remote()
 {
     local remote=$(git remote get-url $1 2>/dev/null || echo '<none>'
-    info "--> remote:" $i: $remote)
+    info "--> pull remote:" $i: $remote)
     ask_execute_command git pull $1 main --tags
+}
+
+function command_repo_fetch_remote()
+{
+    local remote=$(git remote get-url $1 2>/dev/null || echo '<none>'
+    info "--> fetch remote:" $i: $remote)
+    ask_execute_command git fetch $1 --tags
 }
 
 function check_update()
@@ -1085,11 +1092,13 @@ function check_update()
 
     # check if upstream has a newer version than our local latest version and asks to download it.
     if [ "$(git_remote upstream)" == "$default_upstream" ]; then
-        local latest_remote_version=$(timeout 3 curl -s  -H 'cache-control: no-cache' https://raw.githubusercontent.com/getupcloud/managed-cluster/main/version.txt)
+        local latest_remote_version=$(timeout 3 curl -s -H 'cache-control: no-cache' \
+            'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
+            | jq '.[0].name' -r | cut -c 2-)
         if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
             has_updates=true
             if ask "Updates available from $(git_remote upstream) (v${latest_remote_version}). Download now? [Y/n]"; then
-                command_repo_pull_remote upstream
+                command_repo_fetch_remote upstream
             fi
         fi
     fi
