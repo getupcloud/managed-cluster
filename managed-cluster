@@ -1062,22 +1062,24 @@ function command_repo_pull()
         fi
     done
 
-    command_repo_pull_remote origin
-    command_repo_pull_remote upstream
+    repo_pull_remote origin
+    repo_pull_remote upstream
 }
 
-function command_repo_pull_remote()
+function repo_pull_remote()
 {
-    local remote=$(git remote get-url $1 2>/dev/null || echo '<none>'
-    info "--> pull remote:" $i: $remote)
-    ask_execute_command git pull $1 main --tags
+    local remote=$1
+    local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>'
+    info "--> pull remote:" $remote: $remote_url)
+    ask_execute_command git pull $remote main --tags
 }
 
-function command_repo_fetch_remote()
+function repo_fetch_remote()
 {
-    local remote=$(git remote get-url $1 2>/dev/null || echo '<none>'
-    info "--> fetch remote:" $i: $remote)
-    ask_execute_command git fetch $1 --tags
+    local remote=$1
+    local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>'
+    info "--> fetch remote:" $remote: $remote_url)
+    ask_execute_command git fetch $remote main --tags
 }
 
 function check_update()
@@ -1098,7 +1100,7 @@ function check_update()
         if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
             has_updates=true
             if ask "Updates available from $(git_remote upstream) (v${latest_remote_version}). Download now? [Y/n]"; then
-                command_repo_fetch_remote upstream
+                repo_fetch_remote upstream
             fi
         fi
     fi
