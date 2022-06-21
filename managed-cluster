@@ -427,7 +427,7 @@ function get_local_ip()
 
 function usage()
 {
-    echo "Managed Cluster v$current_version"
+    echo "Managed Cluster - v$current_version"
     echo "Usage: $0 COMMAND [OPTIONS...] "
     echo "Creates and manage CLUSTER-DIR (./clusters/\$name/\$type/) from outside manager container."
     if [ -z "$command" ]; then
@@ -820,7 +820,7 @@ standalone=false
 docker_command="" # /bin/bash
 port_range=32000-32010
 run_as_root=false
-docker_image=ghcr.io/getupcloud/managed-cluster:$(make --no-print-directory print-release)
+docker_image=ghcr.io/getupcloud/managed-cluster:$(make --no-print-directory print-release -C $REPO_DIR)
 force_docker_image_build=false
 sudo=sudo
 
