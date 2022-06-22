@@ -685,10 +685,7 @@ function command_create()
 {
     set -e
 
-    if ! [ -e "$REPO_CONF" ]; then
-        create_repo_config
-    fi
-
+    create_repo_config
     create_cluster
 
     if ! has_remote upstream; then
@@ -706,6 +703,11 @@ function command_create()
 
 function create_repo_config()
 {
+    if [ -e "$REPO_CONF" ]; then
+        info Found $REPO_CONF
+        return 0
+    fi
+
     info Creating $REPO_CONF
 
     read_config customer "Customer name"
@@ -1085,7 +1087,7 @@ function repo_fetch_remote()
 function check_update()
 {
     info Checking for updates...
-    if [ -z "$version" ]; then
+    if [ -e "$REPO_CONF" ] && [ -z "$version" ]; then
         set_config version="$current_version" "Installer version" $REPO_CONF
     fi
 
