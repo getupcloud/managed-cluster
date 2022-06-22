@@ -1086,8 +1086,12 @@ function repo_fetch_remote()
 
 function check_update()
 {
+    if ! [ -e "$REPO_CONF" ]; then
+        return 0
+    fi
+
     info Checking for updates...
-    if [ -e "$REPO_CONF" ] && [ -z "$version" ]; then
+    if [ -z "$version" ]; then
         set_config version="$current_version" "Installer version" $REPO_CONF
     fi
 
