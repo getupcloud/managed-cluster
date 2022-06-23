@@ -56,6 +56,14 @@ if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
         fi
     fi
 
+    if ask "Give \`admin\` permission to team \`operations\` into this repository? [Y/n]"; then
+        gh api \
+          --method PUT \
+          -H "Accept: application/vnd.github.v3+json" \
+          /orgs/getupcloud/teams/operations/repos/$gh_owner/$gh_name \
+          -f permission='admin'
+    fi
+
     if ! $success; then
         exit 1
     fi
