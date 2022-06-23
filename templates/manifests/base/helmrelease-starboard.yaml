@@ -12,6 +12,7 @@ spec:
         kind: HelmRepository
         name: aqua
   install:
+    createNamespace: true
     disableWait: true
     remediation:
       retries: -1
@@ -35,6 +36,7 @@ spec:
         kind: HelmRepository
         name: aqua
   install:
+    createNamespace: true
     disableWait: true
     remediation:
       retries: -1

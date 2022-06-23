@@ -12,6 +12,7 @@ resources:
 - helmrelease-loki.yaml
 - helmrelease-monitoring.yaml
 - helmrelease-monitoring-config.yaml
+- helmrelease-starboard.yaml
 - helmrelease-teleport-agent.yaml
 - helmrelease-velero.yaml
 - helmrelease-velero-config.yaml
