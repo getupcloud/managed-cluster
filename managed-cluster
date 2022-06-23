@@ -363,6 +363,7 @@ function start_container()
         --rm
         -it
         --env-file $ROOT_DIR/.dockerenv
+        ${env_file:+--env-file $env_file}
         -v $(readlink -nf $CLUSTER_DIR):/cluster
         -v $ROOT_DIR:/repo
         -v $HOME:/home/_host:ro
@@ -466,6 +467,7 @@ function usage()
         echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
         echo
+        echo "     -e, --env-file FILE                   Export environment files from FILE (file format: name=\"value\")"
         echo "         --force-docker-image-build        Force building local docker image."
         echo "     -i, --image NAME                      Image name (default: $docker_image)."
         echo "         --no-sudo                         Dont use 'sudo' to run docker."
@@ -823,6 +825,7 @@ docker_command="" # /bin/bash
 port_range=32000-32010
 run_as_root=false
 docker_image=ghcr.io/getupcloud/managed-cluster:$(make --no-print-directory print-release -C $REPO_DIR)
+env_file=""
 force_docker_image_build=false
 sudo=sudo
 
@@ -847,6 +850,11 @@ function getopt_start()
             ;;
             --no-sudo)
                 sudo=""
+            ;;
+            -e|--env-file)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                env_file=$1
             ;;
             -i|--image)
                 [ $# -lt 2 ] && invalid_argument $1
