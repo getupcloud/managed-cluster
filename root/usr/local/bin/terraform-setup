@@ -103,10 +103,17 @@ for variables_file in ${variables_files[@]}; do
         # Precedency is: variables.tf:default -> terraform.tfvars -> $TF_VAR_${name} -> $name
         unset value
 
-        # try default from $CLUSTER_DIR/variables*.tf file
-        variable_default=$(jq -r ".variable.${variable}[0].default"' // "%null%"' <<<$variables_file_data)
-        if [ "$variable_default" != '%null%' ]; then
-          value="$variable_default"
+        # try default from $CLUSTER_DIR/variables*.tf file.
+        variable_default=$(jq -r ".variable.${variable}[0].default" <<<$variables_file_data)
+
+        # `false` is a valid default
+        if [ "$variable_default" == false ]; then
+            value="$variable_default"
+        else
+            variable_default=$(jq -r ".variable.${variable}[0].default"' // "%null%"' <<<$variables_file_data)
+            if [ "$variable_default" != '%null%' ]; then
+              value="$variable_default"
+            fi
         fi
 
         # try $CLUSTER_DIR/terraform.tfvars
