@@ -72,6 +72,8 @@ set_config()
     if grep -q "^\s*${_name}=.*" $_config_file 2>/dev/null; then
         sed -i -e "s|^\s*${_name}=.*|$1|" $_config_file
     else
+        local last_byte=$(tac $_config_file | hexdump -n1 -e '"" 1/1 "%02x"')
+        [ "$last_byte" == '0a' ] || echo
         {
             echo "# $_description"
             echo "$1"
