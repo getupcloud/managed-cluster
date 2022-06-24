@@ -30,6 +30,7 @@ module "aks" {
   subscription_id      = var.subscription_id
   sku_tier             = var.sku_tier
   tags                 = var.tags
+  tenant_id            = var.tenant_id
 
   private_cluster_enabled                           = var.private_cluster_enabled
   api_server_authorized_ip_ranges                   = var.api_server_authorized_ip_ranges
