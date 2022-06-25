@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-echo DEPRECATED: Use './managed-cluster create'
