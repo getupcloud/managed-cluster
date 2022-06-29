@@ -345,6 +345,15 @@ function update_git_remotes()
     git remote add origin $origin
 }
 
+function get_docker_image()
+{
+    if [ -z "$docker_image" ]; then
+        echo $default_docker_image_repo:$default_docker_image_version
+    else
+        echo $docker_image
+    fi
+}
+
 function start_container()
 {
     assert_cluster_dir
@@ -397,8 +406,8 @@ function start_container()
 
     check_deprecations
 
-    info Starting cluster: $CLUSTER_DIR with docker image ${docker_image}
-    docker_run="docker run ${docker_run_options_defaults[@]} ${docker_image} ${docker_command}"
+    info Starting cluster: $CLUSTER_DIR with docker image $(get_docker_image)
+    docker_run="docker run ${docker_run_options_defaults[@]} $(get_docker_image) ${docker_command}"
     info \$ $docker_run
     #echo
     eval $sudo $docker_run
@@ -469,7 +478,7 @@ function usage()
         echo
         echo "     -e, --env-file FILE                   Export environment files from FILE (file format: name=\"value\")"
         echo "         --force-docker-image-build        Force building local docker image."
-        echo "     -i, --image NAME                      Image name (default: $docker_image)."
+        echo "     -i, --image NAME                      Image name (default: $(get_docker_image))."
         echo "         --no-sudo                         Dont use 'sudo' to run docker."
         echo "     -p, --port-range $port_range          Exposes container port range into host using format FIRST:LAST."
         echo "     -r, --run-as-root                     Run container as root."
@@ -479,7 +488,13 @@ function usage()
     if [ -z "$command" ] || [ "$command" == "repo-pull" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Pull from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
+        echo "     Pulls from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
+    fi
+
+    if [ -z "$command" ] || [ "$command" == "update" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> update" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Fetch 'upstream' remote and merge from a newer version." "$COLOR_RESET"
     fi
 
     if [ -z "$command" ] || [ "$command" == "sync-template" ]; then
@@ -687,6 +702,7 @@ function command_create()
 {
     set -e
 
+    check_update
     create_repo_config
     create_cluster
 
@@ -824,7 +840,9 @@ standalone=false
 docker_command="" # /bin/bash
 port_range=32000-32010
 run_as_root=false
-docker_image=ghcr.io/getupcloud/managed-cluster:$(make --no-print-directory print-release -C $REPO_DIR)
+default_docker_image_repo='ghcr.io/getupcloud/managed-cluster'
+default_docker_image_version=v$(get_current_version)
+docker_image=''
 env_file=""
 force_docker_image_build=false
 sudo=sudo
@@ -879,6 +897,8 @@ function getopt_start()
         shift
     done
 
+    docker_image=$(get_docker_image)
+
     select_cluster $cluster_dir
 }
 
@@ -927,6 +947,8 @@ function command_start()
         exit 1
     fi
 
+    check_update
+
     if $standalone; then
         export CLUSTER_DIR="$PWD/standalone"
         mkdir -p $CLUSTER_DIR
@@ -970,6 +992,7 @@ function getopt_sync_template()
 function command_st() { command_sync_template "$@"; }
 function command_sync_template()
 {
+    check_update
     assert_cluster_dir
     sync_from_template
     merge_requires
@@ -1050,6 +1073,24 @@ function command_remote_setup()
     git remote -v
 }
 
+#####################
+## COMMAND: update ##
+#####################
+
+update_version=""
+
+function getopt_u() { getopt_update "$@"; }
+function getopt_update()
+{
+    :
+}
+
+function command_u() { command_update "$@"; }
+function command_update()
+{
+    check_update
+}
+
 ###########################
 ## COMMAND: repo-pull    ##
 ###########################
@@ -1073,7 +1114,7 @@ function command_repo_pull()
     done
 
     repo_pull_remote origin
-    repo_pull_remote upstream
+    repo_fetch_remote upstream
 }
 
 function repo_pull_remote()
@@ -1098,7 +1139,15 @@ function check_update()
         return 0
     fi
 
-    info Checking for updates...
+    cd $REPO_DIR
+    info "Checking for updates (current version $current_version) ..."
+
+    if [ "$(git_remote upstream)" != "$default_upstream" ]; then
+        info "Remote upstream doesn't matches $default_upstream"
+        info "Execute \`$0 remote-setup\` and try again."
+        return
+    fi
+
     if [ -z "$version" ]; then
         set_config version="$current_version" "Installer version" $REPO_CONF
     fi
@@ -1107,15 +1156,16 @@ function check_update()
     local latest_local_version=$(get_latest_version)
 
     # check if upstream has a newer version than our local latest version and asks to download it.
-    if [ "$(git_remote upstream)" == "$default_upstream" ]; then
-        local latest_remote_version=$(timeout 3 curl -s -H 'cache-control: no-cache' \
-            'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
-            | jq '.[0].name' -r | cut -c 2-)
-        if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
-            has_updates=true
-            if ask "Updates available from $(git_remote upstream) (v${latest_remote_version}). Download now? [Y/n]"; then
-                repo_fetch_remote upstream
-            fi
+    local latest_remote_version=$(timeout 3 curl -s -H 'cache-control: no-cache' \
+        'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
+        | jq '.[0].name' -r | cut -c 2-)
+
+    if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
+        has_updates=true
+        if ask "Updates available from $(git_remote upstream) (remote version ${latest_remote_version}). Download now? [Y/n]"; then
+            repo_fetch_remote upstream
+        else
+            return
         fi
     fi
 
@@ -1123,14 +1173,11 @@ function check_update()
 
     if [ "$(fmt_version $latest_local_version)" -gt "$(fmt_version $version)" ]; then
         has_updates=true
-        if ask "Upgrade to version v${latest_local_version}? [Y/n]"; then
-            ask_execute_command git merge v${latest_local_version}
+        if ask "Upgrade from version $current_version to newer version ${latest_local_version}? [Y/n]"; then
+            ask_execute_command git merge v${latest_local_version} -Xtheirs
+            current_version=$(get_current_version)
             set_config version="$latest_local_version" "Installer version" $REPO_CONF
         fi
-    fi
-
-    if ! $has_updates; then
-        info No updates available. Starting version ${version}...
     fi
 }
 
@@ -1290,8 +1337,6 @@ if [ -z "$_command" ] || [ "$(type -t command_$_command)" != function ]; then
     usage
     exit 1
 fi
-
-check_update
 
 if [ "$(type -t getopt_$_command)" == function ]; then
     eval getopt_$_command "$@"
