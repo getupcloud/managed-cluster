@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.16"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.17"
 
   api_endpoint                = var.api_endpoint
   cluster_autoscaling         = var.cluster_autoscaling
@@ -42,6 +42,8 @@ module "gke" {
   node_pools_tags             = var.node_pools_tags
   node_pools_taints           = var.node_pools_taints
   project_id                  = var.project_id
+  pre_create                  = var.pre_create
+  post_create                 = var.post_create
   region                      = var.region
   regional                    = var.regional
   release_channel             = var.release_channel

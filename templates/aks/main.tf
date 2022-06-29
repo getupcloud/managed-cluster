@@ -1,5 +1,5 @@
 module "aks" {
-  source = "github.com/getupcloud/terraform-cluster-aks?ref=main"
+  source = "github.com/getupcloud/terraform-cluster-aks?ref=1.1"
 
   cluster_sla             = var.sla
   cronitor_api_key        = var.cronitor_api_key
@@ -12,6 +12,8 @@ module "aks" {
   teleport_auth_token     = var.teleport_auth_token
   use_kubeconfig          = var.use_kubeconfig
   azure_modules           = var.azure_modules
+  pre_create              = var.pre_create
+  post_create             = var.post_create
 
   admin_username       = var.admin_username
   azure_policy_enabled = var.azure_policy_enabled

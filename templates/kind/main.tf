@@ -1,5 +1,5 @@
 module "kind" {
-  source = "github.com/getupcloud/terraform-cluster-kind?ref=v1.4"
+  source = "github.com/getupcloud/terraform-cluster-kind?ref=v1.5"
 
   cluster_name            = var.name
   cluster_sla             = var.sla
@@ -10,5 +10,7 @@ module "kind" {
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
   manifests_template_vars = local.manifests_template_vars
+  pre_create              = var.pre_create
+  post_create             = var.post_create
   use_kubeconfig          = var.use_kubeconfig
 }

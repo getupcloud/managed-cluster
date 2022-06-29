@@ -1,5 +1,5 @@
 module "doks" {
-  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.3"
+  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.4"
 
   cronitor_api_key        = var.cronitor_api_key
   cronitor_pagerduty_key  = var.cronitor_pagerduty_key
@@ -13,6 +13,8 @@ module "doks" {
   manifests_template_vars = local.manifests_template_vars
   node_pool               = var.node_pool
   node_pools              = var.node_pools
+  pre_create              = var.pre_create
+  post_create             = var.post_create
   region                  = var.region
   spaces_access_id        = var.spaces_access_id
   spaces_buckets          = var.spaces_buckets
