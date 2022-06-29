@@ -7,9 +7,8 @@ resources:
 - helmrelease-falco.yaml
 - helmrelease-ingress-nginx.yaml
 - helmrelease-kube-opex-analytics.yaml
-- helmrelease-logging.yaml
 - helmrelease-linkerd.yaml
-- helmrelease-loki.yaml
+- helmrelease-logging.yaml
 - helmrelease-monitoring.yaml
 - helmrelease-monitoring-config.yaml
 - helmrelease-starboard.yaml
