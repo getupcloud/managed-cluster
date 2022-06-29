@@ -1,5 +1,5 @@
 module "aks" {
-  source = "github.com/getupcloud/terraform-cluster-aks?ref=1.1"
+  source = "github.com/getupcloud/terraform-cluster-aks?ref=1.2"
 
   cluster_sla             = var.sla
   cronitor_api_key        = var.cronitor_api_key
