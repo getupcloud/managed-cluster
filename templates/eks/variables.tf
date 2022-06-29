@@ -170,7 +170,7 @@ variable "aws_modules_defaults" {
   description = "Configure AWS modules to install (defaults)"
   type = object({
     alb = object({
-      enabled = bool
+      enabled      = bool
       ingressClass = string
     })
     certmanager = object({
@@ -195,7 +195,7 @@ variable "aws_modules_defaults" {
 
   default = {
     alb = {
-      enabled = false
+      enabled      = false
       ingressClass = "alb"
     }
     certmanager = {
