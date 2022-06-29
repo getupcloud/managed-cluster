@@ -23,6 +23,8 @@ if ! repo-exists 2>/dev/null; then
     ask_execute_command repo-setup
 fi
 
+ask_execute_command kubectl apply --kustomize $CLUSTER_DIR/manifests/cluster/ --dry-run=client --validate=false
+
 FZF_PREVIEW="
 if [ {1} == '??' ]; then
   [ -d {2} ] && tree {2} || cat {2}
@@ -31,25 +33,27 @@ else
 fi
 "
 
-FILES_TO_COMMIT=(
-    $(git status --short repo.conf clusters/$name/$type | fzf -0 --ansi --reverse --multi --disabled \
-        --header='---[ Select files to commit (ctrl+a to select all) ]---' \
-        --preview "$FZF_PREVIEW" \
-        --bind 'ctrl-a:select-all' \
-        | awk '{print $2}'
+if ask "Select files to commit now? [Y/n]"; then
+    FILES_TO_COMMIT=(
+        $(git status --short repo.conf clusters/$name/$type | fzf -0 --ansi --reverse --multi --disabled \
+            --header='---[ Select files to commit (ctrl+a to select all) ]---' \
+            --preview "$FZF_PREVIEW" \
+            --bind 'ctrl-a:select-all' \
+            | awk '{print $2}'
+        )
     )
-)
 
-if [ ${#FILES_TO_COMMIT[*]} -eq 0 ]; then
-    if ! ask "Nothing to commit. Continue anyway? [y/N]"; then
-        exit 0
+    if [ ${#FILES_TO_COMMIT[*]} -eq 0 ]; then
+        if ! ask "Nothing to commit. Continue anyway? [y/N]"; then
+            exit 0
+        fi
+    else
+        echo
+        info Commiting files:
+        printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
+        git add "${FILES_TO_COMMIT[@]}"
+        git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$name/$type"
     fi
-else
-    echo
-    info Commiting files:
-    printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
-    git add "${FILES_TO_COMMIT[@]}"
-    git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$name/$type"
 fi
 
 ask_execute_command git push origin main
