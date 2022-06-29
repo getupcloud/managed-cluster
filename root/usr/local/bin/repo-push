@@ -41,12 +41,15 @@ FILES_TO_COMMIT=(
 )
 
 if [ ${#FILES_TO_COMMIT[*]} -eq 0 ]; then
-    exit 0
+    if ! ask "Nothing to commit. Continue anyway? [y/N]"; then
+        exit 0
+    fi
+else
+    echo
+    info Commiting files:
+    printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
+    git add "${FILES_TO_COMMIT[@]}"
+    git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$name/$type"
 fi
 
-echo
-info Commiting files:
-printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
-git add "${FILES_TO_COMMIT[@]}"
-git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$name/$type"
 ask_execute_command git push origin main
