@@ -171,7 +171,7 @@ variable "aws_modules_defaults" {
   type = object({
     alb = object({
       enabled = bool
-      ingressClass = "alb"
+      ingressClass = string
     })
     certmanager = object({
       enabled         = bool
@@ -196,6 +196,7 @@ variable "aws_modules_defaults" {
   default = {
     alb = {
       enabled = false
+      ingressClass = "alb"
     }
     certmanager = {
       enabled         = false
