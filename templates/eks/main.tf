@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.38"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.39"
 
   account_id                   = var.account_id
   auth_iam_roles               = var.auth_iam_roles
@@ -22,6 +22,8 @@ module "eks" {
   manifests_template_vars      = local.manifests_template_vars
   node_groups_defaults         = var.node_groups_defaults
   node_groups                  = var.node_groups
+  pre_create                   = var.pre_create
+  post_create                  = var.post_create
   region                       = var.region
   subnet_ids                   = var.subnet_ids
   tags                         = var.tags
