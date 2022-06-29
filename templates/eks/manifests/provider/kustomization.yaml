@@ -3,4 +3,7 @@ kind: Kustomization
 
 resources:
 - helmrepository.yaml
+- helmrelease-metrics-server.yaml
+- helmrelease-aws-ebs-csi-driver.yaml
 - helmrelease-aws-efs-csi-driver.yaml
+- helmrelease-aws-load-balancer-controller.yaml
