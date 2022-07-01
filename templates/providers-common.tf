@@ -2,8 +2,8 @@ provider "cronitor" {
   api_key = var.cronitor_api_key
 }
 
-provider "kubernetes" {
-  config_path = var.kubeconfig_filename
+provider "opsgenie" {
+  api_key = var.opsgenie_api_key == "" ? "FAKE" : var.opsgenie_api_key
 }
 
 provider "shell" {

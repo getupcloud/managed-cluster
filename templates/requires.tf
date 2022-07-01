@@ -1,10 +1,5 @@
 terraform {
   required_providers {
-    cronitor = {
-      source  = "nauxliu/cronitor"
-      version = "~> 1"
-    }
-
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = "~> 1"
@@ -12,6 +7,11 @@ terraform {
 
     kubernetes = {
       version = "~> 2.3.2"
+    }
+
+    opsgenie = {
+      source  = "opsgenie/opsgenie"
+      version = "~> 0.6"
     }
 
     random = {
