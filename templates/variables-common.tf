@@ -21,7 +21,7 @@ variable "manifests_template_vars" {
   type        = any
   default = {
     alertmanager_pagerduty_service_key : ""
-    alertmanager_opsgenie_api_key : ""
+    alertmanager_opsgenie_integration_api_key : ""
     alertmanager_slack_channel : ""
     alertmanager_slack_api_url : ""
     alertmanager_msteams_url : ""
@@ -58,20 +58,20 @@ variable "manifests_path" {
   default     = ""
 }
 
-variable "cronitor_enabled" {
-  description = "Creates and enables Cronitor monitor."
-  type        = bool
-  default     = true
-}
-
 variable "cronitor_api_key" {
-  description = "Cronitor API key. Leave empty to destroy"
+  description = "Cronitor API key"
   type        = string
   default     = ""
 }
 
 variable "cronitor_pagerduty_key" {
   description = "Cronitor PagerDuty key"
+  type        = string
+  default     = ""
+}
+
+variable "opsgenie_api_key" {
+  description = "Opsgenie API key to create prometheus integration"
   type        = string
   default     = ""
 }

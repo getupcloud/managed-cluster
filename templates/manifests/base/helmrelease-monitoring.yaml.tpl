@@ -232,10 +232,10 @@ spec:
         #############################
         # Opsgenie
         #############################
-%{~ if alertmanager_opsgenie_api_key != "" }
+%{~ if alertmanager_opsgenie_integration_api_key != "" }
         - name: opsgenie
           opsgenie_configs:
-          - api_key: ${alertmanager_opsgenie_api_key}
+          - api_key: ${alertmanager_opsgenie_integration_api_key}
             # sla-none (no-ops) sla-low (dev/test) sla-high (prod/hlg)
             tags: ${customer_name}, ${cluster_name}, ${cluster_type}, sla-${cluster_sla}
 %{~ if cluster_sla == "high" }
@@ -248,7 +248,7 @@ spec:
 %{~   endif }
 %{~ endif }
 %{~ else }
-        # Set manifests_template_vars.alertmanager_opsgenie_api_key to configure Opsgenie
+        # Set manifests_template_vars.to configure Opsgenie
 %{~ endif }
 
         #############################
