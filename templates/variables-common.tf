@@ -81,6 +81,12 @@ variable "cronitor_pagerduty_key" {
   default     = ""
 }
 
+variable "opsgenie_enabled" {
+  description = "Creates and enables Opsgenie integration."
+  type        = bool
+  default     = true
+}
+
 variable "opsgenie_api_key" {
   description = "Opsgenie API key to create prometheus integration"
   type        = string
