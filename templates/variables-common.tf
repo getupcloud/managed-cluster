@@ -26,7 +26,6 @@ variable "manifests_template_vars" {
   type        = any
   default = {
     alertmanager_pagerduty_service_key : ""
-    alertmanager_opsgenie_integration_api_key : ""
     alertmanager_slack_channel : ""
     alertmanager_slack_api_url : ""
     alertmanager_msteams_url : ""

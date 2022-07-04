@@ -3,7 +3,7 @@ provider "cronitor" {
 }
 
 provider "opsgenie" {
-  api_key = var.opsgenie_api_key
+  api_key = var.opsgenie_api_key == "" ? "FAKE" : var.opsgenie_api_key
 }
 
 provider "shell" {

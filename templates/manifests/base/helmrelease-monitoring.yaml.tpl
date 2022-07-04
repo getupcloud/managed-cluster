@@ -342,7 +342,7 @@ spec:
             continue: true
 %{~ endif }
 
-%{~ if alertmanager_opsgenie_api_key != "" }
+%{~ if alertmanager_opsgenie_integration_api_key != "" }
           #############################
           # Opsgenie
           #############################
