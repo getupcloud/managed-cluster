@@ -11,7 +11,6 @@ module "eks" {
   cluster_name                 = var.name
   cluster_sla                  = var.sla
   cronitor_enabled             = var.cronitor_enabled
-  cronitor_api_key             = var.cronitor_api_key
   cronitor_pagerduty_key       = var.cronitor_pagerduty_key
   customer_name                = var.customer
   eks_addons                   = var.eks_addons
@@ -23,7 +22,6 @@ module "eks" {
   node_groups_defaults         = var.node_groups_defaults
   node_groups                  = var.node_groups
   opsgenie_enabled             = var.opsgenie_enabled
-  opsgenie_api_key             = var.opsgenie_api_key
   pre_create                   = var.pre_create
   post_create                  = var.post_create
   region                       = var.region
