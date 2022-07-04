@@ -18,5 +18,5 @@ if ! has_remote upstream 2>/dev/null; then
     ask_execute_command repo-setup
 fi
 
-ask_execute_command git pull upstream main --tag
 ask_execute_command git pull origin main --tag
+ask_execute_command git fetch upstream --tag
