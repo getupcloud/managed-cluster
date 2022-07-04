@@ -248,7 +248,7 @@ spec:
 %{~   endif }
 %{~ endif }
 %{~ else }
-        # Set manifests_template_vars.opsgenie_api_key to configure Opsgenie
+        # Set var.opsgenie_api_key to configure Opsgenie
 %{~ endif }
 
         #############################
