@@ -22,6 +22,8 @@ module "eks" {
   manifests_template_vars      = local.manifests_template_vars
   node_groups_defaults         = var.node_groups_defaults
   node_groups                  = var.node_groups
+  opsgenie_enabled             = var.opsgenie_enabled
+  opsgenie_api_key             = var.opsgenie_api_key
   pre_create                   = var.pre_create
   post_create                  = var.post_create
   region                       = var.region
