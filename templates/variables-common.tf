@@ -14,6 +14,11 @@ variable "sla" {
   description = "Cluster SLA"
   type        = string
   default     = "none"
+
+  validation {
+    condition     = contains(["high", "low", "none"], var.sla)
+    error_message = "The Cluster SLA is invalid."
+  }
 }
 
 variable "manifests_template_vars" {
@@ -56,6 +61,12 @@ variable "manifests_path" {
   description = "Manifests dir inside GitRepository"
   type        = string
   default     = ""
+}
+
+variable "cronitor_enabled" {
+  description = "Creates and enables Cronitor monitor."
+  type        = bool
+  default     = true
 }
 
 variable "cronitor_api_key" {
