@@ -65,7 +65,7 @@ variable "manifests_path" {
 variable "cronitor_enabled" {
   description = "Creates and enables Cronitor monitor."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "cronitor_api_key" {
@@ -83,7 +83,7 @@ variable "cronitor_pagerduty_key" {
 variable "opsgenie_enabled" {
   description = "Creates and enables Opsgenie integration."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "opsgenie_api_key" {

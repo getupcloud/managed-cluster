@@ -1,4 +1,12 @@
 {
+  "aks": {
+    "tfvars": {
+      "cronitor_enabled": true,
+      "cronitor_pagerduty_key": "XXX",
+      "opsgenie_enabled": true,
+      "opsgenie_team_name": "ops"
+    }
+  },
   "gke": {
     "tfvars": {
       "project_id": "project-1",
@@ -6,7 +14,7 @@
       "zones": ["z1","z2"],
       "service_account_key": "/tmp/fake.json",
       "network": "network-123",
-      "subnetwork": "subnet-123",
+      "subnetwork": "subnet-123"
     }
   },
   "doks": {

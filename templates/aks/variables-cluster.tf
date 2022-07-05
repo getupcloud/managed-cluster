@@ -37,6 +37,7 @@ variable "node_vnet_name" {
 
 variable "default_node_pool" {
   description = "AKS default node pool. Reserved for AKs stuff."
+  type        = any
   default = {
     enable_auto_scaling          = true
     enable_host_encryption       = true
@@ -63,6 +64,7 @@ variable "default_node_pool" {
 
 variable "node_pools" {
   description = "AKS node pools. Will merge with var.default_node_pool"
+  type        = any
   default = {
     infra = {
       min_count   = 2
