@@ -1,17 +1,22 @@
 terraform {
   required_providers {
-    cronitor = {
-      source  = "nauxliu/cronitor"
-      version = "~> 1"
-    }
-
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = "~> 1"
     }
 
     kubernetes = {
-      version = "~> 2.3.2"
+      version = "~> 2.8"
+    }
+
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "< 1"
+    }
+
+    cronitor = {
+      source  = "nauxliu/cronitor"
+      version = "~> 1"
     }
 
     opsgenie = {

@@ -1,17 +1,28 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.8"
+  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.16"
 
-  api_endpoint            = var.api_endpoint
+  # cluster basics
+  customer_name           = var.customer
   cluster_name            = var.name
   cluster_sla             = var.sla
-  cronitor_api_key        = var.cronitor_api_key
+  use_kubeconfig          = var.use_kubeconfig
+  pre_create              = var.pre_create
+  post_create             = var.post_create
+  generic_modules         = var.generic_modules
+
+  # monitoring and operations
+  cronitor_enabled        = var.cronitor_enabled
   cronitor_pagerduty_key  = var.cronitor_pagerduty_key
-  customer_name           = var.customer
+  opsgenie_enabled        = var.opsgenie_enabled
+  teleport_auth_token     = var.teleport_auth_token
+
+  # flux
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
-  kubeconfig_filename     = var.kubeconfig_filename
   manifests_template_vars = local.manifests_template_vars
-  teleport_auth_token     = var.teleport_auth_token
-  use_kubeconfig          = var.use_kubeconfig
+
+  # provider specific
+  api_endpoint            = var.api_endpoint
+  kubeconfig_filename     = var.kubeconfig_filename
 }

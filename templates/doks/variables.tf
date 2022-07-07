@@ -103,3 +103,9 @@ variable "node_pools" {
     error_message = "Missing one or more node_pools[].size. Ex: \"s-4vcpu-8gb\"."
   }
 }
+
+variable "doks_modules" {
+  description = "Configure DOKS modules to install"
+  type        = any
+  default     = {}
+}

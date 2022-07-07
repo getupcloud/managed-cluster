@@ -1,22 +1,35 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v2.19"
+  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v2.23"
 
-  app_nodes               = var.app_nodes
+  # cluster basics
+  customer_name           = var.customer
   cluster_name            = var.name
   cluster_sla             = var.sla
-  cronitor_api_key        = var.cronitor_api_key
+  use_kubeconfig          = var.use_kubeconfig
+  pre_create              = var.pre_create
+  post_create             = var.post_create
+  kubespray_modules       = var.kubespray_modules
+
+  # monitoring and operations
+  cronitor_enabled        = var.cronitor_enabled
   cronitor_pagerduty_key  = var.cronitor_pagerduty_key
-  customer_name           = var.customer
-  deploy_components       = var.deploy_components
-  etc_hosts               = var.etc_hosts
+  opsgenie_enabled        = var.opsgenie_enabled
+  teleport_auth_token     = var.teleport_auth_token
+
+  # flux
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
+  manifests_template_vars = local.manifests_template_vars
+
+  # provider specific
+  app_nodes               = var.app_nodes
+  deploy_components       = var.deploy_components
+  etc_hosts               = var.etc_hosts
   infra_nodes             = var.infra_nodes
   install_packages        = var.install_packages
   kubeconfig_filename     = var.kubeconfig_filename
   kubespray_git_ref       = var.kubespray_git_ref
-  manifests_template_vars = local.manifests_template_vars
   master_nodes            = var.master_nodes
   region                  = var.region
   ssh_private_key         = var.ssh_private_key
@@ -24,7 +37,5 @@ module "cluster" {
   ssh_password            = var.ssh_password
   systemctl_enable        = var.systemctl_enable
   systemctl_disable       = var.systemctl_disable
-  teleport_auth_token     = var.teleport_auth_token
   uninstall_packages      = var.uninstall_packages
-  use_kubeconfig          = var.use_kubeconfig
 }

@@ -100,4 +100,6 @@ test:
 	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
 
 test-help:
-	cd tests && ./test --help
+	@echo Usage: make test TEST_PARAMS="..."
+	@echo
+	@cd tests && ./test --help

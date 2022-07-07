@@ -173,3 +173,9 @@ variable "systemctl_disable" {
   type        = list(string)
   default     = []
 }
+
+variable "kubespray_modules" {
+  description = "Configure Kubespray modules to install"
+  type        = any
+  default     = {}
+}

@@ -293,3 +293,9 @@ variable "logging_service" {
   type        = string
   default     = "none"
 }
+
+variable "gke_modules" {
+  description = "Configure GKE modules to install"
+  type        = any
+  default     = {}
+}
