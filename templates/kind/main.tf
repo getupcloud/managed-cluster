@@ -13,8 +13,8 @@ module "kind" {
   # monitoring and operations
   cronitor_enabled       = var.cronitor_enabled
   cronitor_pagerduty_key = var.cronitor_pagerduty_key
-  #opsgenie_enabled        = var.opsgenie_enabled
-  #teleport_auth_token     = var.teleport_auth_token
+  opsgenie_enabled       = var.opsgenie_enabled
+  teleport_auth_token    = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo
