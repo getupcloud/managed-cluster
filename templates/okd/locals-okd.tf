@@ -1,3 +1,3 @@
 locals {
-  cluster_type    = "okd"
+  cluster_type = "okd"
 }
