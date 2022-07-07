@@ -21,9 +21,9 @@ if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
 fi
 
 : ${gh_description:="Getupcloud Managed Cluster: $customer"}
-: ${gh_team:=developers}
-: ${gh_enable_wiki:=false}
-: ${gh_enable_issues:=false}
+: ${gh_team:=operations}
+: ${gh_disable_issues:=true}
+: ${gh_disable_wiki:=true}
 
 if ! gh api orgs/$gh_owner/teams/$gh_team &>/dev/null; then
     gh_team=""
@@ -41,12 +41,10 @@ if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     # origin will be added by `gh`
     success=true
     if ! gh repo create $gh_owner/$gh_name \
-        --confirm \
         --private=true \
-        ${gh_team:+--team=$gh_team} \
         --description="${gh_description}" \
-        --enable-issues=${gh_enable_issues} \
-        --enable-wiki=${gh_enable_wiki}; then
+        --disable-issues=${gh_disable_issues} \
+        --disable-wiki=${gh_disable_wiki}; then
         success=false
     fi
 
@@ -56,11 +54,11 @@ if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
         fi
     fi
 
-    if ask "Give \`admin\` permission to team \`operations\` into this repository? [Y/n]"; then
+    if [ -n "$gh_team" ] && ask "Give \`admin\` permission to team \`$gh_team\` into this repository? [Y/n]"; then
         gh api \
           --method PUT \
           -H "Accept: application/vnd.github.v3+json" \
-          /orgs/getupcloud/teams/operations/repos/$gh_owner/$gh_name \
+          /orgs/${gh_owner}/teams/${gh_team}/repos/$gh_owner/$gh_name \
           -f permission='admin'
     fi
 
