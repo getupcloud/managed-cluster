@@ -350,11 +350,16 @@ run_as_user()
     fi
     export CONTAINER_GROUP
 
+    if [ -v DOCKER_SOCK_GID ]; then
+        groupadd docker-container -g $DOCKER_SOCK_GID || true
+    fi
+
     if ! CONTAINER_USER=$(id -nu $CONTAINER_USER_ID 2>/dev/null); then
         CONTAINER_USER=getup
         #info "Creating user $CONTAINER_USER ($CONTAINER_USER_ID)"
-        useradd $CONTAINER_USER -u $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -G wheel -m -k /etc/skel
+        useradd $CONTAINER_USER -u $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -G wheel${DOCKER_SOCK_GID:+,docker-container} -m -k /etc/skel
     fi
+
     export CONTAINER_USER
     export HOME=/home/$CONTAINER_USER
 

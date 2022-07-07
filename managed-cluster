@@ -382,6 +382,7 @@ function start_container()
         docker_run_options_defaults+=(
             -v /var/run/docker.sock:/var/run/docker.sock
         )
+        DOCKER_SOCK_GID=$(stat /var/run/docker.sock -c '%g')
     fi
 
     if [ -e "$SSH_AUTH_SOCK" ]; then
@@ -395,6 +396,7 @@ function start_container()
     {
         echo CONTAINER_USER_ID=$CONTAINER_USER_ID
         echo CONTAINER_GROUP_ID=$CONTAINER_GROUP_ID
+        echo DOCKER_SOCK_GID=$DOCKER_SOCK_GID
         echo GH_TOKEN=$GH_TOKEN
         echo debug=$debug
         echo verbose=$verbose
