@@ -16,6 +16,10 @@ spec:
     disableWait: true
     remediation:
       retries: -1
+  upgrade:
+    disableWait: true
+    remediation:
+      retries: -1
   interval: 5m
   releaseName: aws-ebs-csi-driver
   storageNamespace: csi-drivers

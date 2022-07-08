@@ -58,6 +58,10 @@ spec:
     disableWait: false
     remediation:
       retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
   interval: 5m
   storageNamespace: kube-opex-analytics
   targetNamespace: kube-opex-analytics

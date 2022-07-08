@@ -18,6 +18,10 @@ spec:
     disableWait: false
     remediation:
       retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
   interval: 5m
   releaseName: aws-efs-csi-driver
   storageNamespace: kube-system

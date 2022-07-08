@@ -89,6 +89,10 @@ spec:
     disableWait: false
     remediation:
       retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
   interval: 30m
   releaseName: linkerd
   storageNamespace: linkerd
@@ -151,6 +155,10 @@ spec:
     disableWait: false
     remediation:
       retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
   interval: 30m
   releaseName: linkerd-cni
   storageNamespace: linkerd-cni
@@ -188,6 +196,10 @@ spec:
       version: 2.11.2
   install:
     createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
     disableWait: false
     remediation:
       retries: -1

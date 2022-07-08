@@ -13,6 +13,7 @@ spec:
         name: kyverno
       version: v2.3.3
   install:
+    createNamespace: true
     disableWait: true
     remediation:
       retries: -1
@@ -40,6 +41,7 @@ spec:
         name: kyverno
       version: v2.3.4
   install:
+    createNamespace: true
     disableWait: true
     remediation:
       retries: -1

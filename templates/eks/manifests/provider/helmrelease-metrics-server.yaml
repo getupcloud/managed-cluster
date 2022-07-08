@@ -14,6 +14,11 @@ spec:
       version: 3.8.2
   releaseName: metrics-server
   install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
     disableWait: false
     remediation:
       retries: -1

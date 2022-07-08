@@ -13,6 +13,7 @@ spec:
         name: eks
       version: "~1"
   install:
+    createNamespace: true
     disableWait: false
     remediation:
       retries: -1

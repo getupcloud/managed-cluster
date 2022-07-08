@@ -59,6 +59,10 @@ spec:
     disableWait: true
     remediation:
       retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
   interval: 5m
   releaseName: teleport-agent
   storageNamespace: getup
