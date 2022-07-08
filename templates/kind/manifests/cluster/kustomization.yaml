@@ -2,24 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../base/
-- https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+- ../provider/
 
-patchesJson6902:
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: metrics-server
-    namespace: kube-system
-  patch: |-
-    - op: add
-      path: /spec/template/spec/containers/0/args/-
-      value: --kubelet-insecure-tls
+patchesJson6902: []
 
-patchesStrategicMerge:
-- gitrepositories.yaml
-- helmrelease-ingress-nginx.yaml
-- helmrelease-monitoring.yaml
-- helmrelease-velero-config.yaml
-- helmrelease-velero.yaml
+patchesStrategicMerge: []
