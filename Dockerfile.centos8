@@ -61,6 +61,7 @@ RUN cd /usr/local/bin && \
     curl -skL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh > oh-my-bash.install && \
         chmod +x oh-my-bash.install && \
         echo "Execute 'oh-my-bash.install' to install OH-MY-BASH" && \
+    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
     chmod -R +x /usr/local/bin
 
 RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/' -e 's/aarch64/arm64/') && \
