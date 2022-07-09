@@ -21,7 +21,7 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
     \
     INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
-        dialog httpie bind-utils httpd-tools iproute tree \
+        dialog httpie bind-utils httpd-tools iproute iputils tree \
         git net-tools nmap openssl openssl-devel bc \
         gettext jq rsync strace sshpass pv procps-ng \
         python3-pip python3-devel libffi-devel rust cargo" && \
@@ -32,7 +32,8 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
     curl -Lv https://github.com/junegunn/fzf/releases/download/0.29.0/fzf-0.29.0-linux_amd64.tar.gz \
         | sudo tar xzvf - -C /usr/local/bin && \
     curl -Lv https://github.com/Wilfred/difftastic/releases/download/0.27.0/difft-x86_64-unknown-linux-gnu.tar.gz \
-        | sudo tar xzvf - -C /usr/local/bin
+        | sudo tar xzvf - -C /usr/local/bin && \
+    curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
 RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
         unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
