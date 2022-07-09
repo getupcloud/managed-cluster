@@ -951,10 +951,11 @@ function command_start()
     check_update
 
     if $standalone; then
-        export CLUSTER_DIR="$PWD/standalone"
+        export CLUSTER_DIR="$ROOT_DIR/standalone"
         mkdir -p $CLUSTER_DIR
         touch $CLUSTER_DIR/terraform.tfvars
         touch $REPO_CONF
+        export CLUSTER_CONF=$CLUSTER_DIR/cluster.conf
         touch $CLUSTER_CONF
     fi
 
