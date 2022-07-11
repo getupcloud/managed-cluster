@@ -80,6 +80,16 @@ variable "cronitor_pagerduty_key" {
   default     = ""
 }
 
+variable "cronitor_notification_lists" {
+  description = "Cronitor Notification lists by SLA"
+  type        = any
+  default     = {
+    high : ["opsgenie-high-sla"]
+    low  : ["opsgenie-low-sla"]
+    none : []
+  }
+}
+
 variable "opsgenie_enabled" {
   description = "Creates and enables Opsgenie integration."
   type        = bool
