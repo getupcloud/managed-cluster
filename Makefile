@@ -96,10 +96,14 @@ test: TEST_BRANCH ?= $(shell git branch --show-current)
 test: DEFAULT_TEST_PARAMS=--branch $(TEST_BRANCH)
 test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: RELEASE=v$(FILE_VERSION)-$(GIT_COMMIT)-test
-test:
+test: lint
 	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
 
 test-help:
 	@echo Usage: make test TEST_PARAMS="..."
 	@echo
 	@cd tests && ./test --help
+
+lint:
+	for dir in templates/ templates/*/; do echo tflint $$dir && tflint $$dir; done
+
