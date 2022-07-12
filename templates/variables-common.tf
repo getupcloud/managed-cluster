@@ -84,8 +84,8 @@ variable "cronitor_notification_lists" {
   description = "Cronitor Notification lists by SLA"
   type        = any
   default = {
-    high : ["opsgenie-high-sla"]
-    low : ["opsgenie-low-sla"]
+    high : ["default", "opsgenie-high-sla"]
+    low : ["default", "opsgenie-low-sla"]
     none : []
   }
 }
