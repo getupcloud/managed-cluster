@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.49"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.50"
 
   # cluster basics
   customer_name  = var.customer
@@ -11,10 +11,11 @@ module "eks" {
   aws_modules    = var.aws_modules
 
   # monitoring and operations
-  cronitor_enabled       = var.cronitor_enabled
-  cronitor_pagerduty_key = var.cronitor_pagerduty_key
-  opsgenie_enabled       = var.opsgenie_enabled
-  teleport_auth_token    = var.teleport_auth_token
+  cronitor_enabled           = var.cronitor_enabled
+  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
+  cronitor_notification_list = local.cronitor_notification_list
+  opsgenie_enabled           = var.opsgenie_enabled
+  teleport_auth_token        = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo

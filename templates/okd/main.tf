@@ -1,5 +1,5 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.16"
+  source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.17"
 
   # cluster basics
   customer_name   = var.customer
@@ -12,10 +12,11 @@ module "cluster" {
   generic_modules = var.okd_modules
 
   # monitoring and operations
-  cronitor_enabled       = var.cronitor_enabled
-  cronitor_pagerduty_key = var.cronitor_pagerduty_key
-  opsgenie_enabled       = var.opsgenie_enabled
-  teleport_auth_token    = var.teleport_auth_token
+  cronitor_enabled           = var.cronitor_enabled
+  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
+  cronitor_notification_list = local.cronitor_notification_list
+  opsgenie_enabled           = var.opsgenie_enabled
+  teleport_auth_token        = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo

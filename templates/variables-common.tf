@@ -83,9 +83,9 @@ variable "cronitor_pagerduty_key" {
 variable "cronitor_notification_lists" {
   description = "Cronitor Notification lists by SLA"
   type        = any
-  default     = {
+  default = {
     high : ["opsgenie-high-sla"]
-    low  : ["opsgenie-low-sla"]
+    low : ["opsgenie-low-sla"]
     none : []
   }
 }

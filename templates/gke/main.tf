@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.21"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.22"
 
   # cluster basics
   customer_name  = var.customer
@@ -11,10 +11,11 @@ module "gke" {
   gke_modules    = var.gke_modules
 
   # monitoring and operations
-  cronitor_enabled       = var.cronitor_enabled
-  cronitor_pagerduty_key = var.cronitor_pagerduty_key
-  opsgenie_enabled       = var.opsgenie_enabled
-  teleport_auth_token    = var.teleport_auth_token
+  cronitor_enabled           = var.cronitor_enabled
+  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
+  cronitor_notification_list = local.cronitor_notification_list
+  opsgenie_enabled           = var.opsgenie_enabled
+  teleport_auth_token        = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo
@@ -59,7 +60,6 @@ module "gke" {
   regional                    = var.regional
   release_channel             = var.release_channel
   remove_default_node_pool    = var.remove_default_node_pool
-  service_account_key         = var.service_account_key
   subnetwork                  = var.subnetwork
   zones                       = var.zones
 }

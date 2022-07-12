@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+make
 for type in $types; do
     CLUSTER_DIR=$PWD/clusters/$NAME/$type
 
@@ -31,5 +32,5 @@ terraform validate
 #terraform plan -out=/tmp/terraform.tfplan
 EOF
     chmod +x $CLUSTER_DIR/test-cluster
-    run ./managed-cluster start --force-docker-image-build $CLUSTER_DIR -- bash -c /cluster/test-cluster
+    run ./managed-cluster start $CLUSTER_DIR -- bash -c /cluster/test-cluster
 done
