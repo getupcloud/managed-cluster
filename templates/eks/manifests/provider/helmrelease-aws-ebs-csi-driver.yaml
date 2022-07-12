@@ -29,18 +29,19 @@ spec:
       nodeSelector:
         role: infra
 
-    tolerations:
-    - key: dedicated
-      value: infra
-      operator: Equals
-      effect: NoSchedule
+      tolerations:
+      - key: dedicated
+        value: infra
+        operator: Equals
+        effect: NoSchedule
 
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+      requests:
+        cpu: 100m
+        memory: 128Mi
 
     storageClasses:
     - name: gp2-csi
