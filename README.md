@@ -21,7 +21,7 @@ Bootstrap an initial config for a new cluster named `production`:
 $ ./managed-cluster create
 ```
 
-All cluster configs will be stored in an exclusive directory `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}`.
+All cluster configs will be stored inside the directory structure `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}`.
 
 ## Start installer container
 
@@ -36,7 +36,7 @@ There are two volumes mapped from local host into container's filesystem:
 - `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}` -> `/cluster`
 - `./` -> `/repo`
 
-A new `/cluster/terraform.tfvars` will be generated case none is found.
+A new `/cluster/terraform.tfvars` will be generated in case none is found.
 You will be asked to fill in non-default values. After that, if you need to update/change values from `terraform.tfvars` simply run `terraform-edit`
 or `vim /cluster/terraform.tfvars`.
 
@@ -59,4 +59,61 @@ Flux will be installed and configured to sync from `${GITHUB_REPO}/clusters/${CL
 
 In order to update any config, simply `terraform-edit` and then `terraform-apply`.
 
-You are free to edit/add/remove anything from `/cluster` (or `clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}` if you are from out of the container).
+You are free to edit/add/remove anything from `/cluster` (or `clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}` if you are outside of the container).
+
+# Workflow
+
+This is the complete workflow (created in https://asciiflow.com)
+
+```
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                                                   │
+│                                                                                                                                   │
+│          ##################                               ##################                                                      │
+│          # CREATE CLUSTER #                               # UPDATE CLUSTER #                                                      │
+│          ##################                               ##################                                                      │
+│                  │                                                │                                                               │
+│                  │                                                │                                                               │
+│                  │                                                │                                                               │
+│                  ▼                                                ▼                                                               │
+│      ┌────────────────────────┐                      ┌──────────────────────────┐                                                 │
+│      │ managed-cluster create │                      │ git clone $remote-origin │                                                 │
+│      └───────────┬────────────┘                      └────────────┬─────────────┘                                                 │
+│                  │                                                │                                                               │
+│                  │                                                │                                                               │
+│                  ▼                                                │                                                               │
+│      ┌───────────────────────┐                                    ▼                                                               │
+│      │ managed-cluster start │◄────────────┐       ┌──────────────────────────────┐*                                              │
+│      └───────────┬───────────┘             │       │ managed-cluster remote-setup │                                               │
+│                  │                         │       └──────────────┬───────────────┘                                               │
+│                  │                         │                      │                                                               │
+│   ┌──────────────┼───────────────┐         │                      │                                                               │
+│   │ container    │               │         │                      │                         ┌─────────────────────────┐           │
+│   │              ▼               │         │                      ▼                      ┌──┤ git pull origin         │           │
+│   │     ┌─────────────────┐*     │         │         ┌───────────────────────────┐       │  └─────────────────────────┘           │
+│   │     │ terraform-setup │      │         │         │ managed-cluster repo-pull │◄──────┤                                        │
+│   │     └────────┬────────┘      │         │         └────────────┬──────────────┘       │  ┌────────────────────────────┐        │
+│   │              │               │         │                      │                      └──┤ git fetch upstream         │        │
+│   │              │               │         │                      │                         └────────────────────────────┘        │
+│   │              │               │         │                      │                                                               │
+│   │              ▼               │         │                      │                                                               │
+│   │     ┌────────────────┐       │         │                      │                            ┌────────────────────────────┐     │
+│   │     │ terraform-edit │       │         │                      ▼                         ┌──┤ git fetch upstream         │     │
+│   │     └────────┬───────┘       │         │           ┌────────────────────────┐           │  └────────────────────────────┘     │
+│   │              │               │         │           │ managed-cluster update │◄──────────┤                                     │
+│   │              │               │         │           └──────────┬─────────────┘           │  ┌───────────────────────┐          │
+│   │              │               │         │                      │                         └──┤ git merge $latest-tag │          │
+│   │              ▼               │         │                      │                            └───────────────────────┘          │
+│   │     ┌──────────────────┐     │         │                      │                                                               │
+│   │     │ terraform-apply  │     │         │                      │                                                               │
+│   │     └──────────────────┘     │         │                      │                                                               │
+│   │                              │         │                      │                        ┌─────────────────────────────┐        │
+│   └──────────────────────────────┘         │                      ▼                     ┌──┤ rsync templates -> /cluster │        │
+│                                            │       ┌───────────────────────────────┐    │  └─────────────────────────────┘        │
+│                                            └───────┤ managed-cluster sync-template │◄───┤                                         │
+│                                                    └───────────────────────────────┘    │  ┌───────────────────────────────────┐  │
+│                                                                                         └──┤ rsync tempaltes/$type -> /cluster │  │
+│                                                                                            └───────────────────────────────────┘  │
+│ * required only once                                                                                                              │
+└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
