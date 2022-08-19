@@ -32,7 +32,7 @@ spec:
       tolerations:
       - key: dedicated
         value: infra
-        operator: Equals
+        operator: Equal
         effect: NoSchedule
 
       limits:
