@@ -330,16 +330,3 @@ variable "not_allowed_maintenance_windows" {
   description = "(Optional) The start and end of a time span, formatted as an RFC3339 (2022-01-01T00:00:00Z) string."
   default     = []
 }
-
-# Azure Container registry
-variable "azure_container_registry_enabled" {
-  type        = bool
-  description = "(Optional) Should the AKS deployment access a Container Registry?"
-  default     = false
-}
-
-variable "azure_container_registry_id" {
-  type        = string
-  description = "(Optional) The ID of the Container Registry."
-  default     = null
-}
