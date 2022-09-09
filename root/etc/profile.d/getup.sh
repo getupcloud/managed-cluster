@@ -261,16 +261,6 @@ has_valid_config()
     fi
 }
 
-is_github_logged_in()
-{
-    gh auth status &>/dev/null
-}
-
-is_github()
-{
-    [[ "$1" =~ git@github\.com ]] || [[ "$1" =~ https://github\.com ]]
-}
-
 git_owner()
 {
     git-url "$1" owner

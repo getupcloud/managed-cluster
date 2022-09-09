@@ -1135,29 +1135,6 @@ function repo_fetch_remote()
     ask_execute_command git fetch $remote --tags
 }
 
-function check_update_origin()
-{
-    is_github $origin || return
-    type gh &>/dev/null || return
-    if ! is_github_logged_in; then
-        gh auth login
-    fi
-    is_github_logged_in || return
-
-    local repo=$(git_owner_name $origin)
-    local latest_remote_commit=$(gh api "repos/$repo/commits?per_page=1" 2>/dev/null)
-    local latest_remote_commit_sha=$(jq '.[0].sha' <<<$latest_remote_commit)
-    [ -n "$latest_remote_commit_sha" ] || return
-
-    local latest_commit_sha=$(git log -1 '--format=%H')
-    if [ "$latest_commit_sha" != "$latest_remote_commit_sha" ]; then
-        info "Local repo is not synced with remote origin."
-        repo_pull_remote origin
-    else
-        info "Local repo is in sync with origin: $origin"
-    fi
-}
-
 function check_update()
 {
     if ! [ -e "$REPO_CONF" ]; then
@@ -1172,8 +1149,6 @@ function check_update()
         info "Execute \`$0 remote-setup\` and try again."
         return
     fi
-
-    check_update_origin
 
     if [ -z "$version" ]; then
         set_config version="$current_version" "Installer version" $REPO_CONF
