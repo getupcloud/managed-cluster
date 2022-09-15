@@ -28,6 +28,7 @@ module "aks" {
   azure_policy_enabled = var.azure_policy_enabled
   client_id            = var.client_id
   client_secret        = var.client_secret
+  docker_bridge_cidr   = var.docker_bridge_cidr
   identity_type        = var.identity_type
   identity_ids         = var.identity_ids
   identity_name        = var.identity_name
