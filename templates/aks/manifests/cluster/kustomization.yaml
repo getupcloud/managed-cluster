@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../base/
+#- ../provider/
+
+patchesStrategicMerge: []
+- helmrelease-ingress-nginx.yaml
+- helmrelease-logging.yaml
+- helmrelease-monitoring.yaml
+- helmrelease-velero.yaml
