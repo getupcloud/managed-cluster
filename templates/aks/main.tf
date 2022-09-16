@@ -29,6 +29,7 @@ module "aks" {
   client_id            = var.client_id
   client_secret        = var.client_secret
   docker_bridge_cidr   = var.docker_bridge_cidr
+  dns_service_ip       = var.dns_service_ip
   identity_type        = var.identity_type
   identity_ids         = var.identity_ids
   identity_name        = var.identity_name
@@ -38,6 +39,7 @@ module "aks" {
   prefix               = var.prefix
   public_ssh_key       = var.public_ssh_key
   resource_group_name  = var.resource_group_name
+  service_cidr         = var.service_cidr
   subscription_id      = var.subscription_id
   sku_tier             = var.sku_tier
   tags                 = var.tags

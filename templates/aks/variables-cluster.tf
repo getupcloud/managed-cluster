@@ -99,7 +99,7 @@ variable "private_dns_zone_enabled" {
 variable "private_dns_zone_name" {
   description = "Either the DNS-name of Private DNS Zone which should be delegated to this Cluster, 'System' to have AKS manage this or 'None'."
   type        = string
-  default     = "System"
+  default     = null
 }
 
 variable "private_dns_zone_subscription_id" {

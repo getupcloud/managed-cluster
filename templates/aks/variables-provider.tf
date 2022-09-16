@@ -29,12 +29,6 @@ variable "prefix" {
   default     = null
 }
 
-variable "dns_prefix" {
-  type        = string
-  description = "(Optional) The DNS prefix for the AKS deployment. This is used to create a unique FQDN for the cluster when it is created."
-  default     = null
-}
-
 variable "private_cluster_enabled" {
   type        = bool
   description = "(Optional) Should this Kubernetes Cluster have its API server only exposed on internal IP addresses? This provides a Private IP Address for the Kubernetes API on the Virtual Network where the Kubernetes Cluster is located. Defaults to false. Changing this forces a new resource to be created."
@@ -95,12 +89,6 @@ variable "public_ssh_key" {
 variable "enable_role_based_access_control" {
   type        = bool
   description = "(Optional) Enables Role Based Access Control."
-  default     = false
-}
-
-variable "service_principal_enabled" {
-  type        = bool
-  description = "(Optional) Should the Azure Policy Add-On be enabled? For more details please visit [Understand Azure Policy for Azure Kubernetes Service](https://docs.microsoft.com/en-ie/azure/governance/policy/concepts/rego-for-aks)"
   default     = false
 }
 
