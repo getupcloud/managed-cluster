@@ -5,7 +5,7 @@ resources:
 - ../base/
 #- ../provider/
 
-patchesStrategicMerge: []
+patchesStrategicMerge:
 - helmrelease-ingress-nginx.yaml
 - helmrelease-logging.yaml
 - helmrelease-monitoring.yaml
