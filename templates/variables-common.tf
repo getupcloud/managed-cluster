@@ -53,7 +53,7 @@ variable "flux_wait" {
 variable "flux_version" {
   description = "Flux version to install"
   type        = string
-  default     = "v0.28.4"
+  default     = "v0.35.0"
 }
 
 variable "manifests_path" {
