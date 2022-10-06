@@ -1,0 +1,60 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: trivy
+  namespace: flux-system
+spec:
+  suspend: true
+  chart:
+    spec:
+      chart: trivy
+      sourceRef:
+        kind: HelmRepository
+        name: aqua
+  install:
+    createNamespace: true
+    disableWait: true
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: trivy
+  storageNamespace: trivy
+  targetNamespace: trivy
+  values: {}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: starboard-operator
+  namespace: flux-system
+spec:
+  suspend: true
+  chart:
+    spec:
+      chart: starboard-operator
+      sourceRef:
+        kind: HelmRepository
+        name: aqua
+  install:
+    createNamespace: true
+    disableWait: true
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: starboard-operator
+  storageNamespace: starboard-system
+  targetNamespace: starboard-system
+  values:
+    targetNamespaces: ""
+    trivy:
+      ignoreUnfixed: true
+      mode: ClientServer
+      serverURL: https://trivy.trivy.svc.cluster.local:4954
