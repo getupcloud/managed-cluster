@@ -1,9 +1,0 @@
-# Cluster Type
-type=kind
-
-# Cluster Name
-name=ferraz
-
-# Cluster SLA
-sla=high
-
