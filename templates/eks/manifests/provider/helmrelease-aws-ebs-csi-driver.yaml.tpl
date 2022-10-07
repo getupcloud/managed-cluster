@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: aws-ebs-csi-driver
-      version: 2.6.7
+      version: 2.11.1
   install:
     createNamespace: true
     disableWait: true
@@ -26,6 +26,10 @@ spec:
   targetNamespace: csi-drivers
   values:
     controller:
+      serviceAccount:
+        annotations:
+          eks.amazonaws.com/role-arn: ${try(modules_output.ebs_csi.iam_role_arn, "")}
+
       nodeSelector:
         role: infra
 

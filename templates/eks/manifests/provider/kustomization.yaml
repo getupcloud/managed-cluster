@@ -8,12 +8,12 @@ resources:
 - helmrelease-aws-efs-csi-driver.yaml
 - helmrelease-aws-load-balancer-controller.yaml
 
-patchesJson6902:
-- target:
-    group: storage.k8s.io
-    version: v1
-    kind: StorageClass
-    name: gp2
-  patch: |-
-    - op: remove
-      path: /metadata/annotations/storageclass.kubernetes.io/is-default-class
+#patchesJson6902:
+#- target:
+#    group: storage.k8s.io
+#    version: v1
+#    kind: StorageClass
+#    name: gp2
+#  patch: |-
+#    - op: remove
+#      path: /metadata/annotations/storageclass.kubernetes.io/is-default-class
