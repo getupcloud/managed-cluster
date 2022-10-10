@@ -23,7 +23,15 @@ if ! repo-exists 2>/dev/null; then
     ask_execute_command repo-setup
 fi
 
-ask_execute_command kubectl apply --kustomize $CLUSTER_DIR/manifests/cluster/ --dry-run=client --validate=false
+KUSTOMIZE_BUILD=/tmp/.kustomize_build.yaml
+if ! ask_execute_command kustomize build /cluster/manifests/cluster/ -o $KUSTOMIZE_BUILD; then
+    if ask "See failed file $KUSTOMIZE_BUILD? [Y/n]"; then
+        less $KUSTOMIZE_BUILD
+    fi
+else
+    echo Passed
+fi
+#ask_execute_command kubectl apply --kustomize $CLUSTER_DIR/manifests/cluster/ --dry-run=client --validate=false
 
 FZF_PREVIEW="
 if [ {1} == '??' ]; then
