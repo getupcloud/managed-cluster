@@ -1,5 +1,5 @@
 module "kind" {
-  source = "github.com/getupcloud/terraform-cluster-kind?ref=v2.1"
+  source = "github.com/getupcloud/terraform-cluster-kind?ref=v2.2"
 
   # cluster basics
   customer_name  = var.customer
