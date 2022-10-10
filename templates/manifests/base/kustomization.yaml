@@ -11,7 +11,7 @@ resources:
 - helmrelease-logging.yaml
 - helmrelease-monitoring.yaml
 - helmrelease-monitoring-config.yaml
-- helmrelease-starboard.yaml
+- helmrelease-trivy-operator.yaml
 - helmrelease-teleport-agent.yaml
 - helmrelease-velero.yaml
 - helmrelease-velero-config.yaml
