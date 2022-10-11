@@ -25,10 +25,26 @@ spec:
   storageNamespace: trivy-system
   targetNamespace: trivy-system
   values:
+    excludeNamespaces: "kube-system,trivy-system"
+
+    operator:
+      vulnerabilityScannerEnabled: true
+      configAuditScannerEnabled: true
+      rbacAssessmentScannerEnabled: true
+      clusterComplianceEnabled: true
+      accessGlobalSecretsAndServiceAccount: true
+      metricsVulnIdEnabled: true
+      metricsFindingsEnabled: true
+      exposedSecretScannerEnabled: true
+
+    image:
+      #TODO: change when v0.4.0 is released
+      tag: 0.4.0-rc
+
     trivy:
       ignoreUnfixed: false
-      # severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-      severity: MEDIUM,HIGH,CRITICAL
+      severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+      #severity: MEDIUM,HIGH,CRITICAL
 
     resources:
       requests:
@@ -40,4 +56,4 @@ spec:
 
     serviceMonitor:
       enabled: true
-      interval: "300s"
+      interval: "600s"
