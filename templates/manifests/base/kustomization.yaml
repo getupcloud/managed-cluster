@@ -15,4 +15,5 @@ resources:
 - helmrelease-teleport-agent.yaml
 - helmrelease-velero.yaml
 - helmrelease-velero-config.yaml
+- helmrelease-weave-gitops.yaml
 - helmrepository.yaml

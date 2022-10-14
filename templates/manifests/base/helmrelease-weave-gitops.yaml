@@ -16,13 +16,3 @@ spec:
       create: true
       username: <UPDATE>
       passwordHash: <UPDATE>
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: HelmRepository
-metadata:
-  name: ww-gitops
-  namespace: flux-system
-spec:
-  interval: 1h0m0s
-  type: oci
-  url: oci://ghcr.io/weaveworks/charts
