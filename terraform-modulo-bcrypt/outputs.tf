@@ -1,9 +1,9 @@
-output "this_password" {
+output "password_plain" {
   value = random_password.this.result
   sensitive = true
 }
 
-output "this_password_bcrypt" {
+output "password_bcrypt" {
   value = bcrypt(random_password.this.result)
   sensitive = true
 }
