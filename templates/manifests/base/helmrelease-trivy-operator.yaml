@@ -31,7 +31,7 @@ spec:
       vulnerabilityScannerEnabled: true
       configAuditScannerEnabled: true
       rbacAssessmentScannerEnabled: true
-      clusterComplianceEnabled: true
+      clusterComplianceEnabled: false
       accessGlobalSecretsAndServiceAccount: true
       metricsVulnIdEnabled: true
       metricsFindingsEnabled: true
