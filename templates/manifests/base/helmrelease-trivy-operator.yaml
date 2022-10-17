@@ -4,13 +4,15 @@ metadata:
   name: trivy-operator
   namespace: flux-system
 spec:
+  # waiting for relevease 0.4
+  suspend: true
   chart:
     spec:
       chart: trivy-operator
       sourceRef:
         kind: HelmRepository
         name: aqua
-      version: "~> 0.3"
+      version: "~> 0.4"
   install:
     createNamespace: true
     disableWait: true
@@ -31,15 +33,11 @@ spec:
       vulnerabilityScannerEnabled: true
       configAuditScannerEnabled: true
       rbacAssessmentScannerEnabled: true
-      clusterComplianceEnabled: false
+      clusterComplianceEnabled: true
       accessGlobalSecretsAndServiceAccount: true
       metricsVulnIdEnabled: true
       metricsFindingsEnabled: true
       exposedSecretScannerEnabled: true
-
-    image:
-      #TODO: change when v0.4.0 is released
-      tag: 0.4.0-rc
 
     trivy:
       ignoreUnfixed: false
