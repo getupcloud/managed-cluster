@@ -1,4 +1,4 @@
-FROM ghcr.io/getupcloud/managed-cluster-base:v1.5.25
+FROM ghcr.io/getupcloud/managed-cluster-base:v1.5.26
 
 ENV \
     DOCTL_VERSION="1.63.1" \
@@ -6,7 +6,7 @@ ENV \
     GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
     HCL2JSON_VERSION="v0.3.3" \
     KIND_VERSION="v0.11.1" \
-    KREW_PLUGINS="tree kvaps/node-shell deprecations sniff lineage kurt modify-secret explore" \
+    KREW_PLUGINS="access-matrix deprecations explore get-all kurt kvaps/node-shell lineage modify-secret outdated score sniff tree" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.2" \
     KREW_ROOT="/opt/krew" \
