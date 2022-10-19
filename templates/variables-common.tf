@@ -131,3 +131,20 @@ variable "post_create" {
   type        = list(string)
   default     = []
 }
+
+variable "modules_defaults" {
+  description = "Configure modules to install (defaults)"
+  type = object({
+    linkerd = object({ enabled = bool })
+    trivy = object({ enabled = bool })
+  })
+
+  default = {
+    linkerd = {
+      enabled = false
+    }
+    trivy = {
+      enabled = false
+    }
+  }
+}

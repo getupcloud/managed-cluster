@@ -19,5 +19,6 @@ patchesJson6902:
 
 patchesStrategicMerge:
 - helmrelease-ingress-nginx.yaml
+- helmrelease-monitoring.yaml
 - helmrelease-velero-config.yaml
 - helmrelease-velero.yaml

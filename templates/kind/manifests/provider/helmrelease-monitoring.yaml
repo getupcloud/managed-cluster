@@ -1,0 +1,14 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: monitoring
+  namespace: flux-system
+spec:
+  values:
+    prometheus:
+      prometheusSpec:
+        replicas: 1
+        retention: 1d
+    alertmanager:
+      alertmanagerSpec:
+        replicas: 1
