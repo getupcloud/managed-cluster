@@ -442,10 +442,11 @@ spec:
           editable: true
 
       dashboards:
-        trivy-image-vulnerability:
-          gnetId: 17214
-          revision: 1
-          datasource: Prometheus
+        default:
+          trivy-image-vulnerability:
+            gnetId: 17214
+            revision: 1
+            datasource: Prometheus
 
       adminUsername: admin
       #adminPassword: prom-operator
