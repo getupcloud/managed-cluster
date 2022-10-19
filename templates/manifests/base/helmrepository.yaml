@@ -196,3 +196,21 @@ metadata:
 spec:
   interval: 1h
   url: https://helm.linkerd.io/stable
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: policy-reporter
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://kyverno.github.io/policy-reporter
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: trivy-operator-polr-adapter
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://fjogeleit.github.io/trivy-operator-polr-adapter

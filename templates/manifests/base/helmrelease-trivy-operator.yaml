@@ -4,7 +4,7 @@ metadata:
   name: trivy-operator
   namespace: flux-system
 spec:
-  # waiting for relevease 0.4
+  # waiting for trivy-operator 0.4
   suspend: true
   chart:
     spec:
