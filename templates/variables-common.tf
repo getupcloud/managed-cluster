@@ -136,7 +136,7 @@ variable "modules_defaults" {
   description = "Configure modules to install (defaults)"
   type = object({
     linkerd = object({ enabled = bool })
-    trivy = object({ enabled = bool })
+    trivy   = object({ enabled = bool })
   })
 
   default = {
