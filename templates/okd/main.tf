@@ -6,10 +6,10 @@ module "cluster" {
   cluster_name    = var.name
   cluster_sla     = var.sla
   cluster_type    = local.cluster_type
-  use_kubeconfig  = true
+  use_kubeconfig  = var.use_kubeconfig
   pre_create      = var.pre_create
   post_create     = var.post_create
-  generic_modules = var.okd_modules
+  generic_modules = local.generic_modules
 
   # monitoring and operations
   cronitor_enabled           = var.cronitor_enabled
