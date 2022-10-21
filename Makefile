@@ -92,17 +92,21 @@ install:
 	curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.4/hcl2json_linux_amd64 > /usr/local/bin/hcl2json
 	chmod +x /usr/local/bin/hcl2json
 
-test: TEST_BRANCH ?= $(shell git branch --show-current)
-test: DEFAULT_TEST_PARAMS=--branch $(TEST_BRANCH)
-test: VERSION=$(FILE_VERSION)-$(GIT_COMMIT)-test
-test: RELEASE=v$(FILE_VERSION)-$(GIT_COMMIT)-test
+test: TEST_BRANCH = $(shell git branch --show-current)
+test: DEFAULT_TEST_PARAMS = --branch $(TEST_BRANCH)
+test: VERSION := $(FILE_VERSION)-$(GIT_COMMIT)-test
+test: RELEASE := v$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: lint
-	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
+test:
+	@cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
 
 test-help:
 	@echo Usage: make test TEST_PARAMS="..."
 	@echo
 	@cd tests && ./test --help
+
+test-%:
+	make test TEST_PARAMS="--types $(subst test-,,$@) $(TEST_PARAMS)"
 
 lint:
 	for dir in templates/ templates/*/; do echo tflint $$dir && tflint $$dir; done
