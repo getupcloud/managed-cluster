@@ -37,5 +37,6 @@ module "eks" {
   region                       = var.region
   subnet_ids                   = var.subnet_ids
   tags                         = var.tags
+  cluster_tags                 = var.cluster_tags
   vpc_id                       = var.vpc_id
 }
