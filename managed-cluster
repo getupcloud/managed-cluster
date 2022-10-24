@@ -1165,7 +1165,7 @@ function check_update()
 
     if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
         has_updates=true
-        if ask "Remote repo has newer version (latest local: v$latest_local_version, latest remote: v$latest_remote_version). Download now? [Y/n]"; then
+        if ! ask "Remote repo has newer version (latest local: v$latest_local_version, latest remote: v$latest_remote_version). Download now? [y/N]"; then
             repo_fetch_remote upstream
             latest_local_version=$(get_latest_version)
         fi
@@ -1173,7 +1173,7 @@ function check_update()
 
     if [ "$(fmt_version $latest_local_version)" -gt "$(fmt_version $version)" ]; then
         has_updates=true
-        if ask "Upgrade to newer version ${latest_local_version}? [Y/n]"; then
+        if ! ask "Upgrade to newer version ${latest_local_version}? [y/N]"; then
             ask_execute_command git merge v${latest_local_version} -Xtheirs
             current_version=$(get_current_version)
             set_config version="$latest_local_version" "Installer version" $REPO_CONF
