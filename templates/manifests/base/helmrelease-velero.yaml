@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: velero
-      version: 2.23.5
+      version: "~> 2.32.1"
   install:
     createNamespace: true
     disableWait: false
@@ -39,13 +39,17 @@ spec:
 
     tolerations:
     - effect: NoSchedule
-      key: dedicated
-      value: infra
-    - effect: NoSchedule
-      key: CriticalAddonsOnly
+      operator: Exists
 
-    nodeSelector:
-      role: infra
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: role
+              operator: In
+              values:
+              - infra
 
     resources:
       requests:
@@ -59,3 +63,100 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
+      prometheusRule:
+        enabled: true
+        spec:
+        - alert: VeleroBackupPartialFailures
+          expr: velero_backup_partial_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+          for: 15m
+          labels:
+            service: backup
+            severity: warning
+          annotations:
+            message: "Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} partialy failed backups."
+            summary: "Some backups have partialy failed"
+
+        - alert: VeleroBackupFailures
+          expr: velero_backup_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+          for: 15m
+          labels:
+            service: backup
+            severity: warning
+          annotations:
+            message: "Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} failed backups."
+            summary: "Some backups have failed"
+
+        - alert: VeleroBackupPartialFailures
+          expr: sum(rate(velero_backup_partial_failure_total{schedule!=""}[24h])) > 0
+          for: 10m
+          labels:
+            service: backup
+            severity: critical
+          annotations:
+            message: "Velero backup {{ $labels.schedule }} has {{ $value }} partialy failed backups."
+            summary: "Some backups have partialy failed"
+
+        - alert: VeleroBackupFailures
+          expr: sum(rate(velero_backup_failure_total{schedule!=""}[24h])) > 0
+          for: 10m
+          labels:
+            service: backup
+            severity: critical
+          annotations:
+            message: "Velero backup {{ $labels.schedule }} has {{ $value }} failed backups."
+            summary: "Some backups have failed"
+
+        - alert: BackupNotActive
+          expr: absent(kube_pod_container_status_ready{namespace="velero"} == 1)
+          for: 10m
+          labels:
+            service: backup
+            severity: critical
+          annotations:
+            message: "Velero is not installed or has stopped."
+            summary: "Velero not active"
+
+        - alert: BackupNotConfigured
+          expr: sum(velero_backup_total[24h]) == 0
+          for: 24h
+          labels:
+            service: backup
+            severity: critical
+          annotations:
+            message: "Velero has not created any backups in the last 24h. Please check Schedules."
+            summary: "No Velero backups found"
+
+    schedules:
+      volumes:
+        schedule: '0 3 * * *'
+        template:
+          storageLocation: default
+          ttl: 168h0m0s
+
+          labelSelector: {}
+          includedResources:
+          - persistentvolumeclaims
+          - persistentvolumes
+          includeClusterResources: true
+
+          snapshotVolumes: true
+
+      resources:
+        schedule: '0 */12 * * *'
+        template:
+          storageLocation: default
+          ttl: 720h0m0s
+
+          labelSelector: {}
+          includedNamespaces:
+          - "*"
+          excludedNamespaces:
+          - kube-public
+          - monitoring
+          - velero
+          includedResources:
+          - "*"
+          excludedResources: []
+          includeClusterResources: true
+
+          snapshotVolumes: false
