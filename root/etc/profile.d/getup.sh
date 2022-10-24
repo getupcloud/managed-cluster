@@ -195,7 +195,7 @@ ask()
 {
   unset ask_response
   read -e -p "$(prompt COLOR_GREEN "$@")" ask_response
-  export ask_response="${ask_response:-y}"
+  export ask_response="${ask_response:-${_default:-y}}"
 
   case "${ask_response,,}" in
     y|yes|s|sim) return 0;;
