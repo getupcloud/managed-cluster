@@ -246,7 +246,11 @@ ask_execute_command()
     read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
   fi
 
-  res="${res:-y}"
+  if [ "_default" == n ]; then
+    res="${res:-n}"
+  else
+    res="${res:-y}"
+  fi
 
   case "${res,,}" in
     y|yes|s|sim) "$@"
