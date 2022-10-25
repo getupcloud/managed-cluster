@@ -14,5 +14,4 @@ resources:
 - helmrelease-trivy-operator.yaml
 - helmrelease-teleport-agent.yaml
 - helmrelease-velero.yaml
-- helmrelease-velero-config.yaml
 - helmrepository.yaml

@@ -2,11 +2,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- helmrepository.yaml
-- helmrelease-metrics-server.yaml
 - helmrelease-aws-ebs-csi-driver.yaml
 - helmrelease-aws-efs-csi-driver.yaml
 - helmrelease-aws-load-balancer-controller.yaml
+- helmrelease-metrics-server.yaml
+- helmrelease-velero.yaml
+- helmrepository.yaml
 
 #patchesJson6902:
 #- target:
