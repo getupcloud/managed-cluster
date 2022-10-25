@@ -8,7 +8,7 @@ resources:
 - helmrelease-metrics-server.yaml
 - helmrepository.yaml
 
-patches:
+patchesStrategicMerge:
 - helmrelease-velero.yaml
 
 #patchesJson6902:
