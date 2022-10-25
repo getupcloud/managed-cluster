@@ -33,7 +33,7 @@ spec:
         create: true
         name: velero
         annotations:
-          eks.amazonaws.com/role-arn: ${modules_output.velero.iam_role_name}
+          eks.amazonaws.com/role-arn: ${modules_output.velero.iam_role_arn}
 
 #    # Auth via accesskey
 #    credentials:
