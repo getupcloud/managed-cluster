@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+- ../base/
 - helmrelease-aws-ebs-csi-driver.yaml
 - helmrelease-aws-efs-csi-driver.yaml
 - helmrelease-aws-load-balancer-controller.yaml
