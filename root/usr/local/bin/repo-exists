@@ -6,7 +6,7 @@ source /etc/profile.d/getup.sh
 
 cd $REPO_DIR
 
-if ! gh auth status; then
+if ! gh auth status >/dev/null 2>&1; then
     gh auth login
 fi
 

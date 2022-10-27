@@ -19,19 +19,16 @@ if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
   exit 1
 fi
 
-if ! repo-exists 2>/dev/null; then
+if ! repo-exists; then
     ask_execute_command repo-setup
 fi
 
 KUSTOMIZE_BUILD=/tmp/.kustomize_build.yaml
-if ! ask_execute_command kustomize build /cluster/manifests/cluster/ -o $KUSTOMIZE_BUILD; then
-    if ask "See failed file $KUSTOMIZE_BUILD? [Y/n]"; then
-        less $KUSTOMIZE_BUILD
-    fi
-else
+if ask_execute_command kustomize build /cluster/manifests/cluster/ -o $KUSTOMIZE_BUILD; then
     echo Passed
 fi
-#ask_execute_command kubectl apply --kustomize $CLUSTER_DIR/manifests/cluster/ --dry-run=client --validate=false
+
+check-unused-manifests || true
 
 FZF_PREVIEW="
 if [ {1} == '??' ]; then

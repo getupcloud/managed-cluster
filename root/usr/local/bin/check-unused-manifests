@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+#
+# Find resources not referenced in kustomization files.
+#
+
+import os, sys
+import glob
+from pathlib import PurePath
+
+try:
+    from yaml import load, CLoader as Loader
+except ImportError:
+    from yaml import load, Loade
+
+try:
+    dir = sys.argv[1]
+except:
+    dir = "/cluster/manifests/cluster/"
+
+unused = []
+print("Detecting unused resources: ", end='', flush=True)
+
+def verify_dir(dir):
+    dir = os.path.abspath(dir)
+    #print(f'Validating kustomize dir {dir}')
+    k_path = os.path.join(dir, 'kustomization.yaml')
+    k = load(open(k_path, 'r'), Loader=Loader)
+    resources = sorted([
+        os.path.abspath(PurePath(dir, r))
+        for r in (k.get('resources', []) + k.get('patchesStrategicMerge', []))
+    ])
+    files = sorted([
+        os.path.abspath(f) for f in glob.glob(os.path.join(dir, "*"))
+        if not f.endswith('/kustomization.yaml') and not f.endswith('.tpl')
+    ])
+
+    for f_path in files:
+        if f_path not in resources:
+            unused.append(f_path)
+            continue
+
+    for r_dir in [ r for r in resources if os.path.isdir(r) ]:
+        verify_dir(r_dir)
+
+    return
+
+if os.path.isdir(dir):
+    verify_dir(dir)
+
+if unused:
+    print('\n', '\n'.join([ f'- {f}' for f in unused ]), sep='')
+else:
+    print("none")

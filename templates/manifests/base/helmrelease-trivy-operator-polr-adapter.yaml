@@ -4,8 +4,6 @@ metadata:
   name: trivy-operator-polr-adapter
   namespace: flux-system
 spec:
-  # waiting for trivy-operator 0.4
-  suspend: true
   chart:
     spec:
       chart: trivy-operator-polr-adapter
