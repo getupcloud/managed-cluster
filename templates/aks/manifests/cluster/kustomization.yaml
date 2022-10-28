@@ -6,6 +6,7 @@ resources:
 #- ../provider/
 
 patchesStrategicMerge:
+- excludes.yaml
 - helmrelease-ingress-nginx.yaml
 - helmrelease-logging.yaml
 - helmrelease-monitoring.yaml

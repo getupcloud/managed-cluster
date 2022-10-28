@@ -27,7 +27,7 @@ RUN INSTALL_PACKAGES="vim-enhanced sudo docker-ce-cli \
     chmod +s /usr/bin/docker && \
     pip3 install giturlparse.py && \
     pip3 install setuptools-rust wheel && \
-    pip3 install azure-cli awscli
+    pip3 install azure-cli awscli pyyaml
 
 RUN curl -kLO https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-363.0.0-darwin-arm.tar.gz && \
     tar -xvzf google-cloud-sdk-363.0.0-darwin-arm.tar.gz && \

@@ -47,6 +47,9 @@ spec:
         cpu: 100m
         memory: 128Mi
 
+    node:
+      tolerateAllTaints: true
+
     storageClasses:
     - name: gp2-csi
       parameters:

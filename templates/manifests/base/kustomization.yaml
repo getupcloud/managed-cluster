@@ -2,16 +2,20 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- helmrelease-cert-manager.yaml
 - helmrelease-cert-manager-config.yaml
+- helmrelease-cert-manager.yaml
+- helmrelease-cluster-autoscaler.yaml
 - helmrelease-falco.yaml
 - helmrelease-ingress-nginx.yaml
 - helmrelease-kube-opex-analytics.yaml
+- helmrelease-kyverno.yaml
 - helmrelease-linkerd.yaml
 - helmrelease-logging.yaml
-- helmrelease-monitoring.yaml
 - helmrelease-monitoring-config.yaml
-- helmrelease-trivy-operator.yaml
+- helmrelease-monitoring.yaml
+- helmrelease-policy-reporter.yaml
 - helmrelease-teleport-agent.yaml
+- helmrelease-trivy-operator-polr-adapter.yaml
+- helmrelease-trivy-operator.yaml
 - helmrelease-velero.yaml
 - helmrepository.yaml

@@ -11,13 +11,4 @@ resources:
 
 patchesStrategicMerge:
 - helmrelease-velero.yaml
-
-#patchesJson6902:
-#- target:
-#    group: storage.k8s.io
-#    version: v1
-#    kind: StorageClass
-#    name: gp2
-#  patch: |-
-#    - op: remove
-#      path: /metadata/annotations/storageclass.kubernetes.io/is-default-class
+- helmrelease-cluster-autoscaler.yaml

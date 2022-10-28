@@ -31,7 +31,7 @@ spec:
 
     velero:
       prometheusRules:
-        enabled: true
+        enabled: false
 
     rabbitmq:
       prometheusRules:

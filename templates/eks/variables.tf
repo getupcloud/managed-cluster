@@ -70,12 +70,6 @@ variable "vpc_cni_k8s_url" {
   default     = "https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/v1.7.5/config/v1.7/calico.yaml"
 }
 
-variable "metrics_server_url" {
-  description = "URL to Metrics Server deployment"
-  type        = string
-  default     = "https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml"
-}
-
 variable "eks_addons" {
   description = "Manages an EKS add-on"
   type        = any

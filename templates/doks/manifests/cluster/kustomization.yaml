@@ -6,4 +6,5 @@ resources:
 - https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
 
 patchesStrategicMerge:
+- excludes.yaml
 - helmrelease-velero.yaml

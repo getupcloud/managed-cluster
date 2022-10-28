@@ -5,4 +5,5 @@ resources:
 - ../base/
 
 patchesStrategicMerge:
+- excludes.yaml
 - helmrelease-falco.yaml

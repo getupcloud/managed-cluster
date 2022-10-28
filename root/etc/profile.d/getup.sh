@@ -240,13 +240,21 @@ ask_any()
 
 ask_execute_command()
 {
-  if [ $BASH_VERSINFO -lt 5 ]; then
-    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
+  local _default="${_default:-y}"
+
+  if [ "$_default" == "n" ]; then
+    local _sel="[y/N]"
   else
-    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? [Y/n]")" res
+    local _sel="[Y/n]"
   fi
 
-  if [ "_default" == n ]; then
+  if [ $BASH_VERSINFO -lt 5 ]; then
+    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}] now? $_sel")" res
+  else
+    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? $_sel")" res
+  fi
+
+  if [ "$_default" == "n" ]; then
     res="${res:-n}"
   else
     res="${res:-y}"

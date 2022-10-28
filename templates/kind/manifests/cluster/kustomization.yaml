@@ -4,6 +4,5 @@ kind: Kustomization
 resources:
 - ../provider/
 
-patchesJson6902: []
-
-patchesStrategicMerge: []
+patchesStrategicMerge:
+- excludes.yaml
