@@ -26,6 +26,8 @@ spec:
   targetNamespace: kube-system
   storageNamespace: kube-system
   values:
+    args:
+    - --kubelet-insecure-tls
     metrics:
       enabled: true
     serviceMonitor:
