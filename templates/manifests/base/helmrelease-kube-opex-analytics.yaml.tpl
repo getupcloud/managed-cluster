@@ -67,9 +67,6 @@ spec:
   targetNamespace: kube-opex-analytics
   releaseName: kube-opex-analytics
   values:
-    image:
-      repository: getupcloud/kube-opex-analytics
-
     envs:
       KOA_COST_MODEL: RATIO
       KOA_BILLING_CURRENCY_SYMBOL: "R$"
@@ -80,3 +77,11 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
+---
+apiVersion: v1
+data:
+  KOA_GOOGLE_API_KEY: ""
+kind: Secret
+metadata:
+  name: kube-opex-analytics-secrets
+  namespace: kube-opex-analytics
