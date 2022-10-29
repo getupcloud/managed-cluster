@@ -1,0 +1,26 @@
+#
+# Insert here resources you want to exclude from generated manifests
+#
+
+#---
+#$patch: delete
+#apiVersion: helm.toolkit.fluxcd.io/v2beta1
+#kind: HelmRelease
+#metadata:
+#  name: falco
+#  namespace: flux-system
+#---
+#$patch: delete
+#apiVersion: helm.toolkit.fluxcd.io/v2beta1
+#kind: HelmRelease
+#metadata:
+#  name: falco-exporter
+#  namespace: flux-system
+
+#---
+#$patch: delete
+#apiVersion: v1
+#kind: Deployment
+#metadata:
+#  name: api
+#  namespace: shopping

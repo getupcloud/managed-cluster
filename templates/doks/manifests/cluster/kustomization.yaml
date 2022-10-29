@@ -8,3 +8,5 @@ resources:
 patchesStrategicMerge:
 - excludes.yaml
 - helmrelease-velero.yaml
+
+patchesJson6902: []

@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
 - ../base/
-#- ../provider/
 
 patchesStrategicMerge:
 - excludes.yaml
@@ -11,3 +10,5 @@ patchesStrategicMerge:
 - helmrelease-logging.yaml
 - helmrelease-monitoring.yaml
 - helmrelease-velero.yaml
+
+patchesJson6902: []

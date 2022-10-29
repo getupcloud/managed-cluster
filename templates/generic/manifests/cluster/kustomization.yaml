@@ -6,3 +6,5 @@ resources:
 
 patchesStrategicMerge:
 - excludes.yaml
+
+patchesJson6902: []

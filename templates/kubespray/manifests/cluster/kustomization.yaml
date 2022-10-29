@@ -7,3 +7,5 @@ resources:
 patchesStrategicMerge:
 - excludes.yaml
 - helmrelease-falco.yaml
+
+patchesJson6902: []
