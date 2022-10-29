@@ -100,8 +100,6 @@ spec:
           # service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
           # service.beta.kubernetes.io/aws-load-balancer-type: external
 
-
-
       tolerations:
       - effect: NoSchedule
         key: dedicated

@@ -11,13 +11,6 @@ spec:
         enabled: false
       metrics:
         enabled: true
-        serviceMonitor:
-          enabled: false
-      podSecurityPolicy:
-        enabled: true
-      service:
-        enabled: true
-        type: NodePort
 
-    defaultBackend:
-      enabled: false
+      service:
+        type: NodePort

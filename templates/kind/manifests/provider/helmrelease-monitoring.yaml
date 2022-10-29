@@ -6,9 +6,22 @@ metadata:
 spec:
   values:
     prometheus:
+      ingress:
+        enabled: true
+        hosts:
+          - prometheus.localhost.localdomain
       prometheusSpec:
         replicas: 1
         retention: 1d
     alertmanager:
       alertmanagerSpec:
         replicas: 1
+      ingress:
+        enabled: true
+        hosts:
+          - alertmanager.localhost.localdomain
+    grafana:
+      ingress:
+        enabled: true
+        hosts:
+          - grafana.localhost.localdomain
