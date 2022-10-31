@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+info Switching to $REPO_DIR
+cd $REPO_DIR
+
+origin=$(git remote get-url origin)
+if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
+   || [ "$origin" == git@github.com:getupcloud/managed-cluster.git ]; then
+
+  warn Refusing to push code to upstream repository: $origin
+  warn Execute \`managed-cluster setup-remote\` and try again.
+  warn Current remotes:
+  git remote -v
+  exit 1
+fi
+
+repo-validate
+
+FZF_PREVIEW="
+if [ {1} == '??' ]; then
+  [ -d {2} ] && tree {2} || cat {2}
+else
+  git diff --color {2}
+fi
+"
+
+if ask "Select files to commit now? [Y/n]"; then
+    FILES_TO_COMMIT=(
+        $(git status --short repo.conf clusters/$name/$type | fzf -0 --ansi --reverse --multi --disabled \
+            --header='---[ Select files to commit (ctrl+a to select all) ]---' \
+            --preview "$FZF_PREVIEW" \
+            --bind 'ctrl-a:select-all' \
+            | awk '{print $2}'
+        )
+    )
+
+    if [ ${#FILES_TO_COMMIT[*]} -eq 0 ]; then
+        if ! ask "Nothing to commit. Continue anyway? [y/N]"; then
+            exit 0
+        fi
+    else
+        echo
+        info Commiting files:
+        printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
+        git add "${FILES_TO_COMMIT[@]}"
+        git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$name/$type"
+    fi
+fi

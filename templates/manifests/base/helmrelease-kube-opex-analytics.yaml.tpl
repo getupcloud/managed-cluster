@@ -40,6 +40,19 @@ volumes:
 - secret
 %{~ endif }
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-opex-analytics
+---
+apiVersion: v1
+data:
+  KOA_GOOGLE_API_KEY: ""
+kind: Secret
+metadata:
+  name: kube-opex-analytics-secrets
+  namespace: kube-opex-analytics
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -77,11 +90,3 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
----
-apiVersion: v1
-data:
-  KOA_GOOGLE_API_KEY: ""
-kind: Secret
-metadata:
-  name: kube-opex-analytics-secrets
-  namespace: kube-opex-analytics
