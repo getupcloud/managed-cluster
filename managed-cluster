@@ -640,7 +640,7 @@ function getopt_create()
                 opt_local_git_repo=true
                 opt_flux_git_repo="$local_git_repo"
                 ssh_host="$local_git_repo_address"
-                info "Using flux git repo: $local_git_repo"
+                info "Using flux git repo: $opt_flux_git_repo"
             ;;
             -o|--origin)
                 [ $# -lt 2 ] && invalid_argument $1
@@ -738,8 +738,12 @@ function create_repo_config()
     [ -z "$upstream" ] && upstream="$default_upstream"
     read_config upstream "Set UPSTREAM remote"
 
-    [ -z "$origin" ] && origin="$(git-url $(git_remote origin) url2ssh)"
-    origin=${origin%.git}-$customer.git
+    if $opt_local_git_repo; then
+      origin=$opt_flux_git_repo
+    elif [ -z "$origin" ]; then
+      origin="$(git-url $(git_remote origin) url2ssh)"
+      origin=${origin%.git}-$customer.git
+    fi
     read_config origin "Set ORIGIN remote"
 
     flux_git_repo=${origin#git://}

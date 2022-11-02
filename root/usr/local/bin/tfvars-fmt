@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import sys, os
+import json
+
+try:
+    tfvars_file = sys.argv[1]
+except:
+    tfvars_file = '/cluster/terraform.tfvars'
+
+def parse_tfvars(file):
+    blocks = []
+    with open(file, 'r') as f:
+        block = []
+        start = 0
+        var = None
+
+        for n, line in enumerate(f.readlines(), 1):
+            start = n if not block else start
+
+            if line.strip() == '': # end of block
+                if block:
+                    blocks.append({
+                        'start': start,
+                        'lines': list(block),
+                        'var': var.strip(' #'),
+                    })
+                block.clear()
+                var = None
+                continue
+
+            if not var:
+                if not line.lstrip().startswith('#'):
+                    var = line.split('=')[0]
+                elif '=' in line:
+                    var = line.split('=')[0]
+
+            block.append(line.rstrip('\n'))
+    return sorted(blocks, key=lambda x: x.get('var'))
+
+#print(json.dumps(parse_tfvars(tfvars_file)))
+
+for block in parse_tfvars(tfvars_file):
+    print('\n'.join(block.get('lines')))
+    print()

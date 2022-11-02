@@ -104,9 +104,14 @@ test-help:
 	@echo Usage: make test TEST_PARAMS="..."
 	@echo
 	@cd tests && ./test --help
+	@echo
+	@echo Targets: test, test-{type}, test-iter
 
 test-%:
 	make test TEST_PARAMS="--types $(subst test-,,$@) $(TEST_PARAMS)"
+
+test-iter:
+	make test TEST_PARAMS="-i $(TEST_PARAMS)"
 
 lint:
 	for dir in templates/ templates/*/; do echo tflint $$dir && tflint $$dir; done
