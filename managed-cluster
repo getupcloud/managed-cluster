@@ -611,7 +611,7 @@ ssh_host=github.com
 local_git_repo_user=git
 local_git_repo_address=$(get_local_ip 2>/dev/null)
 local_git_repo_path=/git
-local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}${local_git_repo_path}"
+local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}:2222${local_git_repo_path}"
 default_upstream=git@github.com:getupcloud/managed-cluster.git
 common_template_files=(
     manifests
