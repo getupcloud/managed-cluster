@@ -225,18 +225,30 @@ function generate_ssh_key()
         ssh-keygen -yf $_key_priv > $_key_pub
     fi
 
-    info Generating $_kh for $ssh_host
-    ssh-keyscan $ssh_host > $_kh
-
     if $opt_local_git_repo; then
         info Updating local ssh config
         local _key_pub_data=$(cut -f1-2 -d' ' $_key_pub)
         local _key_fp=$(ssh-keygen -l -E md5 -f $_key_pub | cut -f2 -d' ')
-        if ! grep -q "$_key_pub_data" ~/.ssh/authorized_keys; then
+        if ! grep -q "$_key_pub_data" $HOME/.ssh/authorized_keys; then
             info "Appending ssh key ($_key_fp) to $HOME/.ssh/authorized_keys"
             cat $_key_pub >> $HOME/.ssh/authorized_keys
             chmod 600 $HOME/.ssh/authorized_keys
         fi
+        info "Generating static $_kh for $ssh_host"
+        local static_known_hosts=(
+            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGCqvxcZO6VUWq+mz3ybMgsVDJbVGeYF02hCCsnrdoLD/pZyijfjp3UCVlMj2lMhJz6iFwhnSi8w+3EkYGPn3ws="
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/sYED/XeGeSv5PFFA9XE7DLdIkUpjDYD4XD3a7n0Gc"
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDinq0LyTjv49feM9fAzTkE5QFCXQWdFBN95QpVrqEPANzgZKuvlwYg/KwjoxYiz0+CTEkedVKNdvwxCvi15B9Ucfnvz0uGS2+CU0M85dSAspGn92EBCFl/gMfXWcxV8PmTokRozQBHsIbzeDeynTBkPHN2rmsywDTptiaa7gZiTTWpiA0xwmJpVPflQllWvboxHh2RYBSHFsVLzteX+FSvSh0b2cRSA0GZovC6KeYUywHft+6/dia7/erbBa5MRgFWXEkUM6R0SDPU/6kKasC8DZiLvGJjCfUP1ycMmLV6rsgAtK/OlIsjz/WuKqlrf1D0KTL9ucsca6RSRJuu7eaNE7/rAN1ZBCO9HScWyTky165biq60hdkK4o5LvfgAs5C7/xzsnks/3pvzfC9Oe++o9BKUI2UT/TQhLc72jqgHy+K5X+bYRAIiHPoB/ASgXr1tmDIGVxhVeIe4oKLe5zJQTGU1Uw45fvsU7A/7OFLplkVdxmoPWQhcVMF3pdUHBXU="
+        )
+        local hosts=(git git.flux-system.svc git.flux-system.svc.cluster.local)
+        for h in "${hosts[@]}"; do
+            for i in "${static_known_hosts[@]}"; do
+                echo "$h $i"
+            done
+        done >$_kh
+    else
+        info "Generating $_kh for $ssh_host"
+        ssh-keyscan $ssh_host >$_kh
     fi
 }
 
@@ -454,7 +466,7 @@ function usage()
         echo "Run \`$0 --help\` for full help."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "create" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "create" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
@@ -462,9 +474,9 @@ function usage()
         echo "     -c, --customer NAME        Customer name."
         echo "         --force                Force create even if CLUSTER-DIR exists."
         echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
-        echo "         --local-git-repo       Force flux-git-repo to '$local_git_repo'. Implies -f and -H. (default: false)"
+        echo "     -l, --local-git-repo       Force flux-git-repo to '$local_git_repo'. Implies -f and -H. (default: false)"
         echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
-        echo "     -l, --ssh-key-length       SSH key length, depends on ssh key type."
+        echo "         --ssh-key-length       SSH key length, depends on ssh key type."
         echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
         echo "     -n, --name NAME            Unique name for new cluster."
         echo "     -o, --origin REMOTE        Define ORIGIN remote address."
@@ -473,7 +485,7 @@ function usage()
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "start" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "start" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
@@ -487,19 +499,19 @@ function usage()
         echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "repo-pull" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "repo_pull" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Pulls from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
     fi
 
-    if [ -z "$command" ] || [ "$command" == "update" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "update" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> update" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Fetch 'upstream' remote and merge from a newer version." "$COLOR_RESET"
     fi
 
-    if [ -z "$command" ] || [ "$command" == "sync-template" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "sync_template" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> sync-template [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Sync files from ./templates/\$type into CLUSTER-DIR." "$COLOR_RESET"
@@ -507,7 +519,7 @@ function usage()
         echo "         --force                    Force template sync."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "remote-setup" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "remote_setup" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> remote-setup [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Update local remote upstream." "$COLOR_RESET"
@@ -517,7 +529,7 @@ function usage()
         echo "     -u, --upstream REMOTE        Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "update-ssh-key" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "update_ssh_key" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> update-ssh-key [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Creates a new ssh key (doesn't pushes to git repo)." "$COLOR_RESET"
@@ -526,7 +538,7 @@ function usage()
         echo "     -l, --ssh-key-length            SSH key length, depends on ssh key type."
     fi
 
-    if [ -z "$command" ] || [ "$command" == "install-teleport" ]; then
+    if [ -z "$_command" ] || [ "$_command" == "install_teleport_agent" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> install-teleport-agent" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Installs teleport-agent as a systemd service" "$COLOR_RESET"
@@ -538,7 +550,7 @@ function usage()
 #        echo "  -> import-variables [PREFIX SOURCE]...  Adds PREFIX to terraform variables from SOURCE." "$COLOR_RESET"
 #    fi
 
-    if [ -z "$command" ]; then
+    if [ -z "$_command" ]; then
         echo
         echo "  SSH default key lengths:"
         echo "    rsa: $ssh_key_length_rsa"
@@ -596,10 +608,10 @@ ssh_key_length_ecdsa=521
 ssh_key_type=ecdsa
 ssh_key_length=0
 ssh_host=github.com
-local_git_repo_user=$USER
+local_git_repo_user=git
 local_git_repo_address=$(get_local_ip 2>/dev/null)
-local_git_repo_path=$PWD
-local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}${local_git_repo_path}/.git"
+local_git_repo_path=/git
+local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_address}${local_git_repo_path}"
 default_upstream=git@github.com:getupcloud/managed-cluster.git
 common_template_files=(
     manifests
@@ -620,7 +632,7 @@ opt_sla=
 opt_flux_git_repo=
 opt_local_git_repo=false
 
-function getopt_c() { getopt_create "$@"; }
+function getopt_c() { _command=create && getopt_create "$@"; }
 function getopt_create()
 {
     while [ $# -gt 0 ]; do
@@ -636,7 +648,7 @@ function getopt_create()
                 shift
                 opt_flux_git_repo=$1
             ;;
-            --local-git-repo)
+            -l|--local-git-repo)
                 opt_local_git_repo=true
                 opt_flux_git_repo="$local_git_repo"
                 ssh_host="$local_git_repo_address"
@@ -672,7 +684,7 @@ function getopt_create()
                 shift
                 ssh_key_type=$1
             ;;
-            -l|--ssh-key-length)
+            --ssh-key-length)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 ssh_key_length=$1
@@ -699,7 +711,7 @@ function getopt_create()
     fi
 }
 
-function command_c() { command_create "$@"; }
+function command_c() { _command=create && command_create "$@"; }
 function command_create()
 {
     set -e
@@ -794,10 +806,19 @@ function save_cluster_config()
 ## COMMAND: install-teleport-agent ##
 #####################################
 
-function getopt_ita() { getopt_install_teleport_agent "$@"; }
+function getopt_ita() { _command=install_teleport_agent && getopt_install_teleport_agent "$@"; }
 function getopt_install_teleport_agent()
 {
-    :
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h|--help)
+                usage
+            ;;
+            *)
+                invalid_argument $1
+        esac
+        shift
+    done
 }
 
 function command_ita() { command_install_teleport_agent "$@"; }
@@ -852,7 +873,7 @@ env_file=""
 force_docker_image_build=false
 sudo=sudo
 
-function getopt_s() { getopt_start "$@"; }
+function getopt_s() { _command=start && getopt_start "$@"; }
 function getopt_start()
 {
     while [ $# -gt 0 ]; do
@@ -971,7 +992,7 @@ function command_start()
 ## COMMAND: sync-template ##
 ############################
 
-function getopt_st() { getopt_sync_template "$@"; }
+function getopt_st() { _command=sync_template && getopt_sync_template "$@"; }
 function getopt_sync_template()
 {
     while [ $# -gt 0 ]; do
@@ -1011,11 +1032,14 @@ function command_sync_template()
 opt_upstream=
 opt_origin=
 
-function getopt_rs() { getopt_remote_setup "$@"; }
+function getopt_rs() { _command=remote_setup && getopt_remote_setup "$@"; }
 function getopt_remote_setup()
 {
     while [ $# -gt 0 ]; do
         case $1 in
+            -h|--help)
+                usage
+            ;;
             --force)
                 force=true
             ;;
@@ -1085,10 +1109,19 @@ function command_remote_setup()
 
 update_version=""
 
-function getopt_u() { getopt_update "$@"; }
+function getopt_u() { _command=update && getopt_update "$@"; }
 function getopt_update()
 {
-    :
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h|--help)
+                usage
+            ;;
+            *)
+                invalid_argument $1
+        esac
+        shift
+    done
 }
 
 function command_u() { command_update "$@"; }
@@ -1101,10 +1134,19 @@ function command_update()
 ## COMMAND: repo-pull    ##
 ###########################
 
-function getopt_rp() { getopt_repo_pull "$@"; }
+function getopt_rp() { _command=repo_pull && getopt_repo_pull "$@"; }
 function getopt_repo_pull()
 {
-    :
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h|--help)
+                usage
+            ;;
+            *)
+                invalid_argument $1
+        esac
+        shift
+    done
 }
 
 function command_rp() { command_repo_pull "$@"; }
@@ -1189,7 +1231,7 @@ function check_update()
 ## COMMAND: update-ssh-key ##
 #############################
 
-function getopt_usk() { getopt_update_ssh_key "$@"; }
+function getopt_usk() { _command=update_ssh_key && getopt_update_ssh_key "$@"; }
 function getopt_update_ssh_key()
 {
     while [ $# -gt 0 ]; do
@@ -1209,6 +1251,12 @@ function getopt_update_ssh_key()
             ;;
             --force)
                 force=true
+            ;;
+            --local-git-repo)
+                opt_local_git_repo=true
+                opt_flux_git_repo="$local_git_repo"
+                ssh_host="$local_git_repo_address"
+                info "Using flux git repo: $local_git_repo"
             ;;
             *)
                 if [ -z "$cluster_dir" ]; then
