@@ -6,7 +6,7 @@ metadata:
   namespace: ${ namespace }
 spec:
   interval: ${ reconcile_interval }
-  url: ssh://git@git.flux-system.svc.cluster.local/git
+  url: ${ git_repo }
   ref:
     branch: ${ git_branch }
   secretRef:
