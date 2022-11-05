@@ -25,11 +25,11 @@ def verify_dir(dir):
     #print(f'Validating kustomize dir {dir}')
     k_path = os.path.join(dir, 'kustomization.yaml')
     k = load(open(k_path, 'r'), Loader=Loader)
+    res = k.get('resources', None) or []
+    psm = k.get('patchesStrategicMerge', None) or []
     resources = sorted([
         os.path.abspath(PurePath(dir, r))
-        resources = k.get('resources', None) or []
-        resources = k.get('patchesStrategicMerge', None) or []
-        for r in (resources + patchesStrategicMerge)
+        for r in (res + psm)
     ])
     files = sorted([
         os.path.abspath(f) for f in glob.glob(os.path.join(dir, "*"))
