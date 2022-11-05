@@ -438,9 +438,10 @@ function usage()
         echo
         echo "Available commands and options:"
         echo
-        echo "    -d, --debug      Turn bash debug messages on (set -x). Implies --verbose."
-        echo "    -h, --help       This help message."
-        echo "    -v, --verbose    Turn verbose messages on."
+        echo "    -d, --debug            Turn bash debug messages on (set -x). Implies --verbose."
+        echo "    -h, --help             This help message."
+        echo "    -v, --verbose          Turn verbose messages on."
+        echo "    -U, --no-check-update  Do not check for updates from upstream repo (default: false)."
     else
         echo
         echo "Run \`$0 --help\` for full help."
@@ -459,6 +460,7 @@ function usage()
         echo "         --ssh-key-length       SSH key length, depends on ssh key type."
         echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
         echo "     -n, --name NAME            Unique name for new cluster."
+        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
         echo "     -o, --origin REMOTE        Define ORIGIN remote address."
         echo "     -s, --sla VALUE            Cluster SLA: high, low, none (default: $opt_sla)."
         echo "     -t, --type NAME            Cluster type: $(list_cluster_types)."
@@ -583,6 +585,7 @@ cluster_dir=""
 debug=false
 verbose=false
 force=false
+no_check_update=false
 ssh_key_length_rsa=4096
 ssh_key_length_dsa=1024
 ssh_key_length_ecdsa=521
@@ -1161,7 +1164,7 @@ function repo_fetch_remote()
 
 function check_update()
 {
-    if ! [ -e "$REPO_CONF" ]; then
+    if $no_check_update || ! [ -e "$REPO_CONF" ]; then
         return 0
     fi
 
@@ -1288,6 +1291,9 @@ while [ $# -gt 0 ]; do
         ;;
         -v|--verbose)
             verbose=true
+        ;;
+        -U|--no-check-update)
+            no_check_update=true
         ;;
         --)
             break
