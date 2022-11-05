@@ -38,6 +38,12 @@ testing "Can update flux git repo"
 run "./managed-cluster -v remote-setup --force -f flux-$FLUX_GIT_REPO"
 assert "grep -q flux_git_repo=flux-$FLUX_GIT_REPO $REPO_CONFIG"
 
+testing "Can create local git repo"
+run "./managed-cluster create --local-git-repo -c $CUSTOMER -n $NAME -t $TYPE -s none -k ecdsa -u $UPSTREAM "
+cat repo.conf
+assert "grep -q origin=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
+assert "grep -q flux_git_repo=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
+
 testing "Can create cluster with non-default key size"
 rm -f $CLUSTER_DIR/identity
 run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE -s none -k ecdsa -l 256 --force"

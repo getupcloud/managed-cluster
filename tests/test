@@ -29,13 +29,13 @@ function assert()
     local ret_code=$?
 
     if [ $ret_code -eq 0 ]; then
-        echo -n "${COLOR_GREEN}${COLOR_BOLD}PASSED ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@"
+        echo -n "${COLOR_GREEN}${COLOR_BOLD}PASSED ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: ${@@Q}"
         let PASS+=1
     else
-        echo -n "${COLOR_RED}${COLOR_BOLD}FAILED ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: $@"
+        echo -n "${COLOR_RED}${COLOR_BOLD}FAILED ${BASH_SOURCE[1]}[${BASH_LINENO[0]}]: ${@@Q}"
         let FAIL+=1
         echo ${COLOR_RESET}
-        exit
+        exit $ret_code
     fi
 
     echo ${COLOR_RESET}
@@ -182,7 +182,7 @@ fi
 
 testing "Starting $VERSION tests on branch $branch [$PWD]"
 
-make
+#make
 
 export types
 export branch
@@ -248,5 +248,5 @@ if $interactive; then
 fi
 
 for plan in $plans; do
-    run_test_plan $plan
+    run_test_plan $plan || exit $?
 done

@@ -98,7 +98,7 @@ test: VERSION := $(FILE_VERSION)-$(GIT_COMMIT)-test
 test: RELEASE := v$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: lint
 test:
-	@cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
+	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
 
 test-help:
 	@echo Usage: make test TEST_PARAMS="..."

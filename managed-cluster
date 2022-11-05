@@ -208,6 +208,14 @@ function select_cluster_sla()
     export sla
 }
 
+function set_local_git_repo()
+{
+    ssh_host="$local_git_repo_host"
+    opt_flux_git_repo="${opt_flux_git_repo:-$local_git_repo}"
+
+    info "Using local flux git repo: $local_git_repo"
+}
+
 function generate_ssh_key()
 {
     local _key_priv=$CLUSTER_DIR/identity
@@ -226,29 +234,19 @@ function generate_ssh_key()
     fi
 
     if $opt_local_git_repo; then
-        info Updating local ssh config
-        local _key_pub_data=$(cut -f1-2 -d' ' $_key_pub)
-        local _key_fp=$(ssh-keygen -l -E md5 -f $_key_pub | cut -f2 -d' ')
-        if ! grep -q "$_key_pub_data" $HOME/.ssh/authorized_keys; then
-            info "Appending ssh key ($_key_fp) to $HOME/.ssh/authorized_keys"
-            cat $_key_pub >> $HOME/.ssh/authorized_keys
-            chmod 600 $HOME/.ssh/authorized_keys
-        fi
         info "Generating static $_kh for $ssh_host"
         local static_known_hosts=(
             "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGCqvxcZO6VUWq+mz3ybMgsVDJbVGeYF02hCCsnrdoLD/pZyijfjp3UCVlMj2lMhJz6iFwhnSi8w+3EkYGPn3ws="
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/sYED/XeGeSv5PFFA9XE7DLdIkUpjDYD4XD3a7n0Gc"
             "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDinq0LyTjv49feM9fAzTkE5QFCXQWdFBN95QpVrqEPANzgZKuvlwYg/KwjoxYiz0+CTEkedVKNdvwxCvi15B9Ucfnvz0uGS2+CU0M85dSAspGn92EBCFl/gMfXWcxV8PmTokRozQBHsIbzeDeynTBkPHN2rmsywDTptiaa7gZiTTWpiA0xwmJpVPflQllWvboxHh2RYBSHFsVLzteX+FSvSh0b2cRSA0GZovC6KeYUywHft+6/dia7/erbBa5MRgFWXEkUM6R0SDPU/6kKasC8DZiLvGJjCfUP1ycMmLV6rsgAtK/OlIsjz/WuKqlrf1D0KTL9ucsca6RSRJuu7eaNE7/rAN1ZBCO9HScWyTky165biq60hdkK4o5LvfgAs5C7/xzsnks/3pvzfC9Oe++o9BKUI2UT/TQhLc72jqgHy+K5X+bYRAIiHPoB/ASgXr1tmDIGVxhVeIe4oKLe5zJQTGU1Uw45fvsU7A/7OFLplkVdxmoPWQhcVMF3pdUHBXU="
         )
-        local hosts=(git git.flux-system.svc git.flux-system.svc.cluster.local)
-        for h in "${hosts[@]}"; do
-            for i in "${static_known_hosts[@]}"; do
-                echo "$h $i"
-            done
+
+        for i in "${static_known_hosts[@]}"; do
+            echo "$ssh_host $i"
         done >$_kh
     else
-        info "Generating $_kh for $ssh_host"
-        ssh-keyscan $ssh_host >$_kh
+        info "Generating $_kh for $ssh_host: ssh-keyscan $ssh_host"
+        ssh-keyscan $ssh_host &>$_kh
     fi
 }
 
@@ -427,24 +425,6 @@ function start_container()
     eval $sudo $docker_run
 }
 
-function get_local_ip()
-{
-    if which ip &>/dev/null; then
-        ip r \
-            | awk '/^default/{print $5}' \
-            | head -n1 \
-            | xargs ip -4 -o a show dev \
-            | awk '{print $4}' \
-            | cut -f1 -d /
-    else
-        netstat -nr \
-            | awk '/^default/{print $4}' \
-            | head -n1 \
-            | xargs ifconfig \
-            | awk '/inet /{print $2}'
-    fi
-}
-
 ###########
 ## Start ##
 ###########
@@ -474,7 +454,7 @@ function usage()
         echo "     -c, --customer NAME        Customer name."
         echo "         --force                Force create even if CLUSTER-DIR exists."
         echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
-        echo "     -l, --local-git-repo       Force flux-git-repo to '$local_git_repo'. Implies -f and -H. (default: false)"
+        echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
         echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
         echo "         --ssh-key-length       SSH key length, depends on ssh key type."
         echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
@@ -524,9 +504,10 @@ function usage()
         echo "  -> remote-setup [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Update local remote upstream." "$COLOR_RESET"
         echo
-        echo "     -f, --flux-git-repo URL      Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
-        echo "     -o, --origin REMOTE          Define ORIGIN remote address."
-        echo "     -u, --upstream REMOTE        Define UPSTREAM remote address (default: $default_upstream)."
+        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
+        echo "     -o, --origin REMOTE        Define ORIGIN remote address."
+        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
     if [ -z "$_command" ] || [ "$_command" == "update_ssh_key" ]; then
@@ -609,9 +590,9 @@ ssh_key_type=ecdsa
 ssh_key_length=0
 ssh_host=github.com
 local_git_repo_user=git
-local_git_repo_address=$(get_local_ip 2>/dev/null)
+local_git_repo_host=git.flux-system.svc.cluster.local
 local_git_repo_path=/git
-local_git_repo="ssh://git@git.flux-system.svc.cluster.local/git"
+local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_host}${local_git_repo_path}" # port is handled by ~/.ssh/config
 default_upstream=git@github.com:getupcloud/managed-cluster.git
 common_template_files=(
     manifests
@@ -650,9 +631,6 @@ function getopt_create()
             ;;
             -l|--local-git-repo)
                 opt_local_git_repo=true
-                opt_flux_git_repo="$local_git_repo"
-                ssh_host="$local_git_repo_address"
-                info "Using flux git repo: $opt_flux_git_repo"
             ;;
             -o|--origin)
                 [ $# -lt 2 ] && invalid_argument $1
@@ -705,6 +683,10 @@ function getopt_create()
         shift
     done
 
+    if $opt_local_git_repo; then
+        set_local_git_repo
+    fi
+
     if [ $ssh_key_length -eq 0 ]; then
         local key_len=ssh_key_length_$ssh_key_type
         ssh_key_length=${!key_len}
@@ -751,12 +733,12 @@ function create_repo_config()
     read_config upstream "Set UPSTREAM remote"
 
     if $opt_local_git_repo; then
-      origin=$opt_flux_git_repo
+      origin=${local_git_repo}
     elif [ -z "$origin" ]; then
       origin="$(git-url $(git_remote origin) url2ssh)"
       origin=${origin%.git}-$customer.git
+      read_config origin "Set ORIGIN remote"
     fi
-    read_config origin "Set ORIGIN remote"
 
     flux_git_repo=${origin#git://}
     flux_git_repo=ssh://${flux_git_repo/:/\/}
@@ -1029,9 +1011,6 @@ function command_sync_template()
 ## COMMAND: remote-setup ##
 ###########################
 
-opt_upstream=
-opt_origin=
-
 function getopt_rs() { _command=remote_setup && getopt_remote_setup "$@"; }
 function getopt_remote_setup()
 {
@@ -1072,7 +1051,6 @@ function command_remote_setup()
 
     source_env $REPO_CONF
 
-    echo "$opt_upstream$opt_origin$opt_flux_git_repo"
     if [ -z "$opt_upstream$opt_origin$opt_flux_git_repo" ]; then
         read_config upstream "Set UPSTREAM remote"
         read_config origin "Set ORIGIN remote"
@@ -1254,9 +1232,6 @@ function getopt_update_ssh_key()
             ;;
             --local-git-repo)
                 opt_local_git_repo=true
-                opt_flux_git_repo="$local_git_repo"
-                ssh_host="$local_git_repo_address"
-                info "Using flux git repo: $local_git_repo"
             ;;
             *)
                 if [ -z "$cluster_dir" ]; then
@@ -1267,6 +1242,10 @@ function getopt_update_ssh_key()
         esac
         shift
     done
+
+    if $opt_local_git_repo; then
+        set_local_git_repo
+    fi
 
     if [ $ssh_key_length -eq 0 ]; then
         local key_len=ssh_key_length_$ssh_key_type

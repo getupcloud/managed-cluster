@@ -26,6 +26,19 @@ if [ "$type" == standalone ] || [ -z "$type" ]; then
     done
 fi
 
+if is_local_git_repo && ! grep -q "Host git.flux-system.svc.cluster.local" ~/.ssh/config; then
+    export HOST_IP=${HOST_IP:-$(get_host_ip 2>/dev/null)}
+    cat >>~/.ssh/config <<-EOF
+		
+		Host git.flux-system.svc.cluster.local
+		     Hostname ${HOST_IP}
+		     Port 2222
+		     UserKnownHostsFile /dev/null
+		     CheckHostIP no
+		     StrictHostKeyChecking no
+	EOF
+fi
+
 if [ $# -eq 0 ] ; then
     if [ -e $CLUSTER_DIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then
         debug Terraform variables file not found: $TF_VARS_FILE

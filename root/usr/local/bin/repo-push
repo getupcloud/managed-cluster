@@ -19,7 +19,7 @@ if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
   exit 1
 fi
 
-if ! repo-exists; then
+if ! is_local_git_repo && ! repo-exists; then
     ask_execute_command repo-setup
 fi
 

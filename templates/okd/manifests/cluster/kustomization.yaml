@@ -5,7 +5,7 @@ resources:
 - ../base/
 
 patchesStrategicMerge:
-- excludes.yaml
 - delete-helmrelease-monitoring.yaml
+#- excludes.yaml
 
 patchesJson6902: []

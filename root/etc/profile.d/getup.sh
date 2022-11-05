@@ -316,6 +316,11 @@ repo_match()
     [ "$repo1_owner_name" == "$repo2_owner_name" ]
 }
 
+is_local_git_repo()
+{
+    [ -v flux_git_repo ] && grep -q "ssh://git@git.flux-system.svc.cluster.local/git" <<<"$flux_git_repo"
+}
+
 get_current_version()
 {
     cat $REPO_DIR/version.txt
@@ -429,6 +434,24 @@ run_as_user()
     exec setpriv --reuid=$CONTAINER_USER_ID --regid=$CONTAINER_GROUP_ID --init-groups /usr/local/bin/entrypoint "$@" || exit 2
 }
 
+function get_host_ip()
+{
+    if which ip &>/dev/null; then
+        ip r \
+            | awk '/^default/{print $5}' \
+            | head -n1 \
+            | xargs ip -4 -o a show dev \
+            | awk '{print $4}' \
+            | cut -f1 -d /
+    else
+        netstat -nr \
+            | awk '/^0.0.0.0/{print $NF}' \
+            | head -n1 \
+            | xargs ifconfig \
+            | awk '/inet /{print $2}'
+    fi
+}
+
 if [ -t 0 ]; then
     alias l='ls -la --color'
     alias t='terraform'
@@ -519,6 +542,7 @@ function update_globals()
     if [ -v type ]; then
         export TEMPLATE_DIR=$TEMPLATES_DIR/$type
     fi
+
     if ! [ -v TELEPORT_PROXY ]; then
         export TELEPORT_PROXY=getup.teleport.sh
     fi
