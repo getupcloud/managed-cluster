@@ -105,6 +105,10 @@ variable "node_groups_defaults" {
     max_capacity     = 1
     disk_size        = 50
     additional_tags  = {}
+    # To use kubelet_extra_args you must set create_launch_template=true.
+    # kubelet_extra_args : "--max-pods=110",
+    # create_launch_template: true,
+
   }
 
   validation {
@@ -119,6 +123,8 @@ variable "node_groups" {
   type        = any
   default = {
     "infra" : {
+      # kubelet_extra_args : "--max-pods=110",
+      # create_launch_template: true,
       "min_capacity" : 2,
       "max_capacity" : 2,
       "k8s_labels" : {
@@ -133,6 +139,8 @@ variable "node_groups" {
       ]
     },
     "app" : {
+      # kubelet_extra_args : "--max-pods=110",
+      # create_launch_template: true,
       "min_capacity" : 2,
       "max_capacity" : 4,
       "k8s_labels" : {
