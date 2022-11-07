@@ -59,6 +59,7 @@ metadata:
   name: kube-opex-analytics
   namespace: flux-system
 spec:
+  suspend: true
   chart:
     spec:
       chart: kube-opex-analytics
