@@ -12,3 +12,4 @@ resources:
 patchesStrategicMerge:
 - helmrelease-velero.yaml
 - helmrelease-cluster-autoscaler.yaml
+- helmrelease-ingress-nginx.yaml

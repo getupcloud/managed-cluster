@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ingress-nginx
+  namespace: flux-system
+spec:
+  values:
+    controller:
+      service:
+        annotations:
+          # eks - nlb external
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          service.beta.kubernetes.io/aws-load-balancer-type: external
+
+          # eks nlb internal - Lembrando que pra usar NLB INTERNAL O EKS TEM QUE TER SIDO CRIADO COM UMA SUBNET PRIVADA
+          # service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+          # service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          # service.beta.kubernetes.io/aws-load-balancer-type: nlb-ip
