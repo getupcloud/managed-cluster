@@ -47,7 +47,7 @@ variable "endpoint_public_access" {
 }
 
 variable "endpoint_public_access_cidrs" {
-  description = "List of CIDRs to allow access to EKS private endpoint."
+  description = "List of CIDRs to allow access to EKS public endpoint."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
@@ -59,7 +59,7 @@ variable "endpoint_private_access" {
 }
 
 variable "endpoint_private_access_cidrs" {
-  description = "List of CIDRs to allow access to EKS public endpoint."
+  description = "List of CIDRs to allow access to EKS private endpoint."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }

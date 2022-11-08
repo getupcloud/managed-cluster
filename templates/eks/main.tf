@@ -24,19 +24,20 @@ module "eks" {
   manifests_template_vars = local.manifests_template_vars
 
   # provider specific
-  account_id                   = var.account_id
-  auth_iam_roles               = var.auth_iam_roles
-  auth_iam_users               = var.auth_iam_users
-  auth_map_roles               = var.auth_map_roles
-  aws_access_key_id            = var.aws_access_key_id
-  aws_secret_access_key        = var.aws_secret_access_key
-  eks_addons                   = var.eks_addons
-  endpoint_public_access_cidrs = var.endpoint_public_access_cidrs
-  node_groups_defaults         = var.node_groups_defaults
-  node_groups                  = var.node_groups
-  region                       = var.region
-  subnet_ids                   = var.subnet_ids
-  tags                         = var.tags
-  cluster_tags                 = var.cluster_tags
-  vpc_id                       = var.vpc_id
+  account_id                    = var.account_id
+  auth_iam_roles                = var.auth_iam_roles
+  auth_iam_users                = var.auth_iam_users
+  auth_map_roles                = var.auth_map_roles
+  aws_access_key_id             = var.aws_access_key_id
+  aws_secret_access_key         = var.aws_secret_access_key
+  eks_addons                    = var.eks_addons
+  endpoint_public_access_cidrs  = var.endpoint_public_access_cidrs
+  endpoint_private_access_cidrs = var.endpoint_private_access_cidrs
+  node_groups_defaults          = var.node_groups_defaults
+  node_groups                   = var.node_groups
+  region                        = var.region
+  subnet_ids                    = var.subnet_ids
+  tags                          = var.tags
+  cluster_tags                  = var.cluster_tags
+  vpc_id                        = var.vpc_id
 }
