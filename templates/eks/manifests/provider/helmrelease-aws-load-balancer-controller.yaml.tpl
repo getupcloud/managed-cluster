@@ -27,7 +27,7 @@ spec:
   values:
     clusterName: ${cluster_name}
     enableCertManager: ${try(modules.certmanager.enabled, false)}
-    ingressClass: alb${try(modules.certmanager.ingressClass, "alb")}
+    ingressClass: ${try(modules.certmanager.ingressClass, "alb")}
 
     serviceMonitor:
       enabled: true
