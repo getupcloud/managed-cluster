@@ -38,7 +38,7 @@ spec:
     kind: GitRepository
     name: ${ git_repository_name }
 
-%{ if try(provider.kustomize_controller_irsa_arn, "") != "" }
+%{ if try(modules.kms.iam_role_arn, "") != "" }
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -46,5 +46,5 @@ metadata:
   name: kustomize-controller
   namespace: ${ namespace }
   annotations:
-    eks.amazonaws.com/role-arn: ${ provider.kustomize_controller_irsa_arn }
+    eks.amazonaws.com/role-arn: ${ modules.kms.iam_role_arn }
 %{ endif }

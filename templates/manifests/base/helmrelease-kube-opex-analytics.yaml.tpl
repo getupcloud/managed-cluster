@@ -1,3 +1,4 @@
+%{~ if try(modules.kube_opex_analytics.enabled, false) }
 %{ if cluster_type == "okd" ~}
 ---
 apiVersion: security.openshift.io/v1
@@ -91,3 +92,4 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
+%{~ endif }

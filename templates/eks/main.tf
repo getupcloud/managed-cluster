@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v1.61"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0-alpha1"
 
   # cluster basics
   customer_name  = var.customer
@@ -8,7 +8,7 @@ module "eks" {
   use_kubeconfig = var.use_kubeconfig
   pre_create     = var.pre_create
   post_create    = var.post_create
-  aws_modules    = var.aws_modules
+  aws_modules    = merge(local.modules, var.aws_modules)
 
   # monitoring and operations
   cronitor_enabled           = var.cronitor_enabled
