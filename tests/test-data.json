@@ -26,6 +26,7 @@
     "tfvars": {
       "region": "us-east-2",
       "subnet_ids": [ "xxx", "yyyy" ],
+      "flux_debug": true,
       "aws_modules": {
         "certmanager": {
           "hosted_zone_id": "xxx"

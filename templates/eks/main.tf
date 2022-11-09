@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0-alpha3"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0-alpha5"
 
   # cluster basics
   customer_name  = var.customer
@@ -21,6 +21,7 @@ module "eks" {
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
+  flux_debug              = var.flux_debug
   manifests_template_vars = local.manifests_template_vars
 
   # provider specific

@@ -56,6 +56,12 @@ variable "flux_version" {
   default     = "v0.35.0"
 }
 
+variable "flux_debug" {
+  description = "Dump debug info to file .debug-flux.json"
+  type        = bool
+  default     = false
+}
+
 variable "manifests_path" {
   description = "Manifests dir inside GitRepository"
   type        = string
