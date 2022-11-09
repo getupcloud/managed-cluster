@@ -99,7 +99,7 @@ variable "eks_pre_create" {
 variable "eks_post_create" {
   description = "Scripts to execute after cluster is created."
   type        = list(string)
-  default     = [ "./eks-post-create.sh" ]
+  default     = ["./eks-post-create.sh"]
 }
 
 #############################

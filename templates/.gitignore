@@ -1,5 +1,4 @@
-openshift-install
-openshift-install-linux-*
+.debug-*
 .kube
 .local
 .setup_history
@@ -9,4 +8,6 @@ ansible.log
 doctl
 gh
 helm
+openshift-install
+openshift-install-linux-*
 terraform.log
