@@ -1,13 +1,13 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0-alpha1"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0-alpha3"
 
   # cluster basics
   customer_name  = var.customer
   cluster_name   = var.name
   cluster_sla    = var.sla
   use_kubeconfig = var.use_kubeconfig
-  pre_create     = var.pre_create
-  post_create    = var.post_create
+  pre_create     = concat(var.eks_pre_create, var.pre_create)
+  post_create    = concat(var.eks_post_create, var.post_create)
   aws_modules    = merge(local.modules, var.aws_modules)
 
   # monitoring and operations
