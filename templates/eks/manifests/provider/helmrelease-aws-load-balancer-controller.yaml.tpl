@@ -1,4 +1,4 @@
-%{ if try(modules.alb.enabled, false) ~}
+%{ if modules.alb.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -26,13 +26,15 @@ spec:
   targetNamespace: kube-system
   values:
     clusterName: ${cluster_name}
-    enableCertManager: ${try(modules.certmanager.enabled, false)}
-    ingressClass: ${try(modules.certmanager.ingressClass, "alb")}
+    enableCertManager: ${modules.certmanager.enabled}
+    ingressClass: ${modules.alb.ingressClass}
 
     serviceMonitor:
       enabled: true
 
+%{~ if modules.alb.output.iam_role_arn != ""}
     serviceAccount:
       annotations:
-        eks.amazonaws.com/role-arn: ${try(modules_output.alb.iam_role_arn, "")}
+        eks.amazonaws.com/role-arn: ${try(modules.alb.output.iam_role_arn, "")}
+%{~ endif }
 %{~ endif }

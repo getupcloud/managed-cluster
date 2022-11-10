@@ -18,14 +18,14 @@ spec:
       backupStorageLocation:
         name: default
         prefix: velero/${cluster_name}-${suffix}
-        bucket: ${modules_output.velero.bucket_name}
+        bucket: ${modules.velero.output.bucket_name}
         config:
-          region: ${modules_output.velero.bucket_region}
+          region: ${modules.velero.output.bucket_region}
 
       volumeSnapshotLocation:
         name: default
         config:
-          region: ${modules_output.velero.bucket_region}
+          region: ${modules.velero.output.bucket_region}
 
     # Auth via IRSA
     serviceAccount:
@@ -33,7 +33,7 @@ spec:
         create: true
         name: velero
         annotations:
-          eks.amazonaws.com/role-arn: ${modules_output.velero.iam_role_arn}
+          eks.amazonaws.com/role-arn: ${modules.velero.output.iam_role_arn}
 
 #    # Auth via accesskey
 #    credentials:

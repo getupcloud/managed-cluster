@@ -1,4 +1,4 @@
-%{ if try(modules.efs.enabled, false) ~}
+%{ if modules.efs.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -29,12 +29,16 @@ spec:
   values:
     controller:
       serviceAccount:
+%{~ if modules_output.efs.iam_role_arn != ""}
         annotations:
-          eks.amazonaws.com/role-arn: ${try(modules_output.efs.iam_role_arn, "")}
+          eks.amazonaws.com/role-arn: ${modules.efs.output.iam_role_arn}
+%{~ endif }
     node:
       serviceAccount:
+%{~ if modules.efs.output.iam_role_arn != ""}
         annotations:
-          eks.amazonaws.com/role-arn: ${try(modules_output.efs.iam_role_arn, "")}
+          eks.amazonaws.com/role-arn: ${modules.efs.output.iam_role_arn}
+%{~ endif }
 %{~ if length(try(modules.efs.file_system_id, "")) > 0 }
     storageClasses:
     - name: efs-sc
@@ -45,7 +49,7 @@ spec:
       - tls
       parameters:
         provisioningMode: efs-ap
-        fileSystemId: ${try(modules.efs.file_system_id, "")}
+        fileSystemId: ${modules.efs.file_system_id}
         directoryPerms: "700"
         gidRangeStart: "1000"
         gidRangeEnd: "2000"

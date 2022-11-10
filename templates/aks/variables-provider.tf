@@ -17,6 +17,12 @@ variable "tags" {
 }
 
 # Cluster settings
+variable "cluster_name" {
+  type        = string
+  description = "(Optional) The name for the AKS deployment. This variable overwrites the 'prefix' variable."
+  default     = null
+}
+
 variable "kubernetes_version" {
   type        = string
   description = "(Optional) Specify which Kubernetes release to use. The default used is the latest Kubernetes version available in the region."
@@ -26,6 +32,12 @@ variable "kubernetes_version" {
 variable "prefix" {
   type        = string
   description = "(Optional) The prefix for the resources created in the specified Azure Resource Group."
+  default     = null
+}
+
+variable "dns_prefix" {
+  type        = string
+  description = "(Optional) The DNS prefix for the AKS deployment. This is used to create a unique FQDN for the cluster when it is created."
   default     = null
 }
 
@@ -89,6 +101,12 @@ variable "public_ssh_key" {
 variable "enable_role_based_access_control" {
   type        = bool
   description = "(Optional) Enables Role Based Access Control."
+  default     = false
+}
+
+variable "service_principal_enabled" {
+  type        = bool
+  description = "(Optional) Should the Azure Policy Add-On be enabled? For more details please visit [Understand Azure Policy for Azure Kubernetes Service](https://docs.microsoft.com/en-ie/azure/governance/policy/concepts/rego-for-aks)"
   default     = false
 }
 
@@ -317,4 +335,17 @@ variable "not_allowed_maintenance_windows" {
   }))
   description = "(Optional) The start and end of a time span, formatted as an RFC3339 (2022-01-01T00:00:00Z) string."
   default     = []
+}
+
+# Azure Container registry
+variable "azure_container_registry_enabled" {
+  type        = bool
+  description = "(Optional) Should the AKS deployment access a Container Registry?"
+  default     = false
+}
+
+variable "azure_container_registry_id" {
+  type        = string
+  description = "(Optional) The ID of the Container Registry."
+  default     = null
 }

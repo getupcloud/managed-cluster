@@ -1,4 +1,4 @@
-%{~ if try(modules.linkerd.enabled, false) }
+%{~ if modules.linkerd.enabled }
 %{~   if cluster_type == "okd" ~}
 ---
 apiVersion: security.openshift.io/v1
@@ -42,11 +42,11 @@ users:
 - system:serviceaccount:linkerd:linkerd-identity
 - system:serviceaccount:linkerd:linkerd-proxy-injector
 - system:serviceaccount:linkerd:linkerd-heartbeat
-%{~     if try(modules.linkerd-cni.enabled, false) }
+%{~     if modules.linkerd-cni.enabled }
 - system:serviceaccount:linkerd-cni:default
 - system:serviceaccount:linkerd-cni:linkerd-cni
 %{~     endif }
-%{~     if try(modules.linkerd-viz.enabled, false) }
+%{~     if modules.linkerd-viz.enabled }
 %{~       for sa in ["default", "grafana", "metrics-api", "prometheus", "tap", "tap-injector", "web"] }
 - system:serviceaccount:linkerd-viz:${sa}
 %{~       endfor }
@@ -97,7 +97,7 @@ spec:
   releaseName: linkerd
   storageNamespace: linkerd
   targetNamespace: linkerd
-%{~   if try(modules.linkerd-cni.enabled, false) }
+%{~   if modules.linkerd-cni.enabled }
   dependsOn:
   - name: linkerd-cni
 %{~   endif }
@@ -105,16 +105,17 @@ spec:
     installNamespace: false
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
     cniEnabled: ${ modules.linkerd-cni.enabled }
+%{ if trimspace(try(modules.linkerd.output.ca_crt, "") != "" }
     identityTrustAnchorsPEM: |-
-      ${indent(6, trimspace(try(modules_output.linkerd.ca_crt, "")))}
+      ${indent(6, trimspace(try(modules.linkerd.output.ca_crt, "")))}
     identity:
       issuer:
         tls:
           crtPEM: |-
-            ${indent(12, trimspace(try(modules_output.linkerd.issuer_crt, "")))}
+            ${indent(12, trimspace(try(modules.linkerd.output.issuer_crt, "")))}
           keyPEM: |-
-            ${indent(12, trimspace(try(modules_output.linkerd.issuer_key, "")))}
-        crtExpiry: ${try(modules_output.linkerd.issuer_crt_expiry, "")}
+            ${indent(12, trimspace(try(modules.linkerd.output.issuer_key, "")))}
+        crtExpiry: ${try(modules.linkerd.output.issuer_crt_expiry, "")}
 %{~   if length(modules.linkerd.nodeSelector) > 0}
     nodeSelector:
       ${indent(6, yamlencode(modules.linkerd.nodeSelector))}
@@ -124,7 +125,7 @@ spec:
       operator: Exists
 %{~ endif }
 
-%{~ if try(modules.linkerd-cni.enabled, false) }
+%{~ if modules.linkerd-cni.enabled }
 ##
 ## Linkerd CNI (required for OKD)
 ##
@@ -176,7 +177,7 @@ spec:
       operator: Exists
 %{~ endif }
 
-%{~ if try(modules.linkerd-viz.enabled, false) }
+%{~ if modules.linkerd-viz.enabled }
 ##
 ## Linkerd Viz
 ##

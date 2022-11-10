@@ -21,6 +21,18 @@ SHELL         = /bin/bash
 
 default: build
 
+CLUSTER_TYPES := $(shell ls -1 templates/*/provider.env | awk -F/ '{print $$2}')
+
+define CLUSTER_REPO_template =
+	printf "%-110s" "Downloading https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-provider.tf"; \
+	curl --fail -sL https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-provider.tf -o templates/$(1)/variables-provider.tf && echo "[    OK    ]" || echo "[ NotFound ]"; \
+	printf "%-110s" "Downloading https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-modules.tf"; \
+	curl --fail -sL https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-modules.tf -o templates/$(1)/variables-modules.tf && echo "[    OK    ]" || echo "[ NotFound ]";
+endef
+
+import:
+	@$(foreach i,$(CLUSTER_TYPES),$(call CLUSTER_REPO_template,$(i)))
+
 check-version:
 	@if ! [[ "$(VERSION)" =~ $(SEMVER_REGEX) ]]; then \
 		echo Invalid semantic version: $(VERSION) >&2; \
@@ -36,7 +48,7 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt build check-git tag push
+release: import fmt build check-git tag push
 	@echo Finished $(RELEASE) release
 
 check-git:

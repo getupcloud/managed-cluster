@@ -1,24 +1,83 @@
-## Common variables
+## Common variables to all providers
+## Copy to cluster repo
 
-variable "name" {
+variable "cronitor_enabled" {
+  description = "Creates and enables Cronitor monitor."
+  type        = bool
+  default     = false
+}
+
+variable "cronitor_notification_lists" {
+  description = "Cronitor Notification lists by SLA"
+  type        = any
+  default = {
+    high : ["default", "opsgenie-high-sla"]
+    low : ["default", "opsgenie-low-sla"]
+    none : []
+  }
+}
+
+variable "cronitor_pagerduty_key" {
+  description = "Cronitor PagerDuty key"
+  type        = string
+  default     = ""
+}
+
+variable "cluster_name" {
   description = "Cluster name"
   type        = string
 }
 
-variable "customer" {
-  description = "Customer name"
-  type        = string
-}
-
-variable "sla" {
+variable "cluster_sla" {
   description = "Cluster SLA"
   type        = string
   default     = "none"
 
   validation {
-    condition     = contains(["high", "low", "none"], var.sla)
+    condition     = contains(["high", "low", "none"], var.cluster_sla)
     error_message = "The Cluster SLA is invalid."
   }
+}
+
+variable "customer_name" {
+  description = "Customer name"
+  type        = string
+}
+
+variable "flux_debug" {
+  description = "Dump debug info to file .debug-flux.json"
+  type        = bool
+  default     = false
+}
+
+variable "flux_git_repo" {
+  description = "GitRepository URL"
+  type        = string
+  default     = ""
+}
+
+variable "flux_version" {
+  description = "Flux version to install"
+  type        = string
+  default     = "v0.35.0"
+}
+
+variable "flux_wait" {
+  description = "Wait for all manifests to apply"
+  type        = bool
+  default     = true
+}
+
+variable "kubeconfig_filename" {
+  description = "Kubeconfig path"
+  default     = "~/.kube/config"
+  type        = string
+}
+
+variable "manifests_path" {
+  description = "Manifests dir inside GitRepository"
+  type        = string
+  default     = ""
 }
 
 variable "manifests_template_vars" {
@@ -36,106 +95,6 @@ variable "manifests_template_vars" {
       ".*-controllers", ".*-ingress", ".*istio.*", ".*-operator", ".*-provisioner", ".*-system"
     ]
   }
-}
-
-variable "flux_git_repo" {
-  description = "GitRepository URL"
-  type        = string
-  default     = ""
-}
-
-variable "flux_wait" {
-  description = "Wait for all manifests to apply"
-  type        = bool
-  default     = true
-}
-
-variable "flux_version" {
-  description = "Flux version to install"
-  type        = string
-  default     = "v0.35.0"
-}
-
-variable "flux_debug" {
-  description = "Dump debug info to file .debug-flux.json"
-  type        = bool
-  default     = false
-}
-
-variable "manifests_path" {
-  description = "Manifests dir inside GitRepository"
-  type        = string
-  default     = ""
-}
-
-variable "cronitor_enabled" {
-  description = "Creates and enables Cronitor monitor."
-  type        = bool
-  default     = false
-}
-
-variable "cronitor_api_key" {
-  description = "Cronitor API key"
-  type        = string
-  default     = ""
-}
-
-variable "cronitor_pagerduty_key" {
-  description = "Cronitor PagerDuty key"
-  type        = string
-  default     = ""
-}
-
-variable "cronitor_notification_lists" {
-  description = "Cronitor Notification lists by SLA"
-  type        = any
-  default = {
-    high : ["default", "opsgenie-high-sla"]
-    low : ["default", "opsgenie-low-sla"]
-    none : []
-  }
-}
-
-variable "opsgenie_enabled" {
-  description = "Creates and enables Opsgenie integration."
-  type        = bool
-  default     = false
-}
-
-variable "opsgenie_api_key" {
-  description = "Opsgenie API key to create prometheus integration"
-  type        = string
-  default     = ""
-}
-
-variable "use_kubeconfig" {
-  description = "Should kubernetes/kubectl providers use local kubeconfig or credentials from cloud module"
-  type        = bool
-  default     = false
-}
-
-variable "kubeconfig_filename" {
-  description = "Kubeconfig path"
-  type        = string
-  default     = "/cluster/.kube/config"
-}
-
-variable "teleport_auth_token" {
-  description = "Teleport Agent Auth Token"
-  type        = string
-  default     = ""
-}
-
-variable "pre_create" {
-  description = "Scripts to execute before cluster is created."
-  type        = list(string)
-  default     = []
-}
-
-variable "post_create" {
-  description = "Scripts to execute after cluster is created."
-  type        = list(string)
-  default     = []
 }
 
 variable "modules" {
@@ -171,4 +130,40 @@ variable "modules_defaults" {
       enabled = false
     }
   }
+}
+
+variable "opsgenie_enabled" {
+  description = "Creates and enables Opsgenie integration."
+  type        = bool
+  default     = false
+}
+
+variable "opsgenie_team_name" {
+  description = "Opsgenie Owner team name of the integration."
+  type        = string
+  default     = "Operations"
+}
+
+variable "post_create" {
+  description = "Scripts to execute after cluster is created."
+  type        = list(string)
+  default     = []
+}
+
+variable "pre_create" {
+  description = "Scripts to execute before cluster is created."
+  type        = list(string)
+  default     = []
+}
+
+variable "teleport_auth_token" {
+  description = "Teleport Agent Auth Token"
+  type        = string
+  default     = ""
+}
+
+variable "use_kubeconfig" {
+  description = "Should kubernetes/kubectl providers use local kubeconfig or credentials from cloud module"
+  type        = bool
+  default     = false
 }
