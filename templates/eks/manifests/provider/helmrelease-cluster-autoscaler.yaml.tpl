@@ -13,5 +13,4 @@ spec:
       serviceAccount:
         name: cluster-autoscaler
         annotations:
-          eks.amazonaws.com/role-arn: ${modules_output.cluster-autoscaler.iam_role_arn}
-
+          eks.amazonaws.com/role-arn: ${modules.cluster-autoscaler.output.iam_role_arn}

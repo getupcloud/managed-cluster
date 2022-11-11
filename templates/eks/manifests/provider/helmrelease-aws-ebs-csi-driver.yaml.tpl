@@ -28,7 +28,7 @@ spec:
     controller:
       serviceAccount:
         annotations:
-          eks.amazonaws.com/role-arn: ${try(modules_output.ebs_csi.iam_role_arn, "")}
+          eks.amazonaws.com/role-arn: ${try(modules.ebs_csi.output.iam_role_arn, "")}
 
       nodeSelector:
         role: infra

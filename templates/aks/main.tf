@@ -8,12 +8,12 @@ module "aks" {
   use_kubeconfig = var.use_kubeconfig
   pre_create     = var.pre_create
   post_create    = var.post_create
-  azure_modules  = var.azure_modules
+  modules        = var.modules
 
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled
   cronitor_pagerduty_key      = var.cronitor_pagerduty_key
-  cronitor_notification_lists = local.cronitor_notification_lists
+  cronitor_notification_lists = var.cronitor_notification_lists
   opsgenie_enabled            = var.opsgenie_enabled
   teleport_auth_token         = var.teleport_auth_token
 

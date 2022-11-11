@@ -105,7 +105,7 @@ spec:
     installNamespace: false
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
     cniEnabled: ${ modules.linkerd-cni.enabled }
-%{ if trimspace(try(modules.linkerd.output.ca_crt, "") != "" }
+%{ if trimspace(try(modules.linkerd.output.ca_crt, "")) != "" }
     identityTrustAnchorsPEM: |-
       ${indent(6, trimspace(try(modules.linkerd.output.ca_crt, "")))}
     identity:
@@ -116,6 +116,7 @@ spec:
           keyPEM: |-
             ${indent(12, trimspace(try(modules.linkerd.output.issuer_key, "")))}
         crtExpiry: ${try(modules.linkerd.output.issuer_crt_expiry, "")}
+%{~   endif }
 %{~   if length(modules.linkerd.nodeSelector) > 0}
     nodeSelector:
       ${indent(6, yamlencode(modules.linkerd.nodeSelector))}

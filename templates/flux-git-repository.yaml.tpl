@@ -38,7 +38,7 @@ spec:
     kind: GitRepository
     name: ${ git_repository_name }
 
-%{ if modules.kms.enabled }
+%{ if try(modules.kms.enabled, false) }
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -29,7 +29,7 @@ spec:
   values:
     controller:
       serviceAccount:
-%{~ if modules_output.efs.iam_role_arn != ""}
+%{~ if modules.efs.output.iam_role_arn != ""}
         annotations:
           eks.amazonaws.com/role-arn: ${modules.efs.output.iam_role_arn}
 %{~ endif }
