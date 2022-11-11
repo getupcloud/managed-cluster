@@ -118,7 +118,7 @@ spec:
             summary: "Velero not active"
 
         - alert: BackupNotConfigured
-          expr: sum(velero_backup_total[24h]) == 0
+          expr: sum(rate(velero_backup_total[24h])) == 0
           for: 24h
           labels:
             service: backup
