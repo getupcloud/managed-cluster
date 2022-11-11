@@ -24,10 +24,12 @@ default: build
 CLUSTER_TYPES := $(shell ls -1 templates/*/provider.env | awk -F/ '{print $$2}')
 
 define CLUSTER_REPO_template =
-	printf "%-110s" "Downloading https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-provider.tf"; \
-	curl --fail -sL https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-provider.tf -o templates/$(1)/variables-provider.tf && echo "[    OK    ]" || echo "[ NotFound ]"; \
-	printf "%-110s" "Downloading https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-modules.tf"; \
-	curl --fail -sL https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-modules.tf -o templates/$(1)/variables-modules.tf && echo "[    OK    ]" || echo "[ NotFound ]";
+	for i in provider cluster modules; do \
+		url=https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-$$i.tf; \
+		file=templates/$(1)/variables-$$i.tf; \
+		printf "%-110s" "Downloading $$url"; \
+		curl --fail -sL $$url -o $$file && echo "[    OK    ]" || echo "[ NotFound ]"; \
+	done;
 endef
 
 import:

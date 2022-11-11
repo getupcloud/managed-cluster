@@ -223,7 +223,7 @@ function generate_ssh_key()
     local _kh=$CLUSTER_DIR/known_hosts
 
     if ! [ -e $_key_priv ]; then
-        info Generating $_key_priv
+        info "Generating $_key_priv ($ssh_key_length bits)"
         ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $_key_priv -N "" -C "$customer/$name/$type"
     else
         info Using existing $_key_priv
@@ -567,7 +567,7 @@ function dump_options()
     for i in command debug verbose force ssh_key_type ssh_key_length ssh_host \
         standalone docker_command port_range run_as_root \
         docker_image force_docker_image_build cluster_dir \
-        import_var_prefixes import_var_sources
+        import_var_prefixes import_var_sources local_git_repo
         do
         echo "  ${!i@A}"
     done
@@ -736,11 +736,13 @@ function create_repo_config()
     read_config upstream "Set UPSTREAM remote"
 
     if $opt_local_git_repo; then
-      origin=${local_git_repo}
+        origin=${local_git_repo}
     elif [ -z "$origin" ]; then
-      origin="$(git-url $(git_remote origin) url2ssh)"
-      origin=${origin%.git}-$customer.git
-      read_config origin "Set ORIGIN remote"
+        if [ -z "$opt_origin" ]; then
+            origin="$(git-url $(git_remote origin) url2ssh)"
+            origin=${origin%.git}-$customer.git
+        fi
+        read_config origin "Set ORIGIN remote"
     fi
 
     flux_git_repo=${origin#git://}

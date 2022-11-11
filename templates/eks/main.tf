@@ -2,20 +2,20 @@ module "eks" {
   source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0-alpha10"
 
   # cluster basics
-  customer_name  = var.customer
-  cluster_name   = var.name
-  cluster_sla    = var.sla
+  customer_name  = var.customer_name
+  cluster_name   = var.cluster_name
+  cluster_sla    = var.cluster_sla
   use_kubeconfig = var.use_kubeconfig
   pre_create     = concat(var.eks_pre_create, var.pre_create)
   post_create    = concat(var.eks_post_create, var.post_create)
   modules        = local.modules
 
   # monitoring and operations
-  cronitor_enabled           = var.cronitor_enabled
-  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
-  cronitor_notification_list = var.cronitor_notification_list[var.cluster_sla]
-  opsgenie_enabled           = var.opsgenie_enabled
-  teleport_auth_token        = var.teleport_auth_token
+  cronitor_enabled            = var.cronitor_enabled
+  cronitor_pagerduty_key      = var.cronitor_pagerduty_key
+  cronitor_notification_lists = var.cronitor_notification_lists
+  opsgenie_enabled            = var.opsgenie_enabled
+  teleport_auth_token         = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo

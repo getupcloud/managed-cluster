@@ -78,16 +78,6 @@ variable "node_pools" {
   }
 }
 
-variable "azure_modules" {
-  description = "Configure Azure modules to install"
-  type        = any
-  default = {
-    velero : {
-      enabled : true
-    }
-  }
-}
-
 ## Private DNS Zone ##################################################
 
 variable "private_dns_zone_enabled" {
@@ -99,7 +89,7 @@ variable "private_dns_zone_enabled" {
 variable "private_dns_zone_name" {
   description = "Either the DNS-name of Private DNS Zone which should be delegated to this Cluster, 'System' to have AKS manage this or 'None'."
   type        = string
-  default     = null
+  default     = "System"
 }
 
 variable "private_dns_zone_subscription_id" {

@@ -3,6 +3,7 @@
 TYPE=generic
 ROOT_DIR=$PWD
 REPO_CONFIG=$ROOT_DIR/repo.conf
+
 CLUSTER_DIR=$ROOT_DIR/clusters/$NAME/$TYPE
 CLUSTER_CONFIG=$CLUSTER_DIR/cluster.conf
 
@@ -10,9 +11,28 @@ UPSTREAM=git@github.com:$CUSTOMER/managed-cluster.git
 ORIGIN=git@github.com:$CUSTOMER/managed-cluster-$CUSTOMER.git
 FLUX_GIT_REPO=ssh://git@github.com/$CUSTOMER/managed-cluster-$CUSTOMER.git
 
-rm -vf $REPO_CONFIG $CLUSTER_CONFIG
+reset_cluster()
+{
+    rm -rf $REPO_CONFIG $CLUSTER_DIR
+}
+
+##### CREATE CLUSTER ######
+
+reset_cluster
+testing "Can create local git repo"
+run "./managed-cluster create --local-git-repo -c $CUSTOMER -n ${NAME} -t $TYPE -s none -u $UPSTREAM "
+assert "grep -q origin=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
+assert "grep -q flux_git_repo=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
+
+testing "Can create cluster with non-default key size"
+reset_cluster
+run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --sla none --ssh-key-type ecdsa --ssh-key-length 256 --force"
+assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 9 ]"
+assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp256 ]"
+
 testing "Can create cluster"
-run "./managed-cluster create -c $CUSTOMER -n $NAME -t $TYPE -s high -k ecdsa -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO"
+reset_cluster
+run "./managed-cluster create  -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --sla high --ssh-key-type ecdsa"
 assert "grep -q customer=$CUSTOMER $REPO_CONFIG"
 [ "$remote" == local ] || \
     assert "grep -q upstream=$UPSTREAM $REPO_CONFIG"
@@ -23,6 +43,31 @@ assert "grep -q type=$TYPE $CLUSTER_CONFIG"
 assert "grep -q sla=high $CLUSTER_CONFIG"
 assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 12 ]"
 assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp521 ]"
+
+##### CONTAINER ######
+
+testing "Can start container"
+run ./managed-cluster start $CLUSTER_DIR -- id -u | tail -n1 | tr -d '\r' > out.txt
+assert "[ '$(cat out.txt)' -eq '$UID' ]"
+
+##### TEMPLATES ######
+
+testing "Can sync templates"
+cp templates/$TYPE/variables.tf templates/$TYPE/variables.tf.test
+echo "# test-placeholder" >> templates/$TYPE/requires.txt
+grep -q 'TESTING LINE' templates/$TYPE/variables.tf || echo -e "\n# TESTING LINE #$$" >> templates/$TYPE/variables.tf
+run "./managed-cluster -v sync-template --force $CLUSTER_DIR"
+assert "grep -q '# TESTING LINE #$$' $CLUSTER_DIR/variables.tf"
+assert "grep -q '# test-placeholder' $CLUSTER_DIR/requires.tf"
+
+##### SSH KEY ######
+
+testing "Can update ssh key"
+run "./managed-cluster -v update-ssh-key -k rsa -l 2048 --force $CLUSTER_DIR"
+assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 27 ]"
+assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ssh-rsa ]"
+
+##### REMOTES ######
 
 testing "Can update remotes: upstream"
 run "./managed-cluster -v remote-setup --force -u upstream-$UPSTREAM"
@@ -37,34 +82,3 @@ assert "[ \$(git remote get-url origin --push) == 'origin-$ORIGIN' ]"
 testing "Can update flux git repo"
 run "./managed-cluster -v remote-setup --force -f flux-$FLUX_GIT_REPO"
 assert "grep -q flux_git_repo=flux-$FLUX_GIT_REPO $REPO_CONFIG"
-
-testing "Can create local git repo"
-run "./managed-cluster create --local-git-repo -c $CUSTOMER -n $NAME -t $TYPE -s none -k ecdsa -u $UPSTREAM "
-cat repo.conf
-assert "grep -q origin=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
-assert "grep -q flux_git_repo=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
-
-testing "Can create cluster with non-default key size"
-rm -f $CLUSTER_DIR/identity
-run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE -s none -k ecdsa -l 256 --force"
-assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 9 ]"
-assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp256 ]"
-
-testing "Can start container"
-run ./managed-cluster start $CLUSTER_DIR -- id -u | tail -n1 | tr -d '\r' > out.txt
-assert "[ '$(cat out.txt)' -eq '$UID' ]"
-
-testing "Can sync templates"
-cp templates/$TYPE/variables.tf templates/$TYPE/variables.tf.test
-echo "# test-placeholder" >> templates/$TYPE/requires.txt
-grep -q 'TESTING LINE' templates/$TYPE/variables.tf || echo -e "\n# TESTING LINE #$$" >> templates/$TYPE/variables.tf
-run "./managed-cluster -v sync-template --force $CLUSTER_DIR"
-assert "grep -q '# TESTING LINE #$$' $CLUSTER_DIR/variables.tf"
-assert "grep -q '# test-placeholder' $CLUSTER_DIR/requires.tf"
-mv templates/$TYPE/variables.tf.test templates/$TYPE/variables.tf
-
-
-testing "Can update ssh key"
-run "./managed-cluster -v update-ssh-key -k rsa -l 2048 --force $CLUSTER_DIR"
-assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 27 ]"
-assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ssh-rsa ]"

@@ -1,21 +1,21 @@
 module "aks" {
-  source = "github.com/getupcloud/terraform-cluster-aks?ref=v1.9"
+  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.0-alpha4"
 
   # cluster basics
-  customer_name  = var.customer
-  cluster_name   = var.name
-  cluster_sla    = var.sla
+  customer_name  = var.customer_name
+  cluster_name   = var.cluster_name
+  cluster_sla    = var.cluster_sla
   use_kubeconfig = var.use_kubeconfig
   pre_create     = var.pre_create
   post_create    = var.post_create
   azure_modules  = var.azure_modules
 
   # monitoring and operations
-  cronitor_enabled           = var.cronitor_enabled
-  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
-  cronitor_notification_list = local.cronitor_notification_list
-  opsgenie_enabled           = var.opsgenie_enabled
-  teleport_auth_token        = var.teleport_auth_token
+  cronitor_enabled            = var.cronitor_enabled
+  cronitor_pagerduty_key      = var.cronitor_pagerduty_key
+  cronitor_notification_lists = local.cronitor_notification_lists
+  opsgenie_enabled            = var.opsgenie_enabled
+  teleport_auth_token         = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo
