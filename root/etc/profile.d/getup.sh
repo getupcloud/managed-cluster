@@ -338,7 +338,11 @@ get_latest_version()
 
 fmt_version()
 {
-    printf "%03d" ${1//[-.]/ }
+    local v="$1"
+    v=${v//[.-]/ }
+    v=${v/alpha/1}
+    v=${v/beta/2}
+    printf "%03d" $v
 }
 
 update_ca_certificates()
