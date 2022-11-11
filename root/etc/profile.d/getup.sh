@@ -338,7 +338,7 @@ get_latest_version()
 
 fmt_version()
 {
-    printf "%03d" ${1//./ }
+    printf "%03d" ${1//[-.]/ }
 }
 
 update_ca_certificates()
