@@ -946,8 +946,34 @@ function check_deprecations()
     )
 
     for i in ${old_cluster_configs[*]}; do
-        if grep -q $i $CLUSTER_DIR/cluster.conf; then
-            warn "DEPRECATED: $CLUSTER_DIR/cluster.conf: $i: Please remove this config."
+        if grep -q $i $CLUSTER_CONF; then
+            warn "DEPRECATED: $CLUSTER_CONF: $i: Please remove this config."
+        fi
+    done
+
+    local rename_configs=(
+        name:cluster_name
+        customer:customer_name
+        sla:cluster_sla
+    )
+
+    for i in ${rename_configs[*]}; do
+        local old=${i%:*}
+        local new=${i#*:}
+        local found=false
+
+        if grep -q "^\s*$old\s*=" $REPO_CONF; then
+            found=true
+            file=$REPO_CONF
+        elif grep -q "^\s*$old\s*=" $CLUSTER_CONF; then
+            found=true
+            file=$CLUSTER_CONF
+        fi
+
+        if $found; then
+            if ask "Replace deprecated config '$old' for '$new' into file $file? [Y/n]"; then
+                sed -i -e "s/^\s*$old\([\s]*=\)/$new\1/g" $file
+            fi
         fi
     done
 }
