@@ -106,8 +106,8 @@ install:
 	curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.4/hcl2json_linux_amd64 > /usr/local/bin/hcl2json
 	chmod +x /usr/local/bin/hcl2json
 
-test: TEST_BRANCH = $(shell git branch --show-current)
-test: DEFAULT_TEST_PARAMS = --branch $(TEST_BRANCH)
+#test: TEST_BRANCH = $(shell git branch --show-current)
+test: DEFAULT_TEST_PARAMS = ## --branch $(TEST_BRANCH)
 test: VERSION := $(FILE_VERSION)-$(GIT_COMMIT)-test
 test: RELEASE := v$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: lint
