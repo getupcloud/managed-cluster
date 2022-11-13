@@ -57,14 +57,14 @@ function usage()
     {
     echo "Usage: $0 [OPTIONS...]"
     echo
-    echo "  -c, --clone                  Git-clone repository instead copy."
-    echo "  -b, --branch BRANCH-NAME     Branch name to test [default: main]."
-    echo "  -h, --help                   This help message."
-    echo "  -k, --keep                   Keep repo dir after exit."
-    echo "  -p, --plans TEST-PLANS       List of test plans [default: tests/test_*]."
-    echo "  -r, --remote REMOTE          Output from "git remote get-url origin". Use \`local\` to avoid clonning."
-    echo "  -i, --interactive            Show dialogs to select opstion."
-    echo "  -t, --types CLUSTER-TYPES    Comma-separated list of types to test from ./templates/ [default: all]."
+    echo "  -c, --clone                          Git-clone repository instead copy."
+    echo "  -b, --branch BRANCH-NAME             Branch name to test [default: main]."
+    echo "  -h, --help                           This help message."
+    echo "  -k, --keep                           Keep repo dir after exit."
+    echo "  -p, --plans TEST-PLANS               List of test plans [default: tests/test_*]."
+    echo "  -r, --remote REMOTE                  Output from "git remote get-url origin". Use \`local\` to avoid clonning."
+    echo "  -i, --interactive                    Show dialogs to select opstion."
+    echo "  -t, --cluster_types CLUSTER-TYPES    Comma-separated list of types to test from ./templates/ [default: all]."
 
     if [ $# -gt 0 ]; then
         echo
@@ -78,7 +78,7 @@ function usage()
 
 clone=false
 branch=main
-types=all
+cluster_types=all
 remote=""
 plans=tests/test_*
 interactive=false
@@ -113,10 +113,10 @@ while [ $# -gt 0 ]; do
         -i|--interactive)
             interactive=true
         ;;
-        -t|--types)
+        -t|--cluster_types)
             [ $# -lt 2 ] && invalid_argument $1
             shift
-            types="${1//,/ }"
+            cluster_types="${1//,/ }"
         ;;
         *)
             invalid_argument $1
@@ -124,12 +124,12 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-if [ "$types" == 'all' ]; then
+if [ "$cluster_types" == 'all' ]; then
     # copied from ./managed-cluster
-    types=( templates/*/ )
-    types=( ${types[@]#*/} )
-    types=( ${types[@]%/} )
-    types="${types[@]/manifests}"
+    cluster_types=( templates/*/ )
+    cluster_types=( ${cluster_types[@]#*/} )
+    cluster_types=( ${cluster_types[@]%/} )
+    cluster_types="${cluster_types[@]/manifests}"
 fi
 
 if [ -z "$remote" ]; then
@@ -184,7 +184,7 @@ testing "Starting $VERSION tests on branch $branch [$PWD]"
 
 #make
 
-export types
+export cluster_types
 export branch
 
 FAIL=0
@@ -234,17 +234,17 @@ if $interactive; then
     rm -f .tmp
 
     # select cluster types to test
-    types_args=()
+    cluster_types_args=()
     i=1
-    for t in $types; do
-        types_args+=( $t $i on )
+    for t in $cluster_types; do
+        cluster_types_args+=( $t $i on )
         let i+=1
     done
     exec 3>.tmp
-    dialog --output-fd 3 --checklist "Select cluster types to test" 0 0 0 ${types_args[@]}
+    dialog --output-fd 3 --checklist "Select cluster types to test" 0 0 0 ${cluster_types_args[@]}
     set -x
-    types=$(<.tmp) && rm -f .tmp
-    [ ${types:0:1} != , ] || types=${types:1}
+    cluster_types=$(<.tmp) && rm -f .tmp
+    [ ${cluster_types:0:1} != , ] || cluster_types=${cluster_types:1}
 fi
 
 for plan in $plans; do

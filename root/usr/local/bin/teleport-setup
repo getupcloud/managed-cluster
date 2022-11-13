@@ -1,7 +1,7 @@
 #!/bin/bash
 
-context=$(kubectl config get-contexts -o name |
-    grep "^${TELEPORT_PROXY}-$customer" |
+context=$(kubectl config get-contexts -o cluster_name |
+    grep "^${TELEPORT_PROXY}-$customer_name" |
     fzf --ansi --no-preview --cycle --reverse --header='---[ Select Context ]---' |
     awk '{print $1}')
 
@@ -11,8 +11,8 @@ if [ -n "$context" ]; then
 fi
 
 kube_cluster=$(tsh kube ls |
-    grep -iE "^Kube Cluster Name|^----|^$customer" |
-    fzf --ansi --no-preview --cycle --reverse --header="---[ Select Kube Cluster ($customer only) ]---" --header-lines 2 |
+    grep -iE "^Kube Cluster Name|^----|^$customer_name" |
+    fzf --ansi --no-preview --cycle --reverse --header="---[ Select Kube Cluster ($customer_name only) ]---" --header-lines 2 |
     awk '{print $1}')
 
 if [ -n "$kube_cluster" ]; then

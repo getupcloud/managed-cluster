@@ -164,22 +164,22 @@ function select_cluster_type()
     if [ -n "$opt_type" ]; then
         for i in $(list_cluster_types); do
             if [ "$opt_type" == "$i" ]; then
-                export type="$opt_type"
+                export cluster_type="$opt_type"
                 return
             fi
         done
-        warn Invalid cluster type: $opt_type
+        warn Invalid cluster type: $opt_cluster_type
         return 1
     fi
 
     local types=$(list_cluster_types)
     local PS3=$(prompt "Select cluster type")
 
-    select type in ${types}; do
+    select cluster_type in ${types}; do
         break;
     done
 
-    export type
+    export cluster_type
 }
 
 function select_cluster_sla()
@@ -224,7 +224,7 @@ function generate_ssh_key()
 
     if ! [ -e $_key_priv ]; then
         info "Generating $_key_priv ($ssh_key_length bits)"
-        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $_key_priv -N "" -C "$customer/$name/$type"
+        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $_key_priv -N "" -C "$customer_name/$cluster_name/$cluster_type"
     else
         info Using existing $_key_priv
     fi
@@ -433,7 +433,7 @@ function usage()
 {
     echo "Managed Cluster - v$current_version"
     echo "Usage: $0 COMMAND [OPTIONS...] "
-    echo "Creates and manage CLUSTER-DIR (./clusters/\$name/\$type/) from outside manager container."
+    echo "Creates and manage CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/) from outside manager container."
     if [ -z "$command" ]; then
         echo
         echo "Available commands and options:"
@@ -450,20 +450,20 @@ function usage()
     if [ -z "$_command" ] || [ "$_command" == "create" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Creates a new cluster from ./templates/\$type into CLUSTER-DIR (./clusters/\$name/\$type/)." "$COLOR_RESET"
+        echo "     Creates a new cluster from ./templates/\$cluster_type into CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/)." "$COLOR_RESET"
         echo
-        echo "     -c, --customer NAME        Customer name."
+        echo "     -c, --customer_name NAME   Customer name."
         echo "         --force                Force create even if CLUSTER-DIR exists."
         echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
         echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
         echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
         echo "         --ssh-key-length       SSH key length, depends on ssh key type."
         echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
-        echo "     -n, --name NAME            Unique name for new cluster."
+        echo "     -n, --cluster_name NAME    Unique name for new cluster."
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
         echo "     -o, --origin REMOTE        Define ORIGIN remote address."
-        echo "     -s, --sla VALUE            Cluster SLA: high, low, none (default: $opt_sla)."
-        echo "     -t, --type NAME            Cluster type: $(list_cluster_types)."
+        echo "     -s, --cluster_sla VALUE    Cluster SLA: high, low, none (default: $opt_sla)."
+        echo "     -t, --cluster_type NAME    Cluster type: $(list_cluster_types)."
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
@@ -496,7 +496,7 @@ function usage()
     if [ -z "$_command" ] || [ "$_command" == "sync_template" ]; then
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> sync-template [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Sync files from ./templates/\$type into CLUSTER-DIR." "$COLOR_RESET"
+        echo "     Sync files from ./templates/\$cluster_type into CLUSTER-DIR." "$COLOR_RESET"
         echo
         echo "         --force                    Force template sync."
     fi
@@ -609,10 +609,10 @@ common_template_files=(
 
 opt_origin=
 opt_upstream=
-opt_customer=
-opt_name=
-opt_type=
-opt_sla=
+opt_customer_name=
+opt_cluster_name=
+opt_cluster_type=
+opt_cluster_sla=
 opt_flux_git_repo=
 opt_local_git_repo=false
 
@@ -645,20 +645,20 @@ function getopt_create()
                 shift
                 opt_upstream=$1
             ;;
-            -c|--customer)
+            -c|--customer_name)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                opt_customer=$1
+                opt_customer_name=$1
             ;;
-            -n|--name)
+            -n|--cluster_name)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                opt_name=$1
+                opt_cluster_name=$1
             ;;
-            -t|--type)
+            -t|--cluster_type)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                opt_type=$1
+                opt_cluster_type=$1
             ;;
             -k|--ssh-key-type)
                 [ $# -lt 2 ] && invalid_argument $1
@@ -727,7 +727,7 @@ function create_repo_config()
 
     info Creating $REPO_CONF
 
-    read_config customer "Customer name"
+    read_config customer_name "Customer name"
 
     local current_upstream=$(git_remote upstream)
     [ -z "$upstream" ] && upstream="$origin"
@@ -740,7 +740,7 @@ function create_repo_config()
     elif [ -z "$origin" ]; then
         if [ -z "$opt_origin" ]; then
             origin="$(git-url $(git_remote origin) url2ssh)"
-            origin=${origin%.git}-$customer.git
+            origin=${origin%.git}-$customer_name.git
         fi
         read_config origin "Set ORIGIN remote"
     fi
@@ -757,7 +757,7 @@ function save_repo_config()
     info Saving $REPO_CONF
 
     set_config version="$current_version" "Installer version" $REPO_CONF
-    set_config customer="$customer" "Customer name" $REPO_CONF
+    set_config customer_name="$customer_customer" "Customer name" $REPO_CONF
     set_config upstream="$upstream" "Upstream git repo" $REPO_CONF
     set_config origin="$origin" "Origin git repo" $REPO_CONF
     set_config flux_git_repo="$flux_git_repo" "Git repo for default flux GitRepository" $REPO_CONF
@@ -766,10 +766,10 @@ function save_repo_config()
 function create_cluster()
 {
     select_cluster_type
-    read_config name "Cluster name"
+    read_config cluster_name "Cluster name"
     select_cluster_sla
 
-    export CLUSTER_DIR=$ROOT_DIR/clusters/$name/$type
+    export CLUSTER_DIR=$ROOT_DIR/clusters/$cluster_name/$cluster_type
     export CLUSTER_CONF=$CLUSTER_DIR/cluster.conf
 
     mkdir -p ${CLUSTER_DIR}
@@ -784,9 +784,9 @@ function create_cluster()
 function save_cluster_config()
 {
     info Saving $CLUSTER_CONF
-    set_config type="$type" "Cluster Type" $CLUSTER_CONF
-    set_config name="$name" "Cluster Name" $CLUSTER_CONF
-    set_config sla="$sla" "Cluster SLA" $CLUSTER_CONF
+    set_config cluster_type="$cluster_type" "Cluster Type" $CLUSTER_CONF
+    set_config cluster_name="$cluster_name" "Cluster Name" $CLUSTER_CONF
+    set_config cluster_sla="$cluster_sla" "Cluster SLA" $CLUSTER_CONF
 }
 
 #####################################
@@ -816,14 +816,14 @@ function command_install_teleport_agent()
         exit 1
     fi
 
-    read_config customer "Customer name"
+    read_config customer_name "Customer name"
     read_config USERNAME "Username"
     read_config HOSTNAME "Hostname"
     read_config region "Region"
 
     cat > .teleport-config.tmp <<-EOF
 		teleport:
-		  nodename: ${customer}-${HOSTNAME}
+		  nodename: ${customer_name}-${HOSTNAME}
 		ssh_service:
 		  enabled: yes
 		  labels:

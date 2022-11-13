@@ -14,11 +14,11 @@ if [ -n "$GH_TOKEN" ]; then
     gh auth login --with-token <<<$GH_TOKEN
 fi
 
-if [ "$type" == standalone ] || [ -z "$type" ]; then
+if [ "$cluster_type" == standalone ] || [ -z "$cluster_type" ]; then
     info Entering standalone mode
-    export customer=${customer:-standalone}
-    export type=${type:-standalone}
-    export name=${name:-standalone}
+    export customer_name=${customer_name:-standalone}
+    export cluster_type=${cluster_type:-standalone}
+    export cluster_name=${cluster_name:-standalone}
 
     for env in $REPO_DIR/templates/*/provider.env; do
         #info Sourcing $env

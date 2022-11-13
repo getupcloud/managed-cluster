@@ -35,7 +35,7 @@ fi
 
 if ask "Select files to commit now? [Y/n]"; then
     FILES_TO_COMMIT=(
-        $(git status --short repo.conf clusters/$name/$type | fzf -0 --ansi --reverse --multi --disabled \
+        $(git status --short repo.conf clusters/$cluster_name/$cluster_type | fzf -0 --ansi --reverse --multi --disabled \
             --header='---[ Select files to commit (ctrl+a to select all) ]---' \
             --preview "$FZF_PREVIEW" \
             --bind 'ctrl-a:select-all' \
@@ -52,7 +52,7 @@ if ask "Select files to commit now? [Y/n]"; then
         info Commiting files:
         printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
         git add "${FILES_TO_COMMIT[@]}"
-        git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$name/$type"
+        git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$cluster_name/$cluster_type"
     fi
 fi
 

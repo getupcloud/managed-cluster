@@ -502,13 +502,13 @@ if [ -t 0 ]; then
 
     ps1_cluster()
     {
-        if [ -v customer ]; then
-            case "$customer_$name_$type" in
+        if [ -v customer_name ]; then
+            case "${customer_name}_${cluster_name}_${cluster_type}" in
                 standalone_standalone_standalone)
                   ps1_envelope "\[$COLOR_BLUE\]standalone"
                 ;;
                 *)
-                   ps1_envelope cluster "\[$COLOR_YELLOW\]$customer\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$name\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$type"
+                   ps1_envelope cluster "\[$COLOR_YELLOW\]$customer_name\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$cluster_name\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$cluster_type"
             esac
         else
            ps1_envelope cluster '???'
@@ -543,8 +543,8 @@ function update_globals()
         source_env "$CLUSTER_CONF"
     fi
 
-    if [ -v type ]; then
-        export TEMPLATE_DIR=$TEMPLATES_DIR/$type
+    if [ -v cluster_type ]; then
+        export TEMPLATE_DIR=$TEMPLATES_DIR/$cluster_type
     fi
 
     if ! [ -v TELEPORT_PROXY ]; then

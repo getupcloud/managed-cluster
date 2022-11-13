@@ -19,5 +19,5 @@ locals {
       customer_name : var.customer_name
       modules : local.modules_result
     },
-    var.manifests_template_vars)
+  var.manifests_template_vars)
 }

@@ -2,9 +2,9 @@ module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-generic?ref=v1.17"
 
   # cluster basics
-  customer_name   = var.customer
-  cluster_name    = var.name
-  cluster_sla     = var.sla
+  customer_name   = var.customer_name
+  cluster_name    = var.cluster_name
+  cluster_sla     = var.cluster_sla
   use_kubeconfig  = var.use_kubeconfig
   pre_create      = var.pre_create
   post_create     = var.post_create

@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
 make
-for type in $types; do
-    CLUSTER_DIR=$PWD/clusters/$NAME/$type
+for cluster_type in $cluster_types; do
+    CLUSTER_DIR=$PWD/clusters/$NAME/$cluster_type
 
     rm -rf $CLUSTER_DIR
-    ./managed-cluster create --customer $CUSTOMER --name $NAME --type $type --sla none \
+    ./managed-cluster create --customer-name $CUSTOMER --cluster-name $NAME --cluster-type $cluster_type --cluster-sla none \
         --flux-git-repo ssh://git@github.com/eveilcorp/managed-cluster-evilcluster.git \
         --origin git@github.com:evilcorp/managed-cluster-evilcluster.git \
         --upstream git@github.com:evilcorp/managed-cluster.git
 
-    terraform_params=( $(jq .${type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r tests/test-data.json 2>/dev/null || true) )
+    terraform_params=( $(jq .${cluster_type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r tests/test-data.json 2>/dev/null || true) )
 
     cat > $CLUSTER_DIR/test-cluster <<EOF
 #!/bin/bash
 
 tput rev
-m="Starting tests for cluster $NAME type $type at branch $branch"
+m="Starting tests for cluster $NAME type $cluster_type at branch $branch"
 printf '%0.s#' \$(seq 1 \${#m})
 echo -e "\\n\${m}"
 printf '%0.s#' \$(seq 1 \${#m})

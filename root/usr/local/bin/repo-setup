@@ -20,7 +20,7 @@ if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
     exit 1
 fi
 
-: ${gh_description:="Getupcloud Managed Cluster: $customer"}
+: ${gh_description:="Getupcloud Managed Cluster: $customer_name"}
 : ${gh_team:=operations}
 : ${gh_disable_issues:=true}
 : ${gh_disable_wiki:=true}
@@ -90,7 +90,7 @@ else
   info "Uploading ssh key: $CLUSTER_DIR/identity.pub ($local_ssh_key_fingerprint)"
 
   if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
-      -f "key=$(<$CLUSTER_DIR/identity.pub)" -f read_only=false -f title="managed-cluster-${name}-${type}"; then
+      -f "key=$(<$CLUSTER_DIR/identity.pub)" -f read_only=false -f title="managed-cluster-${cluster_name}-${cluster_type}"; then
           warn "Failed adding key"
   fi
 fi
