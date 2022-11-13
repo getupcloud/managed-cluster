@@ -24,7 +24,7 @@ default: build
 CLUSTER_TYPES := $(shell ls -1 templates/*/provider.env | awk -F/ '{print $$2}')
 
 define CLUSTER_REPO_template =
-	for i in provider cluster modules; do \
+	for i in provider cluster; do \
 		url=https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-$$i.tf; \
 		file=templates/$(1)/variables-$$i.tf; \
 		printf "%-110s" "Downloading $$url"; \

@@ -1,9 +1,13 @@
 locals {
-  modules = merge(var.modules_defaults, var.modules_defaults_provider, var.modules)
+  modules = merge(var.modules_defaults, var.modules)
+
+  register_modules = {
+    linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : {}
+  }
 
   modules_result = {
-    for name, module in local.modules : name => merge(module[0], {
-      output : lookup(var.modules, name).enabled ? module[0] : tomap({})
+    for name, config in local.modules : name => merge(config, {
+      output : config.enabled ? lookup(local.register_modules, name, {}) : tomap({})
     })
   }
 

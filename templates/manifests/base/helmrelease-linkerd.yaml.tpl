@@ -113,10 +113,6 @@ spec:
     - effect: NoSchedule
       operator: Exists
 
-### 
-### ${ modules.linkerd.output.ca_crt}
-### 
-
 %{ if try(modules.linkerd.output.ca_crt, "") != "" }
     identityTrustAnchorsPEM: |-
       ${indent(6, trimspace(try(modules.linkerd.output.ca_crt, "")))}
