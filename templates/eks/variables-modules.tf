@@ -8,7 +8,7 @@ variable "modules_defaults_provider" {
       enabled      = bool
       ingressClass = string
     })
-    certmanager = object({
+    cert-manager = object({
       enabled         = bool
       hosted_zone_ids = list(string)
     })
@@ -40,7 +40,7 @@ variable "modules_defaults_provider" {
       enabled      = true
       ingressClass = "alb"
     }
-    certmanager = {
+    cert-manager = {
       enabled         = false
       hosted_zone_ids = []
     }

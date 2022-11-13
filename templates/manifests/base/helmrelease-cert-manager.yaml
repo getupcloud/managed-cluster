@@ -10,8 +10,9 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jetstack
-      version: 1.8.0
-  dependsOn: []
+      version: 1.8.10
+  dependsOn:
+  - name: monitoring
   install:
     createNamespace: true
     disableWait: false
@@ -33,10 +34,7 @@ spec:
         enabled: true
 
     tolerations:
-    - key: dedicated
-      value: infra
-      effect: NoSchedule
-    - key: CriticalAddonsOnly
+    - operator: Exists
       effect: NoSchedule
 
     nodeSelector:
@@ -46,18 +44,12 @@ spec:
       nodeSelector:
         role: infra
       tolerations:
-      - key: dedicated
-        value: infra
-        effect: NoSchedule
-      - key: CriticalAddonsOnly
+      - operator: Exists
         effect: NoSchedule
 
     webhook:
       nodeSelector:
         role: infra
       tolerations:
-      - key: dedicated
-        value: infra
-        effect: NoSchedule
-      - key: CriticalAddonsOnly
+      - operator: Exists
         effect: NoSchedule

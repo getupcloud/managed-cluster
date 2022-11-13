@@ -105,7 +105,19 @@ spec:
     installNamespace: false
     clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
     cniEnabled: ${ modules.linkerd-cni.enabled }
-%{ if trimspace(try(modules.linkerd.output.ca_crt, "")) != "" }
+
+    nodeSelector:
+      role: infra
+
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+
+### 
+### ${ modules.linkerd.output.ca_crt}
+### 
+
+%{ if try(modules.linkerd.output.ca_crt, "") != "" }
     identityTrustAnchorsPEM: |-
       ${indent(6, trimspace(try(modules.linkerd.output.ca_crt, "")))}
     identity:
@@ -117,13 +129,6 @@ spec:
             ${indent(12, trimspace(try(modules.linkerd.output.issuer_key, "")))}
         crtExpiry: ${try(modules.linkerd.output.issuer_crt_expiry, "")}
 %{~   endif }
-%{~   if length(modules.linkerd.nodeSelector) > 0}
-    nodeSelector:
-      ${indent(6, yamlencode(modules.linkerd.nodeSelector))}
-%{~   endif }
-    tolerations:
-    - effect: NoSchedule
-      operator: Exists
 %{~ endif }
 
 %{~ if modules.linkerd-cni.enabled }
@@ -169,10 +174,10 @@ spec:
     installNamespace: false
     destCNIBinDir: /var/lib/cni/bin
     destCNINetDir: /etc/kubernetes/cni/net.d
-%{~   if length(modules.linkerd.nodeSelector) > 0}
+
     nodeSelector:
-      ${indent(6, yamlencode(modules.linkerd-cni.nodeSelector))}
-%{~   endif }
+      role: infra
+
     tolerations:
     - effect: NoSchedule
       operator: Exists
@@ -216,10 +221,10 @@ spec:
   - name: linkerd
   values:
     installNamespace: true
-%{~   if length(modules.linkerd-viz.nodeSelector) > 0 }
+
     nodeSelector:
-      ${indent(6, yamlencode(modules.linkerd-viz.nodeSelector))}
-%{~   endif }
+      role: infra
+
     tolerations:
     - effect: NoSchedule
       operator: Exists

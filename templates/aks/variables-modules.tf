@@ -4,7 +4,7 @@
 variable "modules_defaults_provider" {
   description = "Configure Azure modules to install (defaults)"
   type = object({
-    certmanager = object({
+    cert-manager = object({
       enabled         = bool
       hosted_zone_ids = list(string)
     })
@@ -13,7 +13,7 @@ variable "modules_defaults_provider" {
   })
 
   default = {
-    certmanager = {
+    cert-manager = {
       enabled         = false
       hosted_zone_ids = []
     }
