@@ -2,7 +2,7 @@ locals {
   modules = merge(var.modules_defaults, var.modules)
 
   register_modules = {
-    linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : {}
+    linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
   }
 
   modules_result = {
