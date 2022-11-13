@@ -502,17 +502,13 @@ if [ -t 0 ]; then
 
     ps1_cluster()
     {
-        if [ -v customer_name ]; then
-            case "${customer_name}_${cluster_name}_${cluster_type}" in
-                standalone_standalone_standalone)
-                  ps1_envelope "\[$COLOR_BLUE\]standalone"
-                ;;
-                *)
-                   ps1_envelope cluster "\[$COLOR_YELLOW\]$customer_name\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$cluster_name\[$COLOR_RESET\]|\[$COLOR_YELLOW\]$cluster_type"
-            esac
-        else
-           ps1_envelope cluster '???'
-        fi
+        case "${customer_name}_${cluster_name}_${cluster_type}" in
+            standalone_standalone_standalone)
+                ps1_envelope "\[$COLOR_BLUE\]standalone"
+            ;;
+            *)
+                ps1_envelope cluster "\[$COLOR_YELLOW\]${customer_name:-?}\[$COLOR_RESET\]|\[$COLOR_YELLOW\]${cluster_name:-?}\[$COLOR_RESET\]|\[$COLOR_YELLOW\]${cluster_type:-?}"
+        esac
     }
 
     do_ps1()
