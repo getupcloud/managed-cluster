@@ -40,7 +40,7 @@ function copy_from_template_common()
 
 function copy_from_template_provider()
 {
-    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_DIR/"
+    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR $CLUSTER_DIR/"
     info "--> $cmd"
     $cmd
 }
@@ -952,6 +952,7 @@ function check_deprecations()
     done
 
     local rename_configs=(
+        type:cluster_type
         name:cluster_name
         customer:customer_name
         sla:cluster_sla
@@ -1034,6 +1035,7 @@ function command_sync_template()
 {
     check_update
     assert_cluster_dir
+    check_deprecations
     sync_from_template
     merge_requires
 }
