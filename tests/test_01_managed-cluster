@@ -26,13 +26,13 @@ assert "grep -q flux_git_repo=ssh://git@git.flux-system.svc.cluster.local/git re
 
 testing "Can create cluster with non-default key size"
 reset_cluster
-run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --sla none --ssh-key-type ecdsa --ssh-key-length 256 --force"
+run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --cluster-sla none --ssh-key-type ecdsa --ssh-key-length 256 --force"
 assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 9 ]"
 assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp256 ]"
 
 testing "Can create cluster"
 reset_cluster
-run "./managed-cluster create  -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --sla high --ssh-key-type ecdsa"
+run "./managed-cluster create  -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --cluster-sla high --ssh-key-type ecdsa"
 assert "grep -q customer_name=$CUSTOMER $REPO_CONFIG"
 [ "$remote" == local ] || \
     assert "grep -q upstream=$UPSTREAM $REPO_CONFIG"
@@ -53,11 +53,11 @@ assert "[ '$(cat out.txt)' -eq '$UID' ]"
 ##### TEMPLATES ######
 
 testing "Can sync templates"
-cp templates/$TYPE/variables.tf templates/$TYPE/variables.tf.test
-echo "# test-placeholder" >> templates/$TYPE/requires.txt
-grep -q 'TESTING LINE' templates/$TYPE/variables.tf || echo -e "\n# TESTING LINE #$$" >> templates/$TYPE/variables.tf
+cp templates/$TYPE/variables-provider.tf templates/$TYPE/variables-provider.tf.test
+echo -e "\n# test-placeholder" >> templates/$TYPE/requires.txt
+echo -e "\n# TESTING LINE #$$" >> templates/$TYPE/variables-provider.tf
 run "./managed-cluster -v sync-template --force $CLUSTER_DIR"
-assert "grep -q '# TESTING LINE #$$' $CLUSTER_DIR/variables.tf"
+assert "grep -q '# TESTING LINE #$$' $CLUSTER_DIR/variables-provider.tf"
 assert "grep -q '# test-placeholder' $CLUSTER_DIR/requires.tf"
 
 ##### SSH KEY ######

@@ -33,6 +33,11 @@ fi
 
 function copy_from_template_common()
 {
+    if [ -z "$TEMPLATES_DIR" ] || [ -z "$CLUSTER_DIR" ]; then
+        echo "Invalid empty TEMPLATE_DIR=$TEMPLATES_DIR CLUSTER_DIR=$CLUSTER_DIR. This is a bug!"
+        exit 2
+    fi
+
     local cmd="rsync -va --checksum --omit-dir-times $@ ${common_template_files[@]/#/$TEMPLATES_DIR/} $CLUSTER_DIR/"
     info "--> $cmd"
     $cmd
@@ -40,7 +45,12 @@ function copy_from_template_common()
 
 function copy_from_template_provider()
 {
-    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR $CLUSTER_DIR/"
+    if [ -z "$TEMPLATE_DIR" ] || [ -z "$CLUSTER_DIR" ]; then
+        echo "Invalid empty TEMPLATE_DIR=$TEMPLATE_DIR CLUSTER_DIR=$CLUSTER_DIR. This is a bug!"
+        exit 2
+    fi
+
+    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_DIR/"
     info "--> $cmd"
     $cmd
 }
@@ -161,10 +171,10 @@ function list_cluster_types()
 function select_cluster_type()
 {
     # use value if already exists
-    if [ -n "$opt_type" ]; then
+    if [ -n "$opt_cluster_type" ]; then
         for i in $(list_cluster_types); do
-            if [ "$opt_type" == "$i" ]; then
-                export cluster_type="$opt_type"
+            if [ "$opt_cluster_type" == "$i" ]; then
+                export cluster_type="$opt_cluster_type"
                 return
             fi
         done
@@ -184,28 +194,28 @@ function select_cluster_type()
 
 function select_cluster_sla()
 {
-    if [ -n "$opt_sla" ]; then
-        case "$opt_sla" in
+    if [ -n "$opt_cluster_sla" ]; then
+        case "$opt_cluster_sla" in
             high|low|none)
-                export sla=$opt_sla
+                export cluster_sla=$opt_cluster_sla
                 return
             ;;
         esac
-        warn Invalid cluster SLA: $opt_sla
+        warn Invalid cluster SLA: $opt_cluster_sla
         return 1
     fi
 
     local PS3=$(prompt "Select cluster SLA")
 
-    select sla in "high (prod|hlg)" "low (dev|test)" "none (no remote-ops)"; do
-        sla=$(cut -f1 -d' ' <<<$sla)
-        case "$sla" in
+    select cluster_sla in "high (prod|hlg)" "low (dev|test)" "none (no remote-ops)"; do
+        cluster_sla=$(cut -f1 -d' ' <<<$cluster_sla)
+        case "$cluster_sla" in
             high|low|none)
                 break;
         esac
     done
 
-    export sla
+    export cluster_sla
 }
 
 function set_local_git_repo()
@@ -452,18 +462,18 @@ function usage()
         echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Creates a new cluster from ./templates/\$cluster_type into CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/)." "$COLOR_RESET"
         echo
-        echo "     -c, --customer_name NAME   Customer name."
+        echo "     -c, --customer-name NAME   Customer name."
         echo "         --force                Force create even if CLUSTER-DIR exists."
         echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
         echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
         echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
         echo "         --ssh-key-length       SSH key length, depends on ssh key type."
         echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
-        echo "     -n, --cluster_name NAME    Unique name for new cluster."
+        echo "     -n, --cluster-name NAME    Unique name for new cluster."
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
         echo "     -o, --origin REMOTE        Define ORIGIN remote address."
-        echo "     -s, --cluster_sla VALUE    Cluster SLA: high, low, none (default: $opt_sla)."
-        echo "     -t, --cluster_type NAME    Cluster type: $(list_cluster_types)."
+        echo "     -s, --cluster-sla VALUE    Cluster SLA: high, low, none (default: $opt_cluster_sla)."
+        echo "     -t, --cluster-type NAME    Cluster type: $(list_cluster_types)."
         echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
@@ -645,17 +655,17 @@ function getopt_create()
                 shift
                 opt_upstream=$1
             ;;
-            -c|--customer_name)
+            -c|--customer-name)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 opt_customer_name=$1
             ;;
-            -n|--cluster_name)
+            -n|--cluster-name)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 opt_cluster_name=$1
             ;;
-            -t|--cluster_type)
+            -t|--cluster-type)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 opt_cluster_type=$1
@@ -675,10 +685,10 @@ function getopt_create()
                 shift
                 ssh_host=$1
             ;;
-            -s|--sla)
+            -s|--cluster-sla)
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
-                opt_sla=$1
+                opt_cluster_sla=$1
             ;;
             *)
                 invalid_argument $1
@@ -757,7 +767,7 @@ function save_repo_config()
     info Saving $REPO_CONF
 
     set_config version="$current_version" "Installer version" $REPO_CONF
-    set_config customer_name="$customer_customer" "Customer name" $REPO_CONF
+    set_config customer_name="$customer_name" "Customer name" $REPO_CONF
     set_config upstream="$upstream" "Upstream git repo" $REPO_CONF
     set_config origin="$origin" "Origin git repo" $REPO_CONF
     set_config flux_git_repo="$flux_git_repo" "Git repo for default flux GitRepository" $REPO_CONF
