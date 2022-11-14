@@ -42,11 +42,11 @@ users:
 - system:serviceaccount:linkerd:linkerd-identity
 - system:serviceaccount:linkerd:linkerd-proxy-injector
 - system:serviceaccount:linkerd:linkerd-heartbeat
-%{~     if modules.linkerd-cni.enabled }
+%{~     if modules.linkerd.linkerd-cni.enabled }
 - system:serviceaccount:linkerd-cni:default
 - system:serviceaccount:linkerd-cni:linkerd-cni
 %{~     endif }
-%{~     if modules.linkerd-viz.enabled }
+%{~     if modules.linkerd.linkerd-viz.enabled }
 %{~       for sa in ["default", "grafana", "metrics-api", "prometheus", "tap", "tap-injector", "web"] }
 - system:serviceaccount:linkerd-viz:${sa}
 %{~       endfor }
@@ -74,16 +74,16 @@ metadata:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: linkerd
+  name: linkerd-control-plane
   namespace: flux-system
 spec:
   chart:
     spec:
-      chart: linkerd2
+      chart: linkerd-control-plane
       sourceRef:
         kind: HelmRepository
         name: linkerd
-      version: 2.11.2
+      version: "~> 1.9"
   install:
     createNamespace: false
     disableWait: false
@@ -94,17 +94,18 @@ spec:
     remediation:
       retries: -1
   interval: 30m
-  releaseName: linkerd
+  releaseName: linkerd-control-plane
   storageNamespace: linkerd
   targetNamespace: linkerd
-%{~   if modules.linkerd-cni.enabled }
   dependsOn:
+  - name: linkerd-crds
+%{~   if modules.linkerd.linkerd-cni.enabled }
   - name: linkerd-cni
 %{~   endif }
   values:
     installNamespace: false
-    clusterNetworks: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
-    cniEnabled: ${ modules.linkerd-cni.enabled }
+    clusterNetworks: 10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
+    cniEnabled: ${ modules.linkerd.linkerd-cni.enabled }
 
     nodeSelector:
       role: infra
@@ -127,7 +128,35 @@ spec:
 %{~   endif }
 %{~ endif }
 
-%{~ if modules.linkerd-cni.enabled }
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkerd-crds
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: linkerd-crds
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+      version: "~> 1.4"
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 30m
+  releaseName: linkerd
+  storageNamespace: linkerd
+  targetNamespace: linkerd
+
+%{~ if modules.linkerd.linkerd-cni.enabled }
 ##
 ## Linkerd CNI (required for OKD)
 ##
@@ -152,7 +181,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: linkerd
-      version: 2.11.2
+      version: "~> 30.3"
   install:
     createNamespace: false
     disableWait: false
@@ -179,7 +208,7 @@ spec:
       operator: Exists
 %{~ endif }
 
-%{~ if modules.linkerd-viz.enabled }
+%{~ if modules.linkerd.linkerd-viz.enabled }
 ##
 ## Linkerd Viz
 ##
@@ -196,7 +225,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: linkerd
-      version: 2.11.2
+      version: "~> 30.3"
   install:
     createNamespace: false
     disableWait: false
@@ -214,7 +243,7 @@ spec:
   storageNamespace: flux-system
   targetNamespace: linkerd-viz
   dependsOn:
-  - name: linkerd
+  - name: linkerd-control-plane
   values:
     installNamespace: true
 

@@ -23,8 +23,8 @@ spec:
       retries: -1
   interval: 5m
   releaseName: falco
-  storageNamespace: kube-system
-  targetNamespace: kube-system
+  storageNamespace: falco-system
+  targetNamespace: falco-ssytem
   values:
     #auditLog:
     #  enabled: true
@@ -43,7 +43,7 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
-%{ if modules.falco-exporter.enabled ~}
+%{ if modules.falco.falco-exporter.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -57,7 +57,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      version: "~> 0.9"
+      versoin: "~> 0.9"
   install:
     createNamespace: true
     disableWait: true
@@ -69,8 +69,8 @@ spec:
       retries: -1
   interval: 5m
   releaseName: falco-exporter
-  storageNamespace: kube-system
-  targetNamespace: kube-system
+  storageNamespace: falco-system
+  targetNamespace: falco-system
   values:
     serviceMonitor:
       enabled: true
@@ -112,8 +112,8 @@ spec:
       retries: -1
   interval: 5m
   releaseName: event-generator
-  storageNamespace: kube-system
-  targetNamespace: kube-system
+  storageNamespace: falco-system
+  targetNamespace: falco-ssytem
   values:
     config:
       # -- The event-generator accepts two commands (run, test): 
@@ -132,4 +132,3 @@ spec:
 %{~ endif }
 %{~ endif }
 %{~ endif }
-
