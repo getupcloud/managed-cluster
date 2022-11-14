@@ -28,7 +28,7 @@ spec:
     # HA requires at least 3 pods
     replicaCount: 1
 ---
-%{~ if modules.kyverno-policies.enabled }
+%{~ if modules.kyverno.kyverno-policies.enabled }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

@@ -57,7 +57,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      versoin: "~> 0.9"
+      version: "~> 0.9"
   install:
     createNamespace: true
     disableWait: true

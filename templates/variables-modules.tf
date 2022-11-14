@@ -35,7 +35,7 @@ variable "modules_defaults" {
     kyverno = {
       enabled = false
       kyverno-policies = {
-        enabled = false
+        enabled = true
       }
     }
     linkerd = {
