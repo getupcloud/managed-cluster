@@ -1,4 +1,5 @@
 # local files
+**/.debug*
 **/.aws/*
 **/.kube/*
 **/.setup_history

@@ -21,7 +21,7 @@ locals {
 
   modules_result = {
     for name, config in local.modules : name => merge(config, {
-      output : config.enabled ? lookup(local.register_modules, name, {}) : tomap({})
+      output : config.enabled ? lookup(local.register_modules, name, tomap({})) : tomap({})
     })
   }
 

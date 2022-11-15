@@ -44,12 +44,6 @@ variable "customer_name" {
   type        = string
 }
 
-variable "flux_debug" {
-  description = "Dump debug info to file .debug-flux.json"
-  type        = bool
-  default     = false
-}
-
 variable "flux_git_repo" {
   description = "GitRepository URL"
   type        = string
@@ -135,6 +129,12 @@ variable "teleport_auth_token" {
 
 variable "use_kubeconfig" {
   description = "Should kubernetes/kubectl providers use local kubeconfig or credentials from cloud module"
+  type        = bool
+  default     = false
+}
+
+variable "dump_debug" {
+  description = "Dump debug info to files .debug-*.json"
   type        = bool
   default     = false
 }

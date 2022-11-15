@@ -9,6 +9,7 @@ module "eks" {
   pre_create     = concat(var.eks_pre_create, var.pre_create)
   post_create    = concat(var.eks_post_create, var.post_create)
   modules        = local.modules_result
+  dump_debug     = var.dump_debug
 
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled
@@ -21,7 +22,6 @@ module "eks" {
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
-  flux_debug              = var.flux_debug
   manifests_template_vars = local.manifests_template_vars
 
   # provider specific

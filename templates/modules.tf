@@ -1,12 +1,12 @@
 # Must register all modules in locals.tf
 
 module "linkerd" {
-  count  = try(local.modules.linkerd.enabled, false) ? 1 : 0
+  count  = local.modules.linkerd.enabled ? 1 : 0
   source = "github.com/getupcloud/terraform-module-linkerd?ref=v0.6"
 }
 
 module "weave-gitops-password" {
-  count  = try(local.modules.weave-gitops.enabled, false) ? 1 : 0
+  count  = local.modules.weave-gitops.enabled ? 1 : 0
   source = "github.com/getupcloud/terraform-module-password?ref=v0.1.0"
 
   algorithm  = "bcrypt"
@@ -15,7 +15,12 @@ module "weave-gitops-password" {
 
 locals {
   weave-gitops = {
-    admin-username      = local.modules.weave-gitops.enabled ? local.modules.weave-gitops.admin-username : ""
     admin-password-hash = local.modules.weave-gitops.enabled ? module.weave-gitops-password[0].secret : ""
   }
+}
+
+resource "local_file" "debug-modules" {
+  count = var.dump_debug ? 1 : 0
+  filename = ".debug-modules.json"
+  content = data.merge_merge.modules.output
 }
