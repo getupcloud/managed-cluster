@@ -20,4 +20,5 @@ resources:
 - helmrelease-trivy-operator-polr-adapter.yaml
 - helmrelease-trivy-operator.yaml
 - helmrelease-velero.yaml
+- helmrelease-weave-gitops.yaml
 - helmrepository.yaml
