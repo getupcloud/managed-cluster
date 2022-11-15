@@ -32,7 +32,7 @@ variable "modules_defaults" {
         enabled = true
       }
       falco-exporter = {
-        enabled = false
+        enabled = true
       }
     }
     kong = {
@@ -50,10 +50,10 @@ variable "modules_defaults" {
     linkerd = {
       enabled = false
       linkerd-cni = {
-        enabled = false
+        enabled = true
       }
       linkerd-viz = {
-        enabled = false
+        enabled = true
       }
     }
     trivy = {
