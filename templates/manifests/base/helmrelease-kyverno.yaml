@@ -35,7 +35,6 @@ metadata:
   name: kyverno-policies
   namespace: flux-system
 spec:
-  suspend: true
   chart:
     spec:
       chart: kyverno-policies

@@ -1,5 +1,18 @@
+data "merge_merge" "modules" {
+
+  dynamic "input" {
+    for_each = [ var.modules_defaults, var.modules ]
+
+    content {
+      format = "json"
+      data = jsonencode(input.value)
+    }
+  }
+  output_format = "json"
+}
+
 locals {
-  modules = merge(var.modules_defaults, var.modules)
+  modules = jsondecode(data.merge_merge.modules.output)
 
   register_modules = {
     linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})

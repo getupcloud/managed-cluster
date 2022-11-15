@@ -1,10 +1,10 @@
+%{ if modules.kong.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: kong-dbless
   namespace: flux-system
 spec:
-  suspend: true
   chart:
     spec:
       chart: kong
@@ -1044,3 +1044,4 @@ spec:
     # - name: my-secret
     #   mountPath: /mount/to/my/location
     #   subPath: my-subpath # Optional, if you wish to mount a single key and not the entire ConfigMap
+%{~ endif }

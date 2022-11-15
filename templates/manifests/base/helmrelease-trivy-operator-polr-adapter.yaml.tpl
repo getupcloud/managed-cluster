@@ -1,3 +1,4 @@
+%{ if modules.trivy.enabled }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -10,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: trivy-operator-polr-adapter
-      version: "~> 0.1.3"
+      version: "~> 0.1"
   dependsOn:
   - name: trivy-operator
   - name: policy-reporter
@@ -33,3 +34,4 @@ spec:
         enabled: true
       rbacAssessmentReports:
         enabled: true
+%{~ endif }

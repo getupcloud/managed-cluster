@@ -6,7 +6,7 @@ variable "modules_defaults" {
       event-generator = object({ enabled = bool })
       falco-exporter  = object({ enabled = bool })
     })
-    kube_opex_analytics = object({ enabled = bool })
+    kube-opex-analytics = object({ enabled = bool })
     kyverno = object({
       enabled          = bool
       kyverno-policies = object({ enabled = bool })
@@ -29,7 +29,10 @@ variable "modules_defaults" {
         enabled = false
       }
     }
-    kube_opex_analytics = {
+    kong = {
+      enabled = false
+    }
+    kube-opex-analytics = {
       enabled = false
     }
     kyverno = {

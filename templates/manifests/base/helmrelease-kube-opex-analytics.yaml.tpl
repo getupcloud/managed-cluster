@@ -1,4 +1,4 @@
-%{~ if try(modules.kube_opex_analytics.enabled, false) }
+%{~ if modules.kube-opex-analytics.enabled }
 %{ if cluster_type == "okd" ~}
 ---
 apiVersion: security.openshift.io/v1
@@ -60,7 +60,6 @@ metadata:
   name: kube-opex-analytics
   namespace: flux-system
 spec:
-  suspend: true
   chart:
     spec:
       chart: kube-opex-analytics

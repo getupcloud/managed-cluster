@@ -1,17 +1,17 @@
+%{ if modules.kyverno.enabled || modules.trivy.enabled }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: policy-reporter
   namespace: flux-system
 spec:
-  suspend: false
   chart:
     spec:
       chart: policy-reporter
       sourceRef:
         kind: HelmRepository
         name: policy-reporter
-      version: "~> 2.13.1"
+      version: "~> 2.13"
   dependsOn:
   - name: kyverno
   install:
@@ -42,3 +42,4 @@ spec:
         skipExistingOnStartup: true
         sources:
         - kyverno
+%{~ endif }

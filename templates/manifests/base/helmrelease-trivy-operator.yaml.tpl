@@ -1,3 +1,4 @@
+%{ if modules.trivy.enabled }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -45,11 +46,12 @@ spec:
     resources:
       requests:
         cpu: 100m
-        memory: 100M
+        memory: 128Mi
       limits:
         cpu: 200m
-        memory: 200M
+        memory: 512Mi
 
     serviceMonitor:
       enabled: true
       interval: "600s"
+%{~ endif }
