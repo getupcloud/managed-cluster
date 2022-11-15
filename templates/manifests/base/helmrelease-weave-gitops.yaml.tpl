@@ -27,7 +27,7 @@ spec:
   values:
     adminUser:
       create: true
-      username: ${ try(modules.weave-gitops.output.admin-username )}
+      username: ${ try(modules.weave-gitops.admin-username )}
       passwordHash: ${ try(modules.weave-gitops.output.admin-password-hash)}
     metrics:
       enabled: true
