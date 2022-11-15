@@ -30,5 +30,5 @@ spec:
       username: ${ try(modules.weave-gitops.output.admin-username )}
       passwordHash: ${ try(modules.weave-gitops.output.admin-password-hash)}
     metrics:
-      enabled: ${ modules.monitoring.enabled }
+      enabled: true
 %{~ endif }

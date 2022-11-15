@@ -7,6 +7,7 @@ variable "modules_defaults" {
       falco-exporter  = object({ enabled = bool })
     })
     kube-opex-analytics = object({ enabled = bool })
+    kong = object({ enabled = bool })
     kyverno = object({
       enabled          = bool
       kyverno-policies = object({ enabled = bool })
@@ -17,6 +18,11 @@ variable "modules_defaults" {
       linkerd-viz = object({ enabled = bool })
     })
     trivy = object({ enabled = bool })
+    weave-gitops = object({
+      enabled = bool
+      admin-username = string
+      admin-password = string
+    })
   })
 
   default = {
