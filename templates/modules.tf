@@ -16,6 +16,6 @@ module "weave-gitops-password" {
 locals {
   weave-gitops = {
     admin-username = local.modules.weave-gitops.enabled ? local.modules.weave-gitops.admin-username : ""
-    admin-password-hash = local.modules.weave-gitops.enabled ? module.weave-gitops-password.secret : ""
+    admin-password-hash = local.modules.weave-gitops.enabled ? module.weave-gitops-password[0].secret : ""
   }
 }
