@@ -1,11 +1,11 @@
 data "merge_merge" "modules" {
 
   dynamic "input" {
-    for_each = [ var.modules_defaults, var.modules ]
+    for_each = [var.modules_defaults, var.modules]
 
     content {
       format = "json"
-      data = jsonencode(input.value)
+      data   = jsonencode(input.value)
     }
   }
   output_format = "json"
