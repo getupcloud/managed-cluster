@@ -3,6 +3,7 @@ locals {
 
   register_modules = {
     linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
+    weave-gitops : local.modules.weave-gitops.enabled ? local.weave-gitops : tomap({})
   }
 
   modules_result = {

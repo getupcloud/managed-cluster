@@ -214,3 +214,13 @@ metadata:
 spec:
   interval: 1h
   url: https://fjogeleit.github.io/trivy-operator-polr-adapter
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: weave-gitops
+  namespace: flux-system
+spec:
+  interval: 1h
+  type: oci
+  url: oci://ghcr.io/weaveworks/charts

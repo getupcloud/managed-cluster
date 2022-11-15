@@ -50,5 +50,10 @@ variable "modules_defaults" {
     trivy = {
       enabled = false
     }
+    weave-gitops = {
+      enabled = false
+      admin-username = "admin"
+      admin-password = "weave-admin"
+    }
   }
 }

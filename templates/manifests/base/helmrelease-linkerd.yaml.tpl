@@ -152,7 +152,7 @@ spec:
     remediation:
       retries: -1
   interval: 30m
-  releaseName: linkerd
+  releaseName: linkerd-crds
   storageNamespace: linkerd
   targetNamespace: linkerd
 
@@ -240,7 +240,7 @@ spec:
   ##
   ## We need all labels from chart's template for linkerd-viz namespace
   ##
-  storageNamespace: flux-system
+  storageNamespace: linkerd-viz
   targetNamespace: linkerd-viz
   dependsOn:
   - name: linkerd-control-plane
