@@ -20,7 +20,7 @@ locals {
 }
 
 resource "local_file" "debug-modules" {
-  count = var.dump_debug ? 1 : 0
+  count    = var.dump_debug ? 1 : 0
   filename = ".debug-modules.json"
-  content = data.merge_merge.modules.output
+  content  = data.merge_merge.modules.output
 }

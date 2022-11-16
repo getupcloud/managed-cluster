@@ -12,6 +12,8 @@ data "merge_merge" "modules" {
 }
 
 locals {
+  kubeconfig_filename = abspath(pathexpand(var.kubeconfig_filename))
+
   modules = jsondecode(data.merge_merge.modules.output)
 
   register_modules = {
