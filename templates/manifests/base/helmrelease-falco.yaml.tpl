@@ -24,7 +24,7 @@ spec:
   interval: 5m
   releaseName: falco
   storageNamespace: falco-system
-  targetNamespace: falco-ssytem
+  targetNamespace: falco-system
   values:
     #auditLog:
     #  enabled: true
@@ -113,7 +113,7 @@ spec:
   interval: 5m
   releaseName: event-generator
   storageNamespace: falco-system
-  targetNamespace: falco-ssytem
+  targetNamespace: falco-system
   values:
     config:
       # -- The event-generator accepts two commands (run, test): 
