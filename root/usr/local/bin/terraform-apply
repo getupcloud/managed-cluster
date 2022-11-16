@@ -14,4 +14,6 @@ _default=n \
     ask_execute_command terraform apply $TF_PLAN_FILE
 ask_execute_command terraform fmt
 ask_execute_command repo-push
-ask_execute_command kubeconfig-get
+
+[ -e "$KUBECONFIG" ] && _default=n; \
+    ask_execute_command kubeconfig-get
