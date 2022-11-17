@@ -44,7 +44,6 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
-%{~ endif }
 %{ if modules.falco.falco-exporter.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -194,4 +193,6 @@ spec:
       maxSurge: 0
       maxUnavailable: 20%
     type: RollingUpdate
+%{~ endif }
+
 %{~ endif }

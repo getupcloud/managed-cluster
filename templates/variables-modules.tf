@@ -5,6 +5,7 @@ variable "modules_defaults" {
       enabled         = bool
       event-generator = object({ enabled = bool })
       falco-exporter  = object({ enabled = bool })
+      node-setup      = object({ enabled = bool })
     })
     kube-opex-analytics = object({ enabled = bool })
     kong                = object({ enabled = bool })
@@ -16,7 +17,6 @@ variable "modules_defaults" {
       enabled     = bool
       linkerd-cni = object({ enabled = bool })
       linkerd-viz = object({ enabled = bool })
-      node-setup  = object({ enabled = bool })
     })
     trivy = object({ enabled = bool })
     weave-gitops = object({
@@ -33,6 +33,9 @@ variable "modules_defaults" {
         enabled = true
       }
       falco-exporter = {
+        enabled = true
+      }
+      node-setup = {
         enabled = true
       }
     }
@@ -54,9 +57,6 @@ variable "modules_defaults" {
         enabled = true
       }
       linkerd-viz = {
-        enabled = true
-      }
-      node-setup = {
         enabled = true
       }
     }
