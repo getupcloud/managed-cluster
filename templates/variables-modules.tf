@@ -16,6 +16,7 @@ variable "modules_defaults" {
       enabled     = bool
       linkerd-cni = object({ enabled = bool })
       linkerd-viz = object({ enabled = bool })
+      node-setup  = object({ enabled = bool })
     })
     trivy = object({ enabled = bool })
     weave-gitops = object({
@@ -53,6 +54,9 @@ variable "modules_defaults" {
         enabled = true
       }
       linkerd-viz = {
+        enabled = true
+      }
+      node-setup = {
         enabled = true
       }
     }

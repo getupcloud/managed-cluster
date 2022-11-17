@@ -158,10 +158,12 @@ spec:
         - chroot
         - /host
         - /bin/sh
-        - -c
+        - -xc
         - |-
+%{~ if contains(["aks", "eks", "oke"], cluster_type) }
           yum -y install kernel-devel kernel-headers
-          sleep infinity
+%{~ endif }
+          sleep inf
         image: alpine
         imagePullPolicy: Always
         name: setup
