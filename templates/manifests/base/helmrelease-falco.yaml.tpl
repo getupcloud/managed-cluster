@@ -29,8 +29,9 @@ spec:
     #auditLog:
     #  enabled: true
 
-    ebpf:
+    driver:
       enabled: true
+      kind: ebpf
 
     falco:
       grpc:
@@ -43,6 +44,7 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
+%{~ endif }
 %{ if modules.falco.falco-exporter.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -86,6 +88,7 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
+%{~ endif }
 %{ if modules.falco.event-generator.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -128,7 +131,65 @@ spec:
       loop: true
       # -- The length of time to wait before running an action. Non-zero values should contain 
       # a corresponding time unit (e.g. 1s, 2m, 3h). A value of zero means no sleep. (default 100ms)
-      sleep: "1s"
+      sleep: "5m"
 %{~ endif }
-%{~ endif }
+%{ if modules.falco.node-setup.enabled ~}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-setup
+  namespace: kube-system
+spec:
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: node-setup
+      app.kubernetes.io/name: node-setup
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: node-setup
+        app.kubernetes.io/name: node-setup
+      name: node-setup
+    spec:
+      containers:
+      - command:
+        - chroot
+        - /host
+        - /bin/sh
+        - -c
+        - |-
+          yum -y install kernel-devel kernel-headers
+          sleep infinity
+        image: alpine
+        imagePullPolicy: Always
+        name: setup
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /host
+          name: host-root
+      enableServiceLinks: true
+      hostIPC: true
+      hostNetwork: true
+      hostPID: true
+      priority: 0
+      restartPolicy: Always
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 10
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: host-root
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 20%
+    type: RollingUpdate
 %{~ endif }
