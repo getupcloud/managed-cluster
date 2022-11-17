@@ -56,19 +56,38 @@ volumes:
 %{~   endif }
 
 ##
-## Linkerd Control Plane
+## Linkerd CRDS and Control Plane
 ##
+
 ---
-apiVersion: v1
-kind: Namespace
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
-  annotations:
-    linkerd.io/inject: disabled
-  labels:
-    linkerd.io/control-plane-ns: linkerd
-    linkerd.io/is-control-plane: "true"
-    config.linkerd.io/admission-webhooks: disabled
-  name: linkerd
+  name: linkerd-crds
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: linkerd-crds
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+      version: "~> 1.4"
+  install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 30m
+  releaseName: linkerd-crds
+  storageNamespace: linkerd
+  targetNamespace: linkerd
+  values:
+    cniEnabled: true
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -103,12 +122,11 @@ spec:
   - name: linkerd-cni
 %{~   endif }
   values:
-    installNamespace: false
-    clusterNetworks: 10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16
+    clusterNetworks: 10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16
     cniEnabled: ${ modules.linkerd.linkerd-cni.enabled }
 
-    nodeSelector:
-      role: infra
+    proxyInit:
+      runAsRoot: true
 
     tolerations:
     - effect: NoSchedule
@@ -126,47 +144,11 @@ spec:
             ${indent(12, trimspace(try(modules.linkerd.output.issuer_key, "")))}
         crtExpiry: ${try(modules.linkerd.output.issuer_crt_expiry, "")}
 %{~   endif }
-%{~ endif }
 
----
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
-  name: linkerd-crds
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: linkerd-crds
-      sourceRef:
-        kind: HelmRepository
-        name: linkerd
-      version: "~> 1.4"
-  install:
-    createNamespace: false
-    disableWait: false
-    remediation:
-      retries: -1
-  upgrade:
-    disableWait: false
-    remediation:
-      retries: -1
-  interval: 30m
-  releaseName: linkerd-crds
-  storageNamespace: linkerd
-  targetNamespace: linkerd
-
-%{~ if modules.linkerd.linkerd-cni.enabled }
+%{~ if modules.linkerd.linkerd-cni.enabled || cluster_type == "okd" ~}
 ##
 ## Linkerd CNI (required for OKD)
 ##
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    linkerd.io/inject: disabled
-  name: linkerd-cni
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -183,7 +165,7 @@ spec:
         name: linkerd
       version: "~> 30.3"
   install:
-    createNamespace: false
+    createNamespace: true
     disableWait: false
     remediation:
       retries: -1
@@ -196,12 +178,10 @@ spec:
   storageNamespace: linkerd-cni
   targetNamespace: linkerd-cni
   values:
-    installNamespace: false
     destCNIBinDir: /var/lib/cni/bin
     destCNINetDir: /etc/kubernetes/cni/net.d
 
     nodeSelector:
-      role: infra
 
     tolerations:
     - effect: NoSchedule
@@ -227,7 +207,7 @@ spec:
         name: linkerd
       version: "~> 30.3"
   install:
-    createNamespace: false
+    createNamespace: true
     disableWait: false
     remediation:
       retries: -1
@@ -237,20 +217,13 @@ spec:
       retries: -1
   interval: 30m
   releaseName: linkerd-viz
-  ##
-  ## We need all labels from chart's template for linkerd-viz namespace
-  ##
   storageNamespace: linkerd-viz
   targetNamespace: linkerd-viz
   dependsOn:
   - name: linkerd-control-plane
   values:
-    installNamespace: true
-
-    nodeSelector:
-      role: infra
-
     tolerations:
     - effect: NoSchedule
       operator: Exists
+%{~ endif }
 %{~ endif }

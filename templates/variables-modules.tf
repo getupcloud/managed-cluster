@@ -54,7 +54,7 @@ variable "modules_defaults" {
     linkerd = {
       enabled = false
       linkerd-cni = {
-        enabled = true
+        enabled = false
       }
       linkerd-viz = {
         enabled = true
