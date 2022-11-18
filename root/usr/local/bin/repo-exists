@@ -14,8 +14,9 @@ gh_owner=$(git_owner $origin)
 gh_name=$(git_name $origin)
 
 if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
-    warn Invalid git url: $origin
-    exit 1
+    info Invalid git url: $origin
+    read_config gh_owner "Github org or username" getupcloud
+    read_config gh_name "Github repository name" managed-cluster-$customer_name
 fi
 
 PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null

@@ -16,8 +16,9 @@ gh_owner=$(git_owner $origin)
 gh_name=$(git_name $origin)
 
 if [ -z "$gh_owner" ] || [ -z "$gh_name" ]; then
-    warn Invalid git url: $origin
-    exit 1
+    info Invalid git url: $origin
+    read_config gh_owner "Github org or username" getupcloud
+    read_config gh_name "Github repository name" managed-cluster-$customer_name
 fi
 
 : ${gh_description:="Getupcloud Managed Cluster: $customer_name"}
@@ -28,7 +29,6 @@ fi
 if ! gh api orgs/$gh_owner/teams/$gh_team &>/dev/null; then
     gh_team=""
 fi
-
 
 if ! PAGER= gh api repos/$gh_owner/$gh_name &>/dev/null; then
     ask "Create repository $gh_owner/$gh_name now? [Y/n]"

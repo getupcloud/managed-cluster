@@ -4,7 +4,9 @@ from giturlparse import parse
 import sys
 import os
 
-if os.path.exists(sys.argv[1]):
+if os.path.exists(sys.argv[1]) or sys.argv[1].startswith(".") or sys.argv[1].startswith("/"):
+    if len(sys.argv) > 1:
+        sys.exit(0)
     print(sys.argv[1])
     sys.exit(0)
 

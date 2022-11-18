@@ -164,15 +164,30 @@ line()
 read_config()
 {
     local _name="${1}"
+    local prompt="${2}"
+
     local _opt_name="opt_$_name"
-    local _opt_value="${!_opt_name}"
-    local _default="${!_name}"
+
+    if [ -v "$_opt_name" ]; then
+        local _opt_value="${!_opt_name}"
+    else
+        local _opt_value=""
+    fi
+
+    if [ $# -gt 2 ]; then
+        local _default="$3"
+    elif [ -v "$_name" ]; then
+        local _default="${!_name}"
+    else
+        local _default=""
+    fi
     shift
-    local prompt="$@"
+
 
     if [ -n "$_default" ]; then
         prompt+=" [$_default]"
     fi
+
     if [ -n "$_opt_value" ]; then
         #prompt "$prompt <- Using command line parameter."
         #echo

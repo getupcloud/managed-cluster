@@ -26,7 +26,6 @@ spec:
   targetNamespace: kube-system
   values:
     clusterName: ${cluster_name}
-    enableCertManager: ${modules.cert-manager.enabled}
     ingressClass: ${modules.alb.ingressClass}
 
     serviceMonitor:
