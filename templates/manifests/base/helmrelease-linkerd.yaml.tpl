@@ -147,7 +147,8 @@ spec:
 
 %{~ if modules.linkerd.linkerd-cni.enabled || cluster_type == "okd" ~}
 ##
-## Linkerd CNI (required for OKD)
+## Linkerd CNI (required for OKD).
+## https://linkerd.io/2.12/features/cni/
 ##
 
 ---
