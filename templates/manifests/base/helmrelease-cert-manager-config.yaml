@@ -33,7 +33,7 @@ spec:
       enabled: true
 
     cluster_issuer_letsencrypt:
-      enabled: false
+      enabled: true
 
     cluster_issuer_dns01:
       enabled: false
