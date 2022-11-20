@@ -134,7 +134,11 @@ spec:
           storageLocation: default
           ttl: 168h0m0s
 
-          labelSelector: {}
+          # Please note labelSelector can't be empty
+          # https://github.com/vmware-tanzu/velero/issues/2083
+          #labelSelector:
+          #  app: web
+
           includedResources:
           - persistentvolumeclaims
           - persistentvolumes
@@ -148,7 +152,11 @@ spec:
           storageLocation: default
           ttl: 720h0m0s
 
-          labelSelector: {}
+          # Please note labelSelector can't be empty
+          # https://github.com/vmware-tanzu/velero/issues/2083
+          #labelSelector:
+          #  app: web
+
           includedNamespaces:
           - "*"
           excludedNamespaces:

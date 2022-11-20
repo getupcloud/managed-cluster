@@ -223,8 +223,48 @@ spec:
   dependsOn:
   - name: linkerd-control-plane
   values:
+    dashboard:
+      enforcedHostRegexp: ".*"
     tolerations:
     - effect: NoSchedule
       operator: Exists
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-http01
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required
+    nginx.ingress.kubernetes.io/auth-secret: linkerd-viz-basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+  name: linkerd-viz
+  namespace: linkerd-viz
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: linkerd-viz.demo-customer.aws.getup.sh
+    http:
+      paths:
+      - backend:
+          service:
+            name: web
+            port:
+              number: 8084
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - linkerd-viz.demo-customer.aws.getup.sh
+    secretName: web-tls
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: linkerd-viz-basic-auth
+  namespace: linkerd-viz
+type: Opaque
+data:
+  auth: "${base64encode("${modules.linkerd.linkerd-viz.username}:${bcrypt(modules.linkerd.linkerd-viz.password)}")}"
 %{~ endif }
 %{~ endif }

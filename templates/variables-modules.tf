@@ -16,9 +16,15 @@ variable "modules_defaults" {
     linkerd = object({
       enabled     = bool
       linkerd-cni = object({ enabled = bool })
-      linkerd-viz = object({ enabled = bool })
+      linkerd-viz = object({
+        enabled  = bool
+        username = string
+        password = string
+      })
+      emojivoto = object({ enabled = bool })
     })
-    trivy = object({ enabled = bool })
+    podinfo = object({ enabled = bool })
+    trivy   = object({ enabled = bool })
     weave-gitops = object({
       enabled        = bool
       admin-username = string
@@ -57,8 +63,18 @@ variable "modules_defaults" {
         enabled = false
       }
       linkerd-viz = {
-        enabled = true
+        enabled  = true
+        username = "linkerd"
+        password = "linkerd-admin"
       }
+      emojivoto = {
+        enabled  = false
+        hostname = "emojivoto.example.com"
+      }
+    }
+    podinfo = {
+      enabled  = false
+      hostname = "podinfo.example.com"
     }
     trivy = {
       enabled = false

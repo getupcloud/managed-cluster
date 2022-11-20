@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: podinfo
+  namespace: flux-apps
+spec:
+  interval: 5m0s
+  ref:
+    branch: main
+  url: https://github.com/getupcloud/flux2-kustomize-helm-example
