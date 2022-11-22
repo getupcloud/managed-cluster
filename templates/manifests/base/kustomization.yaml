@@ -5,6 +5,7 @@ resources:
 - helmrelease-cert-manager-config.yaml
 - helmrelease-cert-manager.yaml
 - helmrelease-cluster-autoscaler.yaml
+- helmrelease-external-dns.yaml
 - helmrelease-falco.yaml
 - helmrelease-grafana-extra-dashboards.yaml
 - helmrelease-ingress-nginx.yaml

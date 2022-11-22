@@ -2,8 +2,13 @@
 
 module "linkerd" {
   count  = local.modules.linkerd.enabled ? 1 : 0
-  source = "github.com/getupcloud/terraform-module-linkerd?ref=v0.6"
+  source = "github.com/getupcloud/terraform-module-linkerd?ref=v0.7.1"
+  linkerd-viz = {
+    username = local.modules.linkerd.linkerd-viz.username
+    password = local.modules.linkerd.linkerd-viz.password
+  }
 }
+
 
 module "weave-gitops-password" {
   count  = local.modules.weave-gitops.enabled ? 1 : 0

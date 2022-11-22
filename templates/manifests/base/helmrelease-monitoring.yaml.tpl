@@ -449,7 +449,7 @@ spec:
             datasource: Prometheus
 
       adminUsername: admin
-      #adminPassword: prom-operator
+      adminPassword: admin
 
       grafana.ini:
         auth.anonymous:

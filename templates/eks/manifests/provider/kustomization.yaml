@@ -10,6 +10,7 @@ resources:
 - helmrepository.yaml
 
 patchesStrategicMerge:
-- helmrelease-velero.yaml
 - helmrelease-cluster-autoscaler.yaml
+- helmrelease-external-dns.yaml
 - helmrelease-ingress-nginx.yaml
+- helmrelease-velero.yaml

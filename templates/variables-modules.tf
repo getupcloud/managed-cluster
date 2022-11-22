@@ -20,6 +20,7 @@ variable "modules_defaults" {
         enabled  = bool
         username = string
         password = string
+        hostname = string
       })
       emojivoto = object({ enabled = bool })
     })
@@ -64,8 +65,9 @@ variable "modules_defaults" {
       }
       linkerd-viz = {
         enabled  = true
-        username = "linkerd"
-        password = "linkerd-admin"
+        username = "admin"
+        password = "admin"
+        hostname = "linkerd-viz.example.com"
       }
       emojivoto = {
         enabled  = false
@@ -82,7 +84,7 @@ variable "modules_defaults" {
     weave-gitops = {
       enabled        = false
       admin-username = "admin"
-      admin-password = "weave-admin"
+      admin-password = "admin"
     }
   }
 }

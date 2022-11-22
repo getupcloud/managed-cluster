@@ -243,7 +243,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: linkerd-viz.demo-customer.aws.getup.sh
+  - host: ${modules.linkerd.linkerd-viz.hostname}
     http:
       paths:
       - backend:
@@ -255,7 +255,7 @@ spec:
         pathType: Prefix
   tls:
   - hosts:
-    - linkerd-viz.demo-customer.aws.getup.sh
+    - ${modules.linkerd.linkerd-viz.hostname}
     secretName: web-tls
 ---
 apiVersion: v1
@@ -265,6 +265,6 @@ metadata:
   namespace: linkerd-viz
 type: Opaque
 data:
-  auth: "${base64encode("${modules.linkerd.linkerd-viz.username}:${bcrypt(modules.linkerd.linkerd-viz.password)}")}"
+  auth: ${base64encode(modules.linkerd.output.linkerd-viz-htpasswd)}
 %{~ endif }
 %{~ endif }
