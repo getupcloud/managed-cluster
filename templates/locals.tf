@@ -1,25 +1,5 @@
-data "merge_merge" "modules" {
-
-  dynamic "input" {
-    for_each = [var.modules_defaults, var.modules]
-
-    content {
-      format = "json"
-      data   = jsonencode(input.value)
-    }
-  }
-  output_format = "json"
-}
-
 locals {
   kubeconfig_filename = abspath(pathexpand(var.kubeconfig_filename))
-
-  modules = jsondecode(data.merge_merge.modules.output)
-
-  register_modules = {
-    linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
-    weave-gitops : local.modules.weave-gitops.enabled ? local.weave-gitops : tomap({})
-  }
 
   modules_result = {
     for name, config in local.modules : name => merge(config, {

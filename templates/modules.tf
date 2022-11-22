@@ -9,7 +9,6 @@ module "linkerd" {
   }
 }
 
-
 module "weave-gitops-password" {
   count  = local.modules.weave-gitops.enabled ? 1 : 0
   source = "github.com/getupcloud/terraform-module-password?ref=v0.1.0"
@@ -27,5 +26,5 @@ locals {
 resource "local_file" "debug-modules" {
   count    = var.dump_debug ? 1 : 0
   filename = ".debug-modules.json"
-  content  = data.merge_merge.modules.output
+  content  = jsonencode(local.modules)
 }
