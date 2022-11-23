@@ -194,41 +194,15 @@ spec:
 ## Linkerd Viz
 ##
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
+# We need this in order to create ingress/secret for Viz
+apiVersion: v1
+kind: Namespace
 metadata:
+  labels:
+    kubernetes.io/metadata.name: linkerd-viz
+    linkerd.io/extension: viz
+    name: linkerd-viz
   name: linkerd-viz
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: linkerd-viz
-      sourceRef:
-        kind: HelmRepository
-        name: linkerd
-      version: "~> 30.3"
-  install:
-    createNamespace: true
-    disableWait: false
-    remediation:
-      retries: -1
-  upgrade:
-    disableWait: false
-    remediation:
-      retries: -1
-  interval: 30m
-  releaseName: linkerd-viz
-  storageNamespace: linkerd-viz
-  targetNamespace: linkerd-viz
-  dependsOn:
-  - name: linkerd-control-plane
-  values:
-    dashboard:
-      enforcedHostRegexp: ".*"
-    tolerations:
-    - effect: NoSchedule
-      operator: Exists
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -266,5 +240,40 @@ metadata:
 type: Opaque
 data:
   auth: ${base64encode(modules.linkerd.output.linkerd-viz-htpasswd)}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkerd-viz
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: linkerd-viz
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+      version: "~> 30.3"
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 30m
+  releaseName: linkerd-viz
+  storageNamespace: linkerd-viz
+  targetNamespace: linkerd-viz
+  dependsOn:
+  - name: linkerd-control-plane
+  values:
+    dashboard:
+      enforcedHostRegexp: ".*"
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
 %{~ endif }
 %{~ endif }
