@@ -1,5 +1,3 @@
-provider "merge" {}
-
 provider "cronitor" {
   api_key = var.cronitor_api_key
 }

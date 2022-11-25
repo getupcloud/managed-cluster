@@ -3,9 +3,10 @@ kind: Kustomization
 
 resources:
 - ../base/
+- helmrepository.yaml
+- helmrelease-cert-utils-operator.yaml
 
 patchesStrategicMerge:
-- delete-helmrelease-monitoring.yaml
-#- excludes.yaml
+- excludes.yaml
 
 patchesJson6902: []

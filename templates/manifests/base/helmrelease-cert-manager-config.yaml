@@ -26,8 +26,8 @@ spec:
   storageNamespace: cert-manager
   targetNamespace: cert-manager
   values:
-    acme_email: change.me@example.com
-    ingress_class: nginx
+    acme_email: ${ modules.cert-manager-config.acme_email }
+    ingress_class: ${ modules.cert-manager-config.ingress_class }
 
     cluster_issuer_selfsigned:
       enabled: true

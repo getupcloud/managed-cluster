@@ -1,6 +1,14 @@
 variable "modules_defaults" {
   description = "Configure modules to install (defaults)"
   type = object({
+    cert-manager = object({
+      enabled       = bool
+    })
+    cert-manager-config = object({
+      enabled       = bool
+      acme_email    = string
+      ingress_class = string
+    })
     falco = object({
       enabled         = bool
       event-generator = object({ enabled = bool })
@@ -40,6 +48,14 @@ variable "modules_defaults" {
   })
 
   default = {
+    cert-manager = {
+      enabled       = false
+    }
+    cert-manager-config = {
+      enabled       = false
+      acme_email    = "change.me@example.com"
+      ingress_class = "nginx"
+    }
     falco = {
       enabled = false
       event-generator = {
@@ -97,6 +113,14 @@ variable "modules_defaults" {
 
 locals {
   modules = merge(var.modules_defaults, var.modules, {
+    cert-manager = {
+      enabled = try(var.modules.cert-manager.enabled, var.modules_defaults.cert-manager.enabled)
+    }
+    cert-manager-config = {
+      enabled = try(var.modules.cert-manager-config.enabled, var.modules_defaults.cert-manager-config.enabled)
+      acme_email = try(var.modules.cert-manager-config.acme_email, var.modules_defaults.cert-manager-config.acme_email)
+      ingress_class = try(var.modules.cert-manager-config.ingress_class, var.modules_defaults.cert-manager-config.ingress_class)
+    }
     falco = {
       enabled = try(var.modules.falco.enabled, var.modules_defaults.falco.enabled)
       event-generator = {
