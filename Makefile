@@ -50,12 +50,18 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt check-git #build tag push
+release: fmt check-git check-tag build tag push
 	@echo Finished $(RELEASE) release
 
 check-git:
 	@if git status --porcelain | grep '^\s*[^?]' | grep -qv version.txt; then \
 		echo Git has uncommited files. Please fix and try again; \
+		exit 1; \
+	fi
+
+check-tag:
+	@if git tag -l | grep -q '^$(RELEASE)$$'; then \
+		echo Git tag already exists: $(RELEASE); \
 		exit 1; \
 	fi
 
