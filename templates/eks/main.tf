@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0.0-alpha31"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.0.0-alpha33"
 
   # cluster basics
   customer_name       = var.customer_name
@@ -8,8 +8,8 @@ module "eks" {
   use_kubeconfig      = var.use_kubeconfig
   kubeconfig_filename = local.kubeconfig_filename
   kubernetes_version  = var.kubernetes_version
-  pre_create          = concat(var.eks_pre_create, var.pre_create)
-  post_create         = concat(var.eks_post_create, var.post_create)
+  pre_create          = var.pre_create
+  post_create         = var.post_create
   modules             = local.modules_result
   dump_debug          = var.dump_debug
 
@@ -34,6 +34,8 @@ module "eks" {
   aws_access_key_id             = var.aws_access_key_id
   aws_secret_access_key         = var.aws_secret_access_key
   eks_addons                    = var.eks_addons
+  eks_pre_create                = var.eks_pre_create
+  eks_post_create               = var.eks_post_create
   endpoint_public_access_cidrs  = var.endpoint_public_access_cidrs
   endpoint_private_access_cidrs = var.endpoint_private_access_cidrs
   node_groups_defaults          = var.node_groups_defaults

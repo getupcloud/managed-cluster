@@ -2,7 +2,7 @@ variable "modules_defaults" {
   description = "Configure modules to install (defaults)"
   type = object({
     cert-manager = object({
-      enabled       = bool
+      enabled = bool
     })
     cert-manager-config = object({
       enabled       = bool
@@ -49,7 +49,7 @@ variable "modules_defaults" {
 
   default = {
     cert-manager = {
-      enabled       = false
+      enabled = false
     }
     cert-manager-config = {
       enabled       = false
@@ -117,8 +117,8 @@ locals {
       enabled = try(var.modules.cert-manager.enabled, var.modules_defaults.cert-manager.enabled)
     }
     cert-manager-config = {
-      enabled = try(var.modules.cert-manager-config.enabled, var.modules_defaults.cert-manager-config.enabled)
-      acme_email = try(var.modules.cert-manager-config.acme_email, var.modules_defaults.cert-manager-config.acme_email)
+      enabled       = try(var.modules.cert-manager-config.enabled, var.modules_defaults.cert-manager-config.enabled)
+      acme_email    = try(var.modules.cert-manager-config.acme_email, var.modules_defaults.cert-manager-config.acme_email)
       ingress_class = try(var.modules.cert-manager-config.ingress_class, var.modules_defaults.cert-manager-config.ingress_class)
     }
     falco = {
