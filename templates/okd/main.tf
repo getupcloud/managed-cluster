@@ -2,13 +2,13 @@ module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-generic?ref=v2.0.0-alpha4"
 
   # cluster basics
-  customer_name       = var.customer_name
-  cluster_name        = var.cluster_name
-  cluster_sla         = var.cluster_sla
-  cluster_type        = local.cluster_type
-  use_kubeconfig      = var.use_kubeconfig
-  post_create         = var.post_create
-  modules             = local.modules_result
+  customer_name  = var.customer_name
+  cluster_name   = var.cluster_name
+  cluster_sla    = var.cluster_sla
+  cluster_type   = local.cluster_type
+  use_kubeconfig = var.use_kubeconfig
+  post_create    = var.post_create
+  modules        = local.modules_result
 
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled
