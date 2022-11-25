@@ -1,4 +1,4 @@
-## Provider-specific variables
+## Provider specific variables
 ## Copy to toplevel
 
 variable "aws_access_key_id" {
