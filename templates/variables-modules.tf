@@ -22,9 +22,15 @@ variable "modules_defaults" {
         password = string
         hostname = string
       })
-      emojivoto = object({ enabled = bool })
+      emojivoto = object({
+        enabled = bool
+        hostname = string
+      })
     })
-    podinfo = object({ enabled = bool })
+    podinfo = object({
+      enabled = bool
+      hostname = string
+    })
     trivy   = object({ enabled = bool })
     weave-gitops = object({
       enabled        = bool
@@ -149,5 +155,4 @@ locals {
     linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
     weave-gitops : local.modules.weave-gitops.enabled ? local.weave-gitops : tomap({})
   }
-
 }
