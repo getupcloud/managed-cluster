@@ -50,11 +50,11 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt build check-git tag push
+release: fmt check-git #build tag push
 	@echo Finished $(RELEASE) release
 
 check-git:
-	@if git status --porcelain | grep '^[^?]' -q | grep -v version.txt; then \
+	@if git status --porcelain | grep '^\s*[^?]' | grep -qv version.txt; then \
 		echo Git has uncommited files. Please fix and try again; \
 		exit 1; \
 	fi

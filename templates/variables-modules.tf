@@ -23,15 +23,15 @@ variable "modules_defaults" {
         hostname = string
       })
       emojivoto = object({
-        enabled = bool
+        enabled  = bool
         hostname = string
       })
     })
     podinfo = object({
-      enabled = bool
+      enabled  = bool
       hostname = string
     })
-    trivy   = object({ enabled = bool })
+    trivy = object({ enabled = bool })
     weave-gitops = object({
       enabled        = bool
       admin-username = string
