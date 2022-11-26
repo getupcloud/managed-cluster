@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+
+import sys
+from urllib.parse import urlparse, parse_qs
+from collections import defaultdict
+
+help = f'''
+Usage:
+    {sys.argv[0]} [URL] [PRINT_FORMAT]
+
+Valid format:
+    scheme, netloc, path, params, query, fragment, username, password, hostname, port
+
+Example:
+    $ {sys.argv[0]} "http://docs.python.org:80/3/library/urllib.parse.html?highlight=params#url-parsing" "{{query[highlight]}} (port={{port}})"
+    docs.python.org:80 -> params (port=80)
+'''
+
+try:
+    url, fmt = sys.argv[1:3]
+except ValueError:
+    print(help)
+    sys.exit(1)
+
+if '://' not in url:
+    url = '//' + url
+
+u = urlparse(url)
+query = defaultdict(str, { k : v[0] for k, v in parse_qs(u.query).items() })
+
+#print(u)
+#print(query)
+#print(query['ref'])
+
+s = fmt.format(
+    scheme=u.scheme or '',
+    netloc=u.netloc or '',
+    path=u.path or '',
+    params=u.params or '',
+    query=query,
+    fragment=u.fragment or '',
+    username=u.username or '',
+    password=u.password or '',
+    hostname=u.hostname or '',
+    port=u.port or ''
+)
+
+print(s)

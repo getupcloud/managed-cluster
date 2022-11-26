@@ -24,14 +24,27 @@ default: build
 CLUSTER_TYPES := $(shell ls -1 templates/*/provider.env | awk -F/ '{print $$2}')
 
 define CLUSTER_REPO_template =
-	for i in provider cluster; do \
-		url=https://github.com/getupcloud/terraform-cluster-$(1)/raw/main/variables-$$i.tf; \
-		file=templates/$(1)/variables-$$i.tf; \
-		printf "%-110s" "Downloading $$url"; \
-		curl --fail -sL $$url -o $$file && echo "[    OK    ]" || echo "[ NotFound ]"; \
-	done;
+	modules=$$(hcl2json < templates/$(1)/main.tf  | jq '.module|keys|.[]' -r 2>/dev/null) || true
+	if [ -n "$$modules" ]; then
+		for module in $$modules; do
+			source=$$(hcl2json < templates/$(1)/main.tf  | jq ".module.$$module[0].source" -r)
+			#echo ./root/usr/local/bin/urlparse "$$source" "{query[ref]}"
+			#echo ./root/usr/local/bin/urlparse "$$source" "https://{netloc}{path}/raw"
+
+			base_url=$$(./root/usr/local/bin/urlparse "$$source" "https://{netloc}{path}/raw")
+			ref=$$(./root/usr/local/bin/urlparse "$$source" "{query[ref]}")
+			for i in provider cluster; do
+				url=$$base_url/$${ref:-main}/variables-$$i.tf
+				file=templates/$(1)/variables-$$i.tf
+				echo -n "Downloading: $(1) $$url"
+				curl --fail -sL $$url -o $$file && printf "\r[    OK    ]" || printf "\r[ NotFound ]"
+				echo
+			done
+		done
+	fi;
 endef
 
+.ONESHELL:
 import:
 	@$(foreach i,$(CLUSTER_TYPES),$(call CLUSTER_REPO_template,$(i)))
 
