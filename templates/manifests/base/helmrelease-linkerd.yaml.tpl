@@ -1,5 +1,5 @@
 %{~ if modules.linkerd.enabled }
-%{~   if cluster_type == "okd" ~}
+%{~ if cluster_type == "okd" ~}
 ---
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
@@ -42,18 +42,25 @@ users:
 - system:serviceaccount:linkerd:linkerd-identity
 - system:serviceaccount:linkerd:linkerd-proxy-injector
 - system:serviceaccount:linkerd:linkerd-heartbeat
-%{~     if modules.linkerd.linkerd-cni.enabled }
+%{~ if modules.linkerd.linkerd-cni.enabled }
 - system:serviceaccount:linkerd-cni:default
 - system:serviceaccount:linkerd-cni:linkerd-cni
-%{~     endif }
-%{~     if modules.linkerd.linkerd-viz.enabled }
-%{~       for sa in ["default", "grafana", "metrics-api", "prometheus", "tap", "tap-injector", "web"] }
-- system:serviceaccount:linkerd-viz:${sa}
-%{~       endfor }
-%{~     endif }
+%{~ endif }
+%{~ if modules.linkerd.linkerd-viz.enabled }
+- system:serviceaccount:linkerd-viz:builder
+- system:serviceaccount:linkerd-viz:default
+- system:serviceaccount:linkerd-viz:deployer
+- system:serviceaccount:linkerd-viz:grafana
+- system:serviceaccount:linkerd-viz:metrics-api
+- system:serviceaccount:linkerd-viz:namespace-metadata
+- system:serviceaccount:linkerd-viz:prometheus
+- system:serviceaccount:linkerd-viz:tap
+- system:serviceaccount:linkerd-viz:tap-injector
+- system:serviceaccount:linkerd-viz:web
+%{~ endif }
 volumes:
 - '*'
-%{~   endif }
+%{~ endif }
 
 ##
 ## Linkerd CRDS and Control Plane
@@ -202,6 +209,7 @@ metadata:
     kubernetes.io/metadata.name: linkerd-viz
     linkerd.io/extension: viz
     name: linkerd-viz
+    linkerd.io/inject: disabled
   name: linkerd-viz
 ---
 apiVersion: networking.k8s.io/v1
