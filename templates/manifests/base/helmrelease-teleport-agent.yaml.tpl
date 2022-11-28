@@ -77,8 +77,7 @@ spec:
       ${indent(6, yamlencode(teleport_labels))}
 
     tolerations:
-    - key: dedicated
-      value: infra
+    - operator: Exists
       effect: NoSchedule
 
     affinity:
