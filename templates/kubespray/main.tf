@@ -2,7 +2,7 @@ module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v2.25"
 
   # cluster basics
-  customer_name     = var.customer_naem
+  customer_name     = var.customer_name
   cluster_name      = var.cluster_name
   cluster_sla       = var.cluster_sla
   use_kubeconfig    = var.use_kubeconfig

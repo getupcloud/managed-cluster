@@ -423,23 +423,42 @@ spec:
         - camptocamp-prometheus-alertmanager-datasource
         - grafana-clock-panel
 
-      additionalDataSources:
-        - name: Loki
-          type: loki
-          url: http://loki.logging.svc:3100
-          basicAuth: false
-          access: proxy
-          isDefault: false
-          jsonData:
-            maxLines: 5000
-            manageAlerts: false
-            timeout: 60
-        - name: prometheus
-          type: prometheus
-          url: http://monitoring-prometheus:9090/
-          access: proxy
-          isDefault: false
-          editable: true
+      datasources:
+        datasources.yaml:
+          apiVersion: 1
+          datasources:
+          - name: prometheus
+            type: prometheus
+            access: proxy
+            orgId: 1
+            url: http://{{ template "kube-prometheus-stack.fullname" . }}-prometheus:{{ .Values.prometheus.service.port }}/
+            isDefault: true
+            jsonData:
+              timeInterval: "5s"
+            editable: true
+          - name: Loki
+            type: loki
+            url: http://loki.logging.svc:3100
+            basicAuth: false
+            access: proxy
+            isDefault: false
+            jsonData:
+              maxLines: 5000
+              manageAlerts: false
+              timeout: 60
+
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+          - name: 'default'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/default
 
       dashboards:
         default:
@@ -447,7 +466,82 @@ spec:
             gnetId: 17214
             revision: 1
             datasource: Prometheus
-
+%{~if modules.linkerd.enabled }
+          # https://github.com/linkerd/linkerd2/blob/main/grafana/values.yaml
+          # all these charts are hosted at https://grafana.com/grafana/dashboards/%id%
+          top-line:
+            gnetId: 15474
+            revision: 4
+            datasource: prometheus
+          health:
+            gnetId: 15486
+            revision: 3
+            datasource: prometheus
+          kubernetes:
+            gnetId: 15479
+            revision: 2
+            datasource: prometheus
+          namespace:
+            gnetId: 15478
+            revision: 3
+            datasource: prometheus
+          deployment:
+            gnetId: 15475
+            revision: 6
+            datasource: prometheus
+          pod:
+            gnetId: 15477
+            revision: 3
+            datasource: prometheus
+          service:
+            gnetId: 15480
+            revision: 3
+            datasource: prometheus
+          route:
+            gnetId: 15481
+            revision: 3
+            datasource: prometheus
+          authority:
+            gnetId: 15482
+            revision: 3
+            datasource: prometheus
+          cronjob:
+            gnetId: 15483
+            revision: 3
+            datasource: prometheus
+          job:
+            gnetId: 15487
+            revision: 3
+            datasource: prometheus
+          daemonset:
+            gnetId: 15484
+            revision: 3
+            datasource: prometheus
+          replicaset:
+            gnetId: 15491
+            revision: 3
+            datasource: prometheus
+          statefulset:
+            gnetId: 15493
+            revision: 3
+            datasource: prometheus
+          replicationcontroller:
+            gnetId: 15492
+            revision: 4
+            datasource: prometheus
+          prometheus:
+            gnetId: 15489
+            revision: 2
+            datasource: prometheus
+          prometheus-benchmark:
+            gnetId: 15490
+            revision: 2
+            datasource: prometheus
+          multicluster:
+            gnetId: 15488
+            revision: 3
+            datasource: prometheus
+%{ endif }
       adminUsername: admin
       adminPassword: admin
 
