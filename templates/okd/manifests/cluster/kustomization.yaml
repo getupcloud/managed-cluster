@@ -2,11 +2,43 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../base/
-- helmrepository.yaml
-- helmrelease-cert-utils-operator.yaml
+- ../provider/
+### To install logging you must remove it from excludes.yaml
+#- helmrelease-logging-grafana.yaml
+#- dns.operator.default.yaml
+### Note: efs-csi must use raw manifests in order to patch it below
+#- https://github.com/kubernetes-sigs/aws-efs-csi-driver//deploy/kubernetes/overlays/stable/?ref=release-1.3
+#- aws-efs-csi-driver-storageclass.yaml
 
-patchesStrategicMerge:
+patchesStrategicMerge: []
+### To install logging you must remove it from excludes.yaml
+#- helmrelease-logging.yaml
 - excludes.yaml
 
-patchesJson6902: []
+patches:
+- target:
+    kind: Deployment
+    name: efs-csi-controller
+    namespace: kube-system
+  patch: |-
+    - op: add
+      path: /spec/template/spec/hostNetwork
+      value: true
+    - op: replace
+      path: /spec/template/spec/containers/0/args/3
+      value: "--delete-access-point-root-dir=true"
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value: 
+        name: AWS_USE_FIPS_ENDPOINT
+        value: "true"
+- target:
+    kind: DaemonSet
+    name: efs-csi-node
+    namespace: kube-system
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value: 
+        name: AWS_USE_FIPS_ENDPOINT
+        value: "true"

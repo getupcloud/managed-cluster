@@ -1,0 +1,87 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: flux-system
+spec:
+  values:
+    nodeSelector:
+
+    podSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      seLinuxOptions:
+        user: root
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+
+    podSecurityPolicy:
+      privileged: false
+      allowPrivilegeEscalation: false
+      volumes:
+        - 'secret'
+        - 'downwardAPI'
+        - 'persistentVolumeClaim'
+        - 'configMap'
+        - 'emptyDir'
+        - 'projected'
+      hostNetwork: false
+      hostIPC: false
+      hostPID: false
+      runAsUser:
+        rule: 'RunAsAny'
+      seLinux:
+        rule: 'RunAsAny'
+      supplementalGroups:
+        rule: 'MustRunAs'
+        ranges:
+        - min: 1
+          max: 65535
+      fsGroup:
+        rule: 'RunAsAny'
+      readOnlyRootFilesystem: true
+      requiredDropCapabilities:
+        - ALL
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: flux-system
+spec:
+  values:
+    podSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      seLinuxOptions:
+        user: root
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+
+    podSecurityPolicy:
+      privileged: true
+      allowPrivilegeEscalation: true
+      volumes:
+        - 'secret'
+        - 'hostPath'
+        - 'downwardAPI'
+      hostNetwork: false
+      hostIPC: false
+      hostPID: false
+      runAsUser:
+        rule: 'RunAsAny'
+      seLinux:
+        rule: 'RunAsAny'
+      supplementalGroups:
+        rule: 'RunAsAny'
+      fsGroup:
+        rule: 'RunAsAny'
+      readOnlyRootFilesystem: true
+      requiredDropCapabilities:
+        - ALL
+    rbac:
+      pspEnabled: true

@@ -30,7 +30,7 @@ variable "cluster_provider" {
   type        = string
 
   validation {
-    condition     = contains(["aws", "azure", "gcp", "do"], var.cluster_provider)
+    condition     = contains(["onprem", "aws", "azure", "gcp", "do"], var.cluster_provider)
     error_message = "The Cluster Provider is invalid."
   }
 }

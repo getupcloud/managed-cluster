@@ -1,3 +1,22 @@
+## Provider specific variables
+## Copy to toplevel
+
+variable "cluster_provider" {
+  description = "Cluster provider name"
+  type        = string
+
+  validation {
+    condition     = contains(["onprem", "aws", "azure", "gcp", "do"], var.cluster_provider)
+    error_message = "The Cluster Provider is invalid."
+  }
+}
+
+variable "api_endpoint" {
+  description = "Kubernetes API endpoint"
+  type        = string
+  default     = ""
+}
+
 variable "region" {
   description = "Cluster region"
   type        = string
@@ -132,11 +151,13 @@ variable "app_nodes" {
 
 variable "default_master_node_labels" {
   description = "Default labels for master nodes"
+  type        = map(any)
   default     = {}
 }
 
 variable "default_infra_node_labels" {
   description = "Default labels for infra nodes"
+  type        = map(any)
   default = {
     role : "infra"
     "node-role.kubernetes.io/infra" : ""
@@ -145,6 +166,7 @@ variable "default_infra_node_labels" {
 
 variable "default_app_node_labels" {
   description = "Default labels for app nodes"
+  type        = map(any)
   default = {
     role : "app"
     "node-role.kubernetes.io/app" : ""
@@ -155,11 +177,13 @@ variable "default_app_node_labels" {
 
 variable "default_master_node_taints" {
   description = "Default taints for master nodes"
+  type        = list(string)
   default     = []
 }
 
 variable "default_infra_node_taints" {
   description = "Default taints for infra nodes"
+  type        = list(string)
   default = [
     "dedicated=infra:NoSchedule"
   ]
@@ -167,6 +191,7 @@ variable "default_infra_node_taints" {
 
 variable "default_app_node_taints" {
   description = "Default taints for app nodes"
+  type        = list(string)
   default     = []
 }
 
@@ -284,4 +309,10 @@ variable "systemctl_disable" {
   description = "Services to disable on nodes"
   type        = list(string)
   default     = []
+}
+
+variable "get_kubeconfig_command" {
+  description = "Command to create/update kubeconfig"
+  type        = string
+  default     = "ln -fs $CLUSTER_DIR/artifacts/admin.conf $KUBECONFIG"
 }

@@ -1,0 +1,22 @@
+apiVersion: operator.openshift.io/v1
+kind: DNS
+metadata:
+  name: default
+spec:
+  logLevel: Normal
+  nodePlacement: {}
+  operatorLogLevel: Normal
+  upstreamResolvers:
+    policy: Sequential
+    upstreams:
+    - type: SystemResolvConf
+  servers:
+  - name: my-dns-server
+    # zones to forward dns queries for
+    # list(string)
+    zones: []
+    forwardPlugin:
+      policy: Sequential
+      # upstream dns servers
+      # list(string)
+      upstreams: []

@@ -1,0 +1,191 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: grafana
+      version: 6.29.5
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+  install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: grafana
+  storageNamespace: logging
+  targetNamespace: logging
+  values:
+    podSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      seLinuxOptions:
+        user: root
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+
+    podSecurityPolicy:
+      privileged: true
+      allowPrivilegeEscalation: true
+      volumes:
+        - 'secret'
+        - 'hostPath'
+        - 'downwardAPI'
+        - 'persistentVolumeClaim'
+        - 'configMap'
+        - 'emptyDir'
+        - 'projected'
+      hostNetwork: false
+      hostIPC: false
+      hostPID: false
+      runAsUser:
+        rule: 'RunAsAny'
+      seLinux:
+        rule: 'RunAsAny'
+      supplementalGroups:
+        rule: 'RunAsAny'
+      fsGroup:
+        rule: 'RunAsAny'
+      readOnlyRootFilesystem: false
+      requiredDropCapabilities:
+        - ALL
+
+    service:
+      type: ClusterIP
+      sessionAffinity: ClientIP
+
+    tolerations:
+    - operator: Exists
+      effect: NoSchedule
+
+    deploymentStrategy:
+      type: Recreate
+
+    persistence:
+      enabled: true
+      accessModes: ["ReadWriteOnce"]
+      size: 10Gi
+
+    resources:
+      limits:
+        cpu: 1
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+    env:
+      GF_EXPLORE_ENABLED: "true"
+
+    plugins:
+      - grafana-kubernetes-app
+      - camptocamp-prometheus-alertmanager-datasource
+      - grafana-clock-panel
+
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        url: http://loki.logging.svc:3100
+        basicAuth: false
+        access: proxy
+        isDefault: false
+        jsonData:
+          maxLines: 5000
+          manageAlerts: false
+          timeout: 60
+
+    adminUsername: admin
+    #adminPassword: prom-operator
+
+    grafana.ini:
+      auth.anonymous:
+        enabled: false
+        org_name: Main Org.
+        org_role: Admin
+      auth:
+        disable_login_form: false
+        disable_signout_menu: false
+      auth.basic:
+        # enabled=true is required by grafana config-reloader
+        enabled: true
+      # Admin user/pass comes from a secret
+      #security:
+      #  admin_user: admin
+      #  admin_password: admin
+      auth.ldap:
+        enabled: true
+        allow_sign_up: true
+        config_file: /etc/grafana/ldap.toml
+
+    ## Grafana's LDAP configuration
+    ## Templated by the template in _helpers.tpl
+    ## NOTE: To enable the grafana.ini must be configured with auth.ldap.enabled
+    ## ref: http://docs.grafana.org/installation/configuration/#auth-ldap
+    ## ref: http://docs.grafana.org/installation/ldap/#configuration
+    ldap:
+      enabled: true
+      # `existingSecret` is a reference to an existing secret containing the ldap configuration
+      # for Grafana in a key `ldap-toml`.
+      existingSecret: ""
+      # `config` is the content of `ldap.toml` that will be stored in the created secret
+      # config: ""
+      config: |-
+        verbose_logging = true
+
+        [[servers]]
+        host = "${LDAP_SERVER}"
+        port = 389
+        use_ssl = false
+        start_tls = false
+        ssl_skip_verify = false
+        bind_dn = "CN=${MY_CN},OU=${MY_OU},DC=${MY_DC1},DC=${MY_DC2}"
+        bind_password = '${LDAP_BIND_PASSWORD}'
+        search_filter = "(|(sAMAccountName=%s)(userPrincipalName=%s))"
+        search_base_dns = ["dc=${MY_DC1},dc=${MY_DC2}"]
+        [servers.attributes]
+        name = "givenName"
+        surname = "sn"
+        username = "sAMAccountName"
+        member_of = "memberOf"
+        email =  "mail"
+
+        [[servers.group_mappings]]
+        group_dn = "CN=${MY_CN_GROUP},OU=${MY_OU},DC=${MY_DC1},DC=${MY_DC2}"
+        org_role = "Editor"
+
+    #ingress:
+    #  enabled: "false"
+    #  annotations:
+    #      kubernetes.io/ingress.class: nginx
+    #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
+    #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+    #      nginx.ingress.kubernetes.io/auth-type: basic
+    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
+    # hosts:
+    #   - grafana.example.com
+    #    tls:
+    #    - hosts:
+    #      - grafana.example.com
+    #      secretName: grafana-ingress-tls
+
+    ingress:
+      enabled: true
+      annotations:
+        route.openshift.io/termination: edge
+        #cert-manager.io/cluster-issuer: letsencrypt-staging-http01
+      ingressClassName: openshift-default
+      path: /
+      pathType: Prefix
+      hosts:
+        - grafana.example.com
+      #tls:
+      #- hosts:
+      #  - grafana.example.com
+      #  secretName: grafana-ingress-tls
