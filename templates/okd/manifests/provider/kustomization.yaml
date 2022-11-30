@@ -8,6 +8,7 @@ resources:
 - helmrelease-kyverno.yaml
 - helmrelease-trivy-operator-polr-adapter.yaml
 - openshift-adp.yaml
+- cri-o-garbage-collector.yaml
 
 patchesStrategicMerge:
 - helmrelease-cert-manager.yaml
