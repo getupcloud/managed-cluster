@@ -431,7 +431,7 @@ spec:
             type: prometheus
             access: proxy
             orgId: 1
-            url: http://{{ template "kube-prometheus-stack.fullname" . }}-prometheus:{{ .Values.prometheus.service.port }}/
+            url: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090/
             isDefault: true
             jsonData:
               timeInterval: "5s"

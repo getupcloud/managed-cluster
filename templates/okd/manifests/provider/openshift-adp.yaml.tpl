@@ -23,7 +23,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: velero-cloud-credentials
+  name: cloud-credentials
   namespace: openshift-adp
 data:
   cloud: ${ base64encode(<<EOF
@@ -44,32 +44,50 @@ spec:
   configuration:
     velero:
       defaultPlugins:
-        - openshift
-        - csi
-    featureFlags:
-    - EnableCSI
+      - openshift
+      - csi
+      featureFlags:
+      - EnableCSI
+      podConfig:
+        resourceAllocations:
+          limits:
+            cpu: "1"
+            memory: 1Gi
     restic:
-      enable: true
+      enable: false
 %{~ if cluster_provider == "aws" }
   backupLocations:
-    - name: default
-      velero:
-        provider: aws
-        default: true
-        objectStorage:
-          bucket: ${ modules.velero.output.config.bucket_name }
-          prefix: velero
-        config:
-          region: ${ modules.velero.output.config.bucket_region }
-          profile: default
-        credential:
-          key: cloud
-          name: velero-cloud-credentials
+  - velero:
+      provider: aws
+      default: true
+      objectStorage:
+        bucket: ${ modules.velero.output.config.bucket_name }
+        prefix: velero
+      config:
+        region: ${ modules.velero.output.config.bucket_region }
+        profile: default
+      credential:
+        key: cloud
+        name: cloud-credentials
   snapshotLocations:
-    - name: default
-      velero:
-        provider: aws
-        config:
-          region: ${ modules.velero.output.config.bucket_region }
-          profile: "default"
+  - velero:
+      provider: aws
+      config:
+        region: ${ modules.velero.output.config.bucket_region }
+        profile: "default"
 %{~ endif }
+
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: full-backup
+  namespace: openshift-adp
+spec:
+  schedule: '@every 24h'
+  template:
+    includeClusterResources: true
+    includedNamespaces:
+    - '*'
+    ttl: 336h0m0s
+  useOwnerReferencesInBackup: false
