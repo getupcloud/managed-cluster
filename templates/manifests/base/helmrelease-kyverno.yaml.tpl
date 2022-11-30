@@ -1,4 +1,5 @@
 %{ if modules.kyverno.enabled ~}
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -27,8 +28,11 @@ spec:
   values:
     # HA requires at least 3 pods
     replicaCount: 1
----
+    resources:
+      limits:
+        memory: 2Gi
 %{~ if modules.kyverno.kyverno-policies.enabled }
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

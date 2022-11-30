@@ -17,6 +17,7 @@ DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION
 SEMVER_REGEX := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
 SHELL         = /bin/bash
 
+.ONESHELL:
 .EXPORT_ALL_VARIABLES:
 
 default: build
@@ -44,7 +45,6 @@ define CLUSTER_REPO_template =
 	fi;
 endef
 
-.ONESHELL:
 import:
 	@$(foreach i,$(CLUSTER_TYPES),$(call CLUSTER_REPO_template,$(i)))
 
@@ -63,19 +63,27 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt check-git check-tag build tag push
+release: fmt check-git update-version build-release
 	@echo Finished $(RELEASE) release
 
 check-git:
-	@if git status --porcelain | grep '^\s*[^?]' | grep -qv version.txt; then \
-		echo Git has uncommited files. Please fix and try again; \
-		exit 1; \
+	@if git status --porcelain | grep '^\s*[^?]' | grep -qv version.txt; then
+		git status
+		echo -e "\n>>> Tree is not clean. Please commit and try again <<<\n"
+		exit 1
 	fi
 
+update-version:
+	[ -n "$$BUILD_VERSION" ] || read -e -i "$(FILE_VERSION)" -p "New version: " BUILD_VERSION
+	echo $$BUILD_VERSION > $(VERSION_TXT)
+
+build-release:
+	$(MAKE) check-tag build tag push
+
 check-tag:
-	@if git tag -l | grep -q '^$(RELEASE)$$'; then \
-		echo Git tag already exists: $(RELEASE); \
-		exit 1; \
+	@if git tag -l | grep -q '^$(RELEASE)$$'; then
+		echo Git tag already exists: $(RELEASE)
+		exit 1
 	fi
 
 tag: tag-git tag-image
@@ -110,14 +118,14 @@ fmt:
 	terraform fmt -recursive
 
 install:
-	if [ -e /etc/debian_version ]; then \
-		apt install -y jq python3-pip rsync; \
+	if [ -e /etc/debian_version ]; then
+		apt install -y jq python3-pip rsync
 	fi
-	if [ -e /etc/redhat-release ]; then \
-		yum install -y jq python3-pip rsync; \
+	if [ -e /etc/redhat-release ]; then
+		yum install -y jq python3-pip rsync
 	fi
-	if [ -d /Applications ]; then \
-		brew install jq; \
+	if [ -d /Applications ]; then
+		brew install jq
 	fi
 	pip3 install giturlparse || pip install giturlparse
 	curl -skL https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64 > /usr/local/bin/yq
@@ -131,7 +139,8 @@ test: VERSION := $(FILE_VERSION)-$(GIT_COMMIT)-test
 test: RELEASE := v$(FILE_VERSION)-$(GIT_COMMIT)-test
 test: lint
 test:
-	cd tests && ./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
+	cd tests
+	./test $(DEFAULT_TEST_PARAMS) $(TEST_PARAMS)
 
 test-help:
 	@echo Usage: make test TEST_PARAMS="..."
@@ -141,11 +150,12 @@ test-help:
 	@echo Targets: test, test-{type}, test-iter
 
 test-%:
-	make test TEST_PARAMS="--types $(subst test-,,$@) $(TEST_PARAMS)"
+	$(MAKE) test TEST_PARAMS="--types $(subst test-,,$@) $(TEST_PARAMS)"
 
 test-iter:
-	make test TEST_PARAMS="-i $(TEST_PARAMS)"
+	$(MAKE) test TEST_PARAMS="-i $(TEST_PARAMS)"
 
 lint:
-	for dir in templates/ templates/*/; do echo tflint $$dir && tflint $$dir; done
-
+	@for dir in templates/ templates/*/; do
+		echo tflint $$dir && tflint $$dir
+	done

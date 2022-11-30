@@ -1,5 +1,5 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-generic?ref=v2.0.0-alpha8"
+  source = "github.com/getupcloud/terraform-cluster-generic?ref=v2.0.0-alpha10"
 
   # cluster basics
   customer_name    = var.customer_name
@@ -8,8 +8,10 @@ module "cluster" {
   cluster_type     = local.cluster_type
   cluster_provider = var.cluster_provider
   use_kubeconfig   = var.use_kubeconfig
+  pre_create       = var.pre_create
   post_create      = var.post_create
-  modules          = local.modules_result
+  modules          = var.modules
+  dump_debug       = var.dump_debug
 
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled

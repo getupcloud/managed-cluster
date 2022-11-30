@@ -3,16 +3,16 @@ kind: Kustomization
 
 resources:
 - ../base/
-- clusterrolebinding-scc-monitoring.yaml
 - helmrelease-cert-utils-operator.yaml
 - helmrepository.yaml
+- helmrelease-kyverno.yaml
+- helmrelease-trivy-operator-polr-adapter.yaml
 - openshift-adp.yaml
 
 patchesStrategicMerge:
 - helmrelease-cert-manager.yaml
 - helmrelease-cert-manager-config.yaml
 - helmrelease-linkerd.yaml
-- excludes.yaml
 
 patches: []
 #- target:
