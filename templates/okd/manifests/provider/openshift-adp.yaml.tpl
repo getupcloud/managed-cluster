@@ -44,37 +44,39 @@ spec:
   configuration:
     velero:
       defaultPlugins:
-      - openshift
-      - csi
-      featureFlags:
-      - EnableCSI
+        - openshift
+%{~ if cluster_provider == "aws" }
+        - aws ## replace for csi and uncoment below
+%{~ endif }
+      #featureFlags:
+      #- EnableCSI
       podConfig:
         resourceAllocations:
           limits:
             cpu: "1"
-            memory: 1Gi
+            memory: 2Gi
     restic:
       enable: false
 %{~ if cluster_provider == "aws" }
   backupLocations:
-  - velero:
-      provider: aws
-      default: true
-      objectStorage:
-        bucket: ${ modules.velero.output.config.bucket_name }
-        prefix: velero
-      config:
-        region: ${ modules.velero.output.config.bucket_region }
-        profile: default
-      credential:
-        key: cloud
-        name: cloud-credentials
+    - velero:
+        provider: aws
+        default: true
+        objectStorage:
+          bucket: ${ modules.velero.output.config.bucket_name }
+          prefix: velero
+        config:
+          region: ${ modules.velero.output.config.bucket_region }
+          profile: default
+        credential:
+          key: cloud
+          name: cloud-credentials
   snapshotLocations:
-  - velero:
-      provider: aws
-      config:
-        region: ${ modules.velero.output.config.bucket_region }
-        profile: "default"
+    - velero:
+        provider: aws
+        config:
+          region: ${ modules.velero.output.config.bucket_region }
+          profile: "default"
 %{~ endif }
 
 ---
