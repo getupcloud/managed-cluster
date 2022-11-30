@@ -1,7 +1,7 @@
 VERSION_TXT          := version.txt
 FILE_VERSION         := $(shell cat $(VERSION_TXT))
-VERSION              ?= $(FILE_VERSION)
-RELEASE              ?= v$(VERSION)
+VERSION              := $(FILE_VERSION)
+RELEASE              := v$(VERSION)
 ARCH                 := $(shell uname -m | tr '[:upper:]' '[:lower:]')
 
 IMAGE_HOST           ?= ghcr.io
