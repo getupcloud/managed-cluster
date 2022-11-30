@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: flux-system
+spec:
+  dependsOn:
+  values:
+    nodeSelector:
+    cainjector:
+      nodeSelector:
+    webhook:
+      nodeSelector:

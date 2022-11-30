@@ -7,6 +7,14 @@ $patch: delete
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
+  name: grafana
+  namespace: flux-system
+
+---
+$patch: delete
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
   name: loki
   namespace: flux-system
 
