@@ -21,7 +21,7 @@ SHELL         = /bin/bash
 
 default: build
 
-CLUSTER_TYPES := $(shell ls -1 templates/*/provider.env | awk -F/ '{print $$2}')
+CLUSTER_TYPES := $(shell ls -1 templates/*/main.tf | awk -F/ '{print $$2}')
 
 define CLUSTER_REPO_template =
 	modules=$$(hcl2json < templates/$(1)/main.tf  | jq '.module|keys|.[]' -r 2>/dev/null) || true

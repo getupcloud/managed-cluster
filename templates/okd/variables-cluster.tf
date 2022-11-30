@@ -25,6 +25,16 @@ variable "cluster_type" {
   default     = "generic"
 }
 
+variable "cluster_provider" {
+  description = "Cluster provider name"
+  type        = string
+
+  validation {
+    condition     = contains(["onprem", "aws", "azure", "gcp", "do"], var.cluster_provider)
+    error_message = "The Cluster Provider is invalid."
+  }
+}
+
 variable "get_kubeconfig_command" {
   description = "Command to create/update kubeconfig"
   type        = string
