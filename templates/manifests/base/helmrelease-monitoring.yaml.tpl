@@ -432,7 +432,7 @@ spec:
             access: proxy
             orgId: 1
             url: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090/
-            isDefault: true
+            isDefault: false
             jsonData:
               timeInterval: "5s"
             editable: true
