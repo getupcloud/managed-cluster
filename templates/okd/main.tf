@@ -10,7 +10,7 @@ module "cluster" {
   use_kubeconfig   = var.use_kubeconfig
   pre_create       = var.pre_create
   post_create      = var.post_create
-  modules          = var.modules
+  modules          = local.modules_result
   dump_debug       = var.dump_debug
 
   # monitoring and operations
