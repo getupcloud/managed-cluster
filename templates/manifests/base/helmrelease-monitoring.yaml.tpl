@@ -65,10 +65,10 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - prometheus.example.com
+          - ${ modules.monitoring.prometheus.externalUrl }
     #    tls:
     #    - hosts:
-    #      - prometheus.example.com
+    #      - ${ modules.monitoring.prometheus.externalUrl }
     #      secretName: prometheus-ingress-tls
 
       prometheusSpec:
@@ -470,10 +470,12 @@ spec:
 
       dashboards:
         default:
+%{~if modules.linkerd.enabled }
           trivy-image-vulnerability:
             gnetId: 17214
             revision: 1
             datasource: Prometheus
+%{~ endif }
 %{~if modules.linkerd.enabled }
           # https://github.com/linkerd/linkerd2/blob/main/grafana/values.yaml
           # all these charts are hosted at https://grafana.com/grafana/dashboards/$gnetId
@@ -550,8 +552,8 @@ spec:
             revision: 3
             datasource: prometheus
 %{ endif }
-      adminUsername: admin
-      adminPassword: admin
+      adminUsername: ${ modules.monitoring.grafana.adminUsername }
+      adminPassword: ${ modules.monitoring.grafana.adminPassword }
 
       grafana.ini:
         auth.anonymous:
@@ -578,10 +580,10 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - grafana.example.com
+          - ${ modules.monitoring.grafana.externalUrl }
     #    tls:
     #    - hosts:
-    #      - grafana.example.com
+    #      - ${ modules.monitoring.grafana.externalUrl }
     #      secretName: grafana-ingress-tls
 
     kubeApiServer:

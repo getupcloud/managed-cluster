@@ -36,6 +36,16 @@ variable "modules_defaults" {
         hostname = string
       })
     })
+    monitoring = object({
+      prometheus = object({
+        externalUrl = string
+      })
+      grafana = object({
+        externalUrl   = string
+        adminUsername = string
+        adminPassword = string
+      })
+    })
     podinfo = object({
       enabled  = bool
       hostname = string
@@ -98,6 +108,16 @@ variable "modules_defaults" {
       emojivoto = {
         enabled  = false
         hostname = "emojivoto.example.com"
+      }
+    }
+    monitoring = {
+      prometheus = {
+        externalUrl = "https://prometheus.example.com"
+      }
+      grafana = {
+        externalUrl   = "https://grafana.example.com"
+        adminUsername = "admin"
+        adminPassword = "prom-operator"
       }
     }
     podinfo = {
@@ -166,6 +186,16 @@ locals {
       emojivoto = {
         enabled  = try(var.modules.linkerd.emojivoto.enabled, var.modules_defaults.linkerd.emojivoto.enabled)
         hostname = try(var.modules.linkerd.emojivoto.hostname, var.modules_defaults.linkerd.emojivoto.hostname)
+      }
+    }
+    monitoring = {
+      prometheus = {
+        externalUrl = try(var.modules.monitoring.prometheus.externalUrl, var.modules_defaults.monitoring.prometheus.externalUrl)
+      }
+      grafana = {
+        externalUrl   = try(var.modules.monitoring.grafana.externalUrl, var.modules_defaults.monitoring.grafana.externalUrl)
+        adminUsername = try(var.modules.monitoring.grafana.adminUsername, var.modules_defaults.monitoring.grafana.adminUsername)
+        adminPassword = try(var.modules.monitoring.grafana.adminPassword, var.modules_defaults.monitoring.grafana.adminPassword)
       }
     }
     podinfo = {

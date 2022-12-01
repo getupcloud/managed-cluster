@@ -303,6 +303,13 @@ spec:
   values:
     dashboard:
       enforcedHostRegexp: ".*"
+      prometheusUrl: "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
+%{~ if modules.linkerd.linkerd-jaeger.enabled }
+    jaegerUrl: "jaeger.linkerd-jaeger.svc:16686"
+%{~ endif }
+    grafana:
+      externalUrl: ${ modules.monitoring.grafana.externalUrl }
+
     tolerations:
     - effect: NoSchedule
       operator: Exists
