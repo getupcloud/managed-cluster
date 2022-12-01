@@ -89,13 +89,21 @@ spec:
           cluster: ${customer_name}/${cluster_name}
         prometheusExternalLabelName: cluster
 
-        ruleNamespaceSelector: {}
         ruleSelectorNilUsesHelmValues: false
         ruleSelector: {}
+        ruleNamespaceSelector: {}
 
-        serviceMonitorNamespaceSelector: {}
         serviceMonitorSelectorNilUsesHelmValues: false
         serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+
+        podMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
+
+        probeSelectorNilUsesHelmValues: false
+        probeSelector: {}
+        probeNamespaceSelector: {}
 
         tolerations:
         - key: dedicated
@@ -468,7 +476,7 @@ spec:
             datasource: Prometheus
 %{~if modules.linkerd.enabled }
           # https://github.com/linkerd/linkerd2/blob/main/grafana/values.yaml
-          # all these charts are hosted at https://grafana.com/grafana/dashboards/%id%
+          # all these charts are hosted at https://grafana.com/grafana/dashboards/$gnetId
           top-line:
             gnetId: 15474
             revision: 4

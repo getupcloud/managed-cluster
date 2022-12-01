@@ -139,6 +139,26 @@ spec:
     - effect: NoSchedule
       operator: Exists
 
+    proxyInit:
+      resources:
+        cpu:
+          limit: 100m
+          request: 10m
+        memory:
+          limit: 50Mi
+          request: 10Mi
+
+    podMonitor:
+      enabled: true
+      scrapeInterval: "30s"
+      serviceMirror:
+        enabled: false
+
+%{~ if modules.linkerd.linkerd-jaeger.enabled }
+    controlPlaneTracing: true
+    controlPlaneTracingNamespace: linkerd-jaeger
+%{~ endif }
+
 %{ if try(modules.linkerd.output.ca_crt, "") != "" }
     identityTrustAnchorsPEM: |-
       ${indent(6, trimspace(try(modules.linkerd.output.ca_crt, "")))}
@@ -277,11 +297,46 @@ spec:
   targetNamespace: linkerd-viz
   dependsOn:
   - name: linkerd-control-plane
+%{~ if modules.linkerd.linkerd-jaeger.enabled }
+  - name: linkerd-jaeger
+%{~ endif }
   values:
     dashboard:
       enforcedHostRegexp: ".*"
     tolerations:
     - effect: NoSchedule
       operator: Exists
+%{~ endif }
+
+%{~ if modules.linkerd.linkerd-jaeger.enabled }
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkerd-jaeger
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: linkerd-jaeger
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+      version: "~> 30.4"
+  dependsOn:
+  - name: linkerd-control-plane
+  install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: linkerd-jaeger
+  storageNamespace: linkerd-jaeger
+  targetNamespace: linkerd-jaeger
+  values: {}
 %{~ endif }
 %{~ endif }

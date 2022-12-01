@@ -24,6 +24,7 @@ variable "modules_defaults" {
     linkerd = object({
       enabled     = bool
       linkerd-cni = object({ enabled = bool })
+      linkerd-jaeger = object({ enabled = bool })
       linkerd-viz = object({
         enabled  = bool
         username = string
@@ -85,6 +86,9 @@ variable "modules_defaults" {
       linkerd-cni = {
         enabled = false
       }
+      linkerd-jaeger = {
+        enabled = true
+      }
       linkerd-viz = {
         enabled  = true
         username = "admin"
@@ -112,7 +116,7 @@ variable "modules_defaults" {
 }
 
 locals {
-  modules = merge(var.modules_defaults, var.modules, {
+  modules = {
     cert-manager = {
       enabled = try(var.modules.cert-manager.enabled, var.modules_defaults.cert-manager.enabled)
     }
@@ -150,6 +154,9 @@ locals {
       linkerd-cni = {
         enabled = try(var.modules.linkerd.linkerd-cni.enabled, var.modules_defaults.linkerd.linkerd-cni.enabled)
       }
+      linkerd-jaeger = {
+        enabled = try(var.modules.linkerd.linkerd-jaeger.enabled, var.modules_defaults.linkerd.linkerd-jaeger.enabled)
+      }
       linkerd-viz = {
         enabled  = try(var.modules.linkerd.linkerd-viz.enabled, var.modules_defaults.linkerd.linkerd-viz.enabled)
         username = try(var.modules.linkerd.linkerd-viz.username, var.modules_defaults.linkerd.linkerd-viz.username)
@@ -173,7 +180,7 @@ locals {
       admin-username = try(var.modules.weave-gitops.admin-username, var.modules_defaults.weave-gitops.admin-username)
       admin-password = try(var.modules.weave-gitops.admin-password, var.modules_defaults.weave-gitops.admin-password)
     }
-  })
+  }
 
   register_modules = {
     linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
