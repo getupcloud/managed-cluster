@@ -94,7 +94,7 @@ spec:
   storageNamespace: linkerd
   targetNamespace: linkerd
   values:
-    cniEnabled: %{ modules.linkerd.linkerd-cni.enabled }
+    cniEnabled: ${ modules.linkerd.linkerd-cni.enabled }
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
