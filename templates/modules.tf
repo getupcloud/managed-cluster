@@ -26,7 +26,7 @@ locals {
 resource "local_file" "debug-modules" {
   count    = var.dump_debug ? 1 : 0
   filename = ".debug-modules.json"
-  content  = jsonencode({
+  content = jsonencode({
     user_defined_modules : var.modules
     modules : local.modules
     modules_result : local.modules_result

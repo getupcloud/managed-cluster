@@ -22,8 +22,8 @@ variable "modules_defaults" {
       kyverno-policies = object({ enabled = bool })
     })
     linkerd = object({
-      enabled     = bool
-      linkerd-cni = object({ enabled = bool })
+      enabled        = bool
+      linkerd-cni    = object({ enabled = bool })
       linkerd-jaeger = object({ enabled = bool })
       linkerd-viz = object({
         enabled  = bool
