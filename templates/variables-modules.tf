@@ -37,6 +37,7 @@ variable "modules_defaults" {
       })
     })
     monitoring = object({
+      enabled = bool
       prometheus = object({
         externalUrl = string
       })
@@ -111,6 +112,7 @@ variable "modules_defaults" {
       }
     }
     monitoring = {
+      enabled = true
       prometheus = {
         externalUrl = "https://prometheus.example.com"
       }
@@ -189,6 +191,7 @@ locals {
       }
     }
     monitoring = {
+      enabled = try(var.modules.monitoring.enabled, var.modules_defaults.monitoring.enabled)
       prometheus = {
         externalUrl = try(var.modules.monitoring.prometheus.externalUrl, var.modules_defaults.monitoring.prometheus.externalUrl)
       }
