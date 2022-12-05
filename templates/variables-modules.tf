@@ -1,6 +1,14 @@
 variable "modules_defaults" {
   description = "Configure modules to install (defaults)"
   type = object({
+    cert-manager = object({
+      enabled                   = bool
+      cluster_oidc_issuer_url   = string
+      service_account_namespace = string
+      service_account_name      = string
+      tags                      = map(string)
+      hosted_zone_ids           = list(string)
+    })
     cert-manager-config = object({
       enabled       = bool
       acme_email    = string
@@ -54,6 +62,14 @@ variable "modules_defaults" {
       hostname = string
     })
     trivy = object({ enabled = bool })
+    velero = object({
+      enabled                   = bool
+      cluster_oidc_issuer_url   = string
+      service_account_namespace = string
+      service_account_name      = string
+      tags                      = map(string)
+      bucket_name               = string
+    })
     weave-gitops = object({
       enabled        = bool
       admin-username = string
@@ -62,6 +78,14 @@ variable "modules_defaults" {
   })
 
   default = {
+    cert-manager = {
+      enabled                   = false
+      cluster_oidc_issuer_url   = ""
+      service_account_namespace = "cert-manager"
+      service_account_name      = "cert-manger"
+      tags                      = {}
+      hosted_zone_ids           = []
+    }
     cert-manager-config = {
       enabled       = false
       acme_email    = "change.me@example.com"
@@ -133,6 +157,14 @@ variable "modules_defaults" {
     trivy = {
       enabled = false
     }
+    velero = {
+      enabled                   = false
+      cluster_oidc_issuer_url   = ""
+      service_account_namespace = "velero"
+      service_account_name      = "velero"
+      tags                      = {}
+      bucket_name               = ""
+    }
     weave-gitops = {
       enabled        = false
       admin-username = "admin"
@@ -143,6 +175,14 @@ variable "modules_defaults" {
 
 locals {
   modules = {
+    cert-manager = {
+      enabled                   = try(var.modules.cert-manager.enabled, var.modules_defaults.cert-manager.enabled)
+      cluster_oidc_issuer_url   = try(var.modules.cert-manager.cluster_oidc_issuer_url, var.modules_defaults.cert-manager.cluster_oidc_issuer_url)
+      service_account_namespace = try(var.modules.cert-manager.service_account_namespace, var.modules_defaults.cert-manager.service_account_namespace)
+      service_account_name      = try(var.modules.cert-manager.service_account_name, var.modules_defaults.cert-manager.service_account_name)
+      tags                      = try(var.modules.cert-manager.tags, var.modules_defaults.cert-manager.tags)
+      hosted_zone_ids           = try(var.modules.cert-manager.hosted_zone_ids, var.modules_defaults.cert-manager.hosted_zone_ids)
+    }
     cert-manager-config = {
       enabled       = try(var.modules.cert-manager-config.enabled, var.modules_defaults.cert-manager-config.enabled)
       acme_email    = try(var.modules.cert-manager-config.acme_email, var.modules_defaults.cert-manager-config.acme_email)
@@ -213,6 +253,14 @@ locals {
     }
     trivy = {
       enabled = try(var.modules.trivy.enabled, var.modules_defaults.trivy.enabled)
+    }
+    velero = {
+      enabled                   = try(var.modules.velero.enabled, var.modules_defaults.velero.enabled)
+      cluster_oidc_issuer_url   = try(var.modules.velero.cluster_oidc_issuer_url, var.modules_defaults.velero.cluster_oidc_issuer_url)
+      service_account_namespace = try(var.modules.velero.service_account_namespace, var.modules_defaults.velero.service_account_namespace)
+      service_account_name      = try(var.modules.velero.service_account_name, var.modules_defaults.velero.service_account_name)
+      tags                      = try(var.modules.velero.tags, var.modules_defaults.velero.tags)
+      bucket_name               = try(var.modules.velero.bucket_name, var.modules_defaults.velero.bucket_name)
     }
     weave-gitops = {
       enabled        = try(var.modules.weave-gitops.enabled, var.modules_defaults.weave-gitops.enabled)
