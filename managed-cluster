@@ -997,13 +997,13 @@ function check_dependencies()
 function check_deprecations()
 {
     local removed_files=(
-        providers-common.tf
+        $CLUSTER_DIR/providers-common.tf
     )
 
     for i in ${removed_files[*]}; do
-        if [ -e "$CLUSTER_DIR?$i" ]; then
-            if ask "Remove deprecated file '$CLUSTER_DIR/$i'? [Y/n]"; then
-                rm -vf "$CLUSTER_DIR/$i"
+        if [ -e "$i" ]; then
+            if ask "Remove deprecated file '$i'? [Y/n]"; then
+                rm -vf "$i"
             fi
         fi
     done

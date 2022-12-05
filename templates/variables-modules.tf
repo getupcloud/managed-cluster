@@ -6,6 +6,11 @@ variable "modules_defaults" {
       acme_email    = string
       ingress_class = string
     })
+    external-dns = object({
+      enabled        = bool
+      domain_filters = list(string)
+      private        = bool
+    })
     falco = object({
       enabled         = bool
       event-generator = object({ enabled = bool })
@@ -61,6 +66,11 @@ variable "modules_defaults" {
       enabled       = false
       acme_email    = "change.me@example.com"
       ingress_class = "nginx"
+    }
+    external-dns = {
+      enabled        = false
+      domain_filters = []
+      private        = false
     }
     falco = {
       enabled = false
@@ -137,6 +147,11 @@ locals {
       enabled       = try(var.modules.cert-manager-config.enabled, var.modules_defaults.cert-manager-config.enabled)
       acme_email    = try(var.modules.cert-manager-config.acme_email, var.modules_defaults.cert-manager-config.acme_email)
       ingress_class = try(var.modules.cert-manager-config.ingress_class, var.modules_defaults.cert-manager-config.ingress_class)
+    }
+    external-dns = {
+      enabled        = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
+      domain_filters = try(var.modules.external-domain_filters, var.modules_defaults.external-dns.domain_filters)
+      private        = try(var.modules.external-private, var.modules_defaults.external-dns.private)
     }
     falco = {
       enabled = try(var.modules.falco.enabled, var.modules_defaults.falco.enabled)

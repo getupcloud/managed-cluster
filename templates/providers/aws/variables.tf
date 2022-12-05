@@ -25,6 +25,11 @@ variable "modules_defaults" {
       tags                      = map(string)
       hosted_zone_ids           = list(string)
     })
+    external-dns = object({
+      enabled        = bool
+      domain_filters = list(string)
+      private        = bool
+    })
     velero = object({
       enabled                   = bool
       cluster_oidc_issuer_url   = string
@@ -43,6 +48,11 @@ variable "modules_defaults" {
       service_account_name      = "cert-manger"
       tags                      = {}
       hosted_zone_ids           = []
+    }
+    external-dns = {
+      enabled        = false
+      domain_filters = []
+      private        = false
     }
     velero = {
       enabled                   = false
@@ -64,6 +74,11 @@ locals {
       service_account_name      = try(var.modules.cert-manager.service_account_name, var.modules_defaults.cert-manager.service_account_name)
       tags                      = try(var.modules.cert-manager.tags, var.modules_defaults.cert-manager.tags)
       hosted_zone_ids           = try(var.modules.cert-manager.hosted_zone_ids, var.modules_defaults.cert-manager.hosted_zone_ids)
+    }
+    external-dns = {
+      enabled        = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
+      domain_filters = try(var.modules.external-domain_filters, var.modules_defaults.external-dns.domain_filters)
+      private        = try(var.modules.external-private, var.modules_defaults.external-dns.private)
     }
     velero = {
       enabled                   = try(var.modules.velero.enabled, var.modules_defaults.velero.enabled)
