@@ -132,14 +132,12 @@ spec:
     clusterNetworks: 10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16
     cniEnabled: ${ modules.linkerd.linkerd-cni.enabled }
 
-    proxyInit:
-      runAsRoot: true
-
     tolerations:
     - effect: NoSchedule
       operator: Exists
 
     proxyInit:
+      runAsRoot: true
       resources:
         cpu:
           limit: 100m
