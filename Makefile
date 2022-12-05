@@ -150,12 +150,15 @@ test-help:
 	@echo Targets: test, test-{type}, test-iter
 
 test-%:
-	$(MAKE) test TEST_PARAMS="--types $(subst test-,,$@) $(TEST_PARAMS)"
+	$(MAKE) test TEST_PARAMS="--plans tests/test_02_cluster-types --cluster-types $(subst test-,,$@) $(TEST_PARAMS)"
 
 test-iter:
 	$(MAKE) test TEST_PARAMS="-i $(TEST_PARAMS)"
 
 lint:
-	@for dir in templates/ templates/*/; do
+	@for dir in templates/ templates/*/ templates/providers/*/; do
+		if [ "$$dir" == templates/providers/ ]; then
+			continue
+		fi
 		echo tflint $$dir && tflint $$dir
 	done

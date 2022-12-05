@@ -4,14 +4,17 @@ make
 for cluster_type in $cluster_types; do
     CLUSTER_DIR=$PWD/clusters/$NAME/$cluster_type
 
+    create_params="$(jq .${cluster_type}'.create_params|.[]' -c -r tests/test-data.json 2>/dev/null || true)"
+    terraform_params=( $(jq .${cluster_type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r tests/test-data.json 2>/dev/null || true) )
+
     rm -rf $CLUSTER_DIR
+    set -x
     ./managed-cluster create --customer-name $CUSTOMER --cluster-name $NAME --cluster-type $cluster_type --cluster-sla none \
         --flux-git-repo ssh://git@github.com/eveilcorp/managed-cluster-evilcluster.git \
         --origin git@github.com:evilcorp/managed-cluster-evilcluster.git \
-        --upstream git@github.com:evilcorp/managed-cluster.git
-
-    terraform_params=( $(jq .${cluster_type}'.tfvars|keys[] as $k | "\($k)=\(.[$k])"' -c -r tests/test-data.json 2>/dev/null || true) )
-
+        --upstream git@github.com:evilcorp/managed-cluster.git \
+        ${create_params}
+    set +x
     cat > $CLUSTER_DIR/test-cluster <<EOF
 #!/bin/bash
 
@@ -32,5 +35,5 @@ terraform validate
 #terraform plan -out=/tmp/terraform.tfplan
 EOF
     chmod +x $CLUSTER_DIR/test-cluster
-    run ./managed-cluster start $CLUSTER_DIR -- bash -c /cluster/test-cluster
+    run ./managed-cluster --no-check-update start $CLUSTER_DIR -- bash -c /cluster/test-cluster
 done

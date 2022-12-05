@@ -44,6 +44,16 @@ variable "customer_name" {
   type        = string
 }
 
+variable "cluster_provider" {
+  description = "Cluster provider name"
+  type        = string
+
+  validation {
+    condition     = contains(["aws", "azure", "do", "gcp", "none", "oci"], var.cluster_provider)
+    error_message = "The Cluster Provider is invalid."
+  }
+}
+
 variable "flux_git_repo" {
   description = "GitRepository URL"
   type        = string

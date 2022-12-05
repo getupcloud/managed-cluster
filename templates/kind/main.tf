@@ -8,12 +8,13 @@ module "kind" {
   use_kubeconfig = var.use_kubeconfig
   pre_create     = var.pre_create
   post_create    = var.post_create
-  kind_modules   = var.kind_modules
+  kind_modules   = local.modules_result
+  #dump_debug          = var.dump_debug
 
   # monitoring and operations
   cronitor_enabled           = var.cronitor_enabled
   cronitor_pagerduty_key     = var.cronitor_pagerduty_key
-  cronitor_notification_list = local.cronitor_notification_list
+  cronitor_notification_list = var.cronitor_notification_lists
   opsgenie_enabled           = var.opsgenie_enabled
   teleport_auth_token        = var.teleport_auth_token
 

@@ -1,4 +1,16 @@
 {
+  "generic": {
+    "create_params": ["--cluster-provider aws"]
+  },
+  "kubespray": {
+    "create_params": ["--cluster-provider aws"]
+  },
+  "okd": {
+    "create_params": ["--cluster-provider aws"]
+  },
+  "kind": {
+    "create_params": ["--cluster-provider none"]
+  },
   "aks": {
     "tfvars": {
       "cronitor_enabled": true,

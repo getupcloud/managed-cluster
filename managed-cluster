@@ -50,9 +50,13 @@ function copy_from_template_provider()
         exit 2
     fi
 
-    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_DIR/"
+    local cmd="rsync -va --checksum --omit-dir-times $@ $TEMPLATE_DIR/ $CLUSTER_PROVIDER_DIR $CLUSTER_PROVIDER_TF $CLUSTER_DIR/"
     info "--> $cmd"
     $cmd
+
+    if [ -d $CLUSTER_PROVIDER_DIR ]; then
+        sed -i -e "s|%cluster_provider%|$cluster_provider|g" $CLUSTER_PROVIDER_TF
+    fi
 }
 
 function sync_from_template()
@@ -72,7 +76,7 @@ function sync_from_template()
       return 1
     fi
 
-    local rsync_params="--out-format=%n --info=all0,name1 --exclude=manifests/cluster/ --exclude=provider.env --exclude=\*.swp"
+    local rsync_params="--out-format=%n --info=all0,name1 --exclude=manifests/cluster/ --exclude=providers/ --exclude=provider.env --exclude=\*.swp"
     local files_to_sync_common=( $(copy_from_template_common $rsync_params --dry-run) )
     local files_to_sync_provider=( $(copy_from_template_provider $rsync_params --dry-run) )
 
@@ -159,37 +163,70 @@ function merge_requires()
 #    set_config "$_name='$_value'" "$_description" $_filename
 #}
 
-function list_cluster_types()
-{
-    local types=( templates/*/ )
-    types=( ${types[@]#*/} )
-    types=( ${types[@]%/} )
-    types=( "${types[@]/manifests}" ) ## remove manifests from types
-    echo ${types[*]}
-}
-
 function select_cluster_type()
 {
-    # use value if already exists
+    # Cluster Type
     if [ -n "$opt_cluster_type" ]; then
-        for i in $(list_cluster_types); do
+        local valid=false
+        for i in $CLUSTER_TYPES; do
             if [ "$opt_cluster_type" == "$i" ]; then
                 export cluster_type="$opt_cluster_type"
-                return
+                valid=true
+                break
             fi
         done
-        warn Invalid cluster type: $opt_cluster_type
-        return 1
+        if ! $valid; then
+            warn Invalid cluster type: $opt_cluster_type
+            return 1
+        fi
+    else
+        local types="$CLUSTER_TYPES"
+        local PS3=$(prompt "Select cluster type")
+
+        select cluster_type in ${types}; do
+            break;
+        done
+
+        export cluster_type
     fi
 
-    local types=$(list_cluster_types)
-    local PS3=$(prompt "Select cluster type")
+    # Cluster Provider
+    if [ -n "$opt_cluster_provider" ]; then
+        local valid=false
+        for i in $(list_cluster_providers $cluster_type); do
+            if [ "$opt_cluster_provider" == "$i" ]; then
+                export cluster_provider="$opt_cluster_provider"
+                valid=true
+                break
+            fi
+        done
+        if ! $valid; then
+            warn Invalid cluster provider: $opt_cluster_provider
+            return 1
+        fi
+    else
+        local providers=( $(list_cluster_providers $cluster_type) )
+        if [ ${#providers[*]} -gt 1 ]; then
+            local PS3=$(prompt "Select cluster provider")
 
-    select cluster_type in ${types}; do
-        break;
-    done
+            select cluster_provider in ${providers[*]}; do
+                break;
+            done
+        else
+            cluster_provider=${providers[0]}
+        fi
 
-    export cluster_type
+        export cluster_provider
+    fi
+}
+
+function list_cluster_providers()
+{
+    if [ $# -gt 0 ]; then
+        echo ${CLUSTER_TYPES_PROVIDERS[$1]}
+    else
+        echo $CLUSTER_PROVIDERS
+    fi
 }
 
 function select_cluster_sla()
@@ -462,19 +499,20 @@ function usage()
         echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Creates a new cluster from ./templates/\$cluster_type into CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/)." "$COLOR_RESET"
         echo
-        echo "     -c, --customer-name NAME   Customer name."
-        echo "         --force                Force create even if CLUSTER-DIR exists."
-        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
-        echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
-        echo "     -k, --ssh-key-type         SSH key type (default: $ssh_key_type)."
-        echo "         --ssh-key-length       SSH key length, depends on ssh key type."
-        echo "     -H, --ssh-host             SSH host (default: $ssh_host)."
-        echo "     -n, --cluster-name NAME    Unique name for new cluster."
-        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
-        echo "     -o, --origin REMOTE        Define ORIGIN remote address."
-        echo "     -s, --cluster-sla VALUE    Cluster SLA: high, low, none (default: $opt_cluster_sla)."
-        echo "     -t, --cluster-type NAME    Cluster type: $(list_cluster_types)."
-        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
+        echo "     -c, --customer-name NAME       Customer name."
+        echo "         --force                    Force create even if CLUSTER-DIR exists."
+        echo "     -f, --flux-git-repo URL        Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -l, --local-git-repo           Use cluster-internal git server '$local_git_repo'. (default: false)"
+        echo "     -k, --ssh-key-type             SSH key type (default: $ssh_key_type)."
+        echo "         --ssh-key-length           SSH key length, depends on ssh key type."
+        echo "     -H, --ssh-host                 SSH host (default: $ssh_host)."
+        echo "     -n, --cluster-name NAME        Unique name for new cluster."
+        echo "     -u, --upstream REMOTE          Define UPSTREAM remote address (default: $default_upstream)."
+        echo "     -o, --origin REMOTE            Define ORIGIN remote address."
+        echo "     -p, --cluster-provider NAME    Cluster provider: $CLUSTER_PROVIDERS."
+        echo "     -s, --cluster-sla VALUE        Cluster SLA: high, low, none (default: $opt_cluster_sla)."
+        echo "     -t, --cluster-type NAME        Cluster type: $CLUSTER_TYPES."
+        echo "     -u, --upstream REMOTE          Define UPSTREAM remote address (default: $default_upstream)."
     fi
 
     if [ -z "$_command" ] || [ "$_command" == "start" ]; then
@@ -622,6 +660,7 @@ opt_upstream=
 opt_customer_name=
 opt_cluster_name=
 opt_cluster_type=
+opt_cluster_provider=
 opt_cluster_sla=
 opt_flux_git_repo=
 opt_local_git_repo=false
@@ -664,6 +703,11 @@ function getopt_create()
                 [ $# -lt 2 ] && invalid_argument $1
                 shift
                 opt_cluster_name=$1
+            ;;
+            -p|--cluster-provider)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_cluster_provider=$1
             ;;
             -t|--cluster-type)
                 [ $# -lt 2 ] && invalid_argument $1
@@ -711,7 +755,6 @@ function command_create()
 {
     set -e
 
-    check_update
     create_repo_config
     create_cluster
 
@@ -795,6 +838,7 @@ function save_cluster_config()
 {
     info Saving $CLUSTER_CONF
     set_config cluster_type="$cluster_type" "Cluster Type" $CLUSTER_CONF
+    set_config cluster_provider="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
     set_config cluster_name="$cluster_name" "Cluster Name" $CLUSTER_CONF
     set_config cluster_sla="$cluster_sla" "Cluster SLA" $CLUSTER_CONF
 }
@@ -948,6 +992,18 @@ function check_dependencies()
 
 function check_deprecations()
 {
+    local removed_files=(
+        providers-common.tf
+    )
+
+    for i in ${removed_files[*]}; do
+        if [ -e "$CLUSTER_DIR?$i" ]; then
+            if ask "Remove deprecated file '$CLUSTER_DIR/$i'? [Y/n]"; then
+                rm -vf "$CLUSTER_DIR/$i"
+            fi
+        fi
+    done
+
     local old_cluster_configs=(
         upstream_git_repo
         origin_git_repo

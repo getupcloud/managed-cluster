@@ -558,6 +558,11 @@ function update_globals()
         export TEMPLATE_DIR=$TEMPLATES_DIR/$cluster_type
     fi
 
+    if [ -v cluster_provider ]; then
+        export CLUSTER_PROVIDER_DIR=$TEMPLATES_DIR/providers/$cluster_provider
+        export CLUSTER_PROVIDER_TF=$TEMPLATES_DIR/providers/${cluster_provider}_modules.tf
+    fi
+
     if ! [ -v TELEPORT_PROXY ]; then
         export TELEPORT_PROXY=getup.teleport.sh
     fi
@@ -578,6 +583,20 @@ fi
 
 export TEMPLATES_DIR=$REPO_DIR/templates
 export REPO_CONF=$REPO_DIR/repo.conf
+#export CLUSTER_TYPES="aks doks eks generic gke kind kubespray okd oke"
+#export CLUSTER_PROVIDERS="aws azure do gcp none oci"
+export CLUSTER_TYPES="aks eks generic kind kubespray okd oke"
+export CLUSTER_PROVIDERS="aws azure none oci"
+declare -A CLUSTER_TYPES_PROVIDERS
+CLUSTER_TYPES_PROVIDERS[aks]=azure
+#CLUSTER_TYPES_PROVIDERS[doks]=do
+CLUSTER_TYPES_PROVIDERS[eks]=aws
+CLUSTER_TYPES_PROVIDERS[generic]="$CLUSTER_PROVIDERS"
+CLUSTER_TYPES_PROVIDERS[gke]=gcp
+CLUSTER_TYPES_PROVIDERS[kind]="$CLUSTER_PROVIDERS"
+CLUSTER_TYPES_PROVIDERS[kubespray]="$CLUSTER_PROVIDERS"
+CLUSTER_TYPES_PROVIDERS[okd]="$CLUSTER_PROVIDERS"
+CLUSTER_TYPES_PROVIDERS[oke]=oci
 
 source_env "$REPO_CONF"
 update_globals

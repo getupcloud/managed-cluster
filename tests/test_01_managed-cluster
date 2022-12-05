@@ -20,19 +20,19 @@ reset_cluster()
 
 reset_cluster
 testing "Can create local git repo"
-run "./managed-cluster create --local-git-repo -c $CUSTOMER -n ${NAME} -t $TYPE -s none -u $UPSTREAM "
+run "./managed-cluster create --local-git-repo -c $CUSTOMER -n ${NAME} -t $TYPE -s none -u $UPSTREAM -p aws"
 assert "grep -q origin=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
 assert "grep -q flux_git_repo=ssh://git@git.flux-system.svc.cluster.local/git repo.conf"
 
 testing "Can create cluster with non-default key size"
 reset_cluster
-run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --cluster-sla none --ssh-key-type ecdsa --ssh-key-length 256 --force"
+run "./managed-cluster -v create -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --cluster-sla none --ssh-key-type ecdsa --ssh-key-length 256 --force -p aws"
 assert "[ \$(wc -l $CLUSTER_DIR/identity | cut -f1 -d' ') -eq 9 ]"
 assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp256 ]"
 
 testing "Can create cluster"
 reset_cluster
-run "./managed-cluster create  -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --cluster-sla high --ssh-key-type ecdsa"
+run "./managed-cluster create  -c $CUSTOMER -n $NAME -t $TYPE  -u $UPSTREAM -o $ORIGIN -f $FLUX_GIT_REPO --cluster-sla high --ssh-key-type ecdsa -p aws"
 assert "grep -q customer_name=$CUSTOMER $REPO_CONFIG"
 [ "$remote" == local ] || \
     assert "grep -q upstream=$UPSTREAM $REPO_CONFIG"
@@ -47,7 +47,7 @@ assert "[ \$(cut -f1 -d' ' $CLUSTER_DIR/identity.pub) == ecdsa-sha2-nistp521 ]"
 ##### CONTAINER ######
 
 testing "Can start container"
-run ./managed-cluster start $CLUSTER_DIR -- id -u | tail -n1 | tr -d '\r' > out.txt
+run ./managed-cluster --no-check-update start $CLUSTER_DIR -- id -u | tail -n1 | tr -d '\r' > out.txt
 assert "[ '$(cat out.txt)' -eq '$UID' ]"
 
 ##### TEMPLATES ######

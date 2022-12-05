@@ -2,6 +2,7 @@
 
 export TEST_ROOT_DIR=$(dirname $(realpath -e $0))
 export REPO_ROOT_DIR=$(dirname $TEST_ROOT_DIR)
+source $REPO_ROOT_DIR/root/etc/profile.d/getup.sh
 
 cd $REPO_ROOT_DIR
 
@@ -113,7 +114,7 @@ while [ $# -gt 0 ]; do
         -i|--interactive)
             interactive=true
         ;;
-        -t|--cluster_types)
+        -t|--cluster-types)
             [ $# -lt 2 ] && invalid_argument $1
             shift
             cluster_types="${1//,/ }"
@@ -125,11 +126,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [ "$cluster_types" == 'all' ]; then
-    # copied from ./managed-cluster
-    cluster_types=( templates/*/ )
-    cluster_types=( ${cluster_types[@]#*/} )
-    cluster_types=( ${cluster_types[@]%/} )
-    cluster_types="${cluster_types[@]/manifests}"
+    cluster_types=$CLUSTER_TYPES
 fi
 
 if [ -z "$remote" ]; then
@@ -242,7 +239,6 @@ if $interactive; then
     done
     exec 3>.tmp
     dialog --output-fd 3 --checklist "Select cluster types to test" 0 0 0 ${cluster_types_args[@]}
-    set -x
     cluster_types=$(<.tmp) && rm -f .tmp
     [ ${cluster_types:0:1} != , ] || cluster_types=${cluster_types:1}
 fi

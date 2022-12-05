@@ -1,16 +1,6 @@
 ## Provider specific variables
 ## Copy to toplevel
 
-variable "cluster_provider" {
-  description = "Cluster provider name"
-  type        = string
-
-  validation {
-    condition     = contains(["onprem", "aws", "azure", "gcp", "do"], var.cluster_provider)
-    error_message = "The Cluster Provider is invalid."
-  }
-}
-
 variable "api_endpoint" {
   description = "Kubernetes API endpoint"
   type        = string
@@ -234,12 +224,6 @@ variable "ssh_bastion_private_key" {
   description = "Path for SSH bastion private key"
   type        = string
   default     = ""
-}
-
-variable "custom_provisioner" {
-  description = "Path for custom provisioner script"
-  type        = string
-  default     = null
 }
 
 variable "install_packages" {

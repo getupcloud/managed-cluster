@@ -1,9 +1,11 @@
 variable "do_token" {
   description = "DigitalOcean API Token"
+  type        = string
 }
 
 variable "region" {
   description = "Region where to create cluster"
+  type        = string
 }
 
 variable "spaces_access_id" {
@@ -54,16 +56,19 @@ variable "kubernetes_version" {
 
 variable "auto_upgrade" {
   description = "Should the cluster will be automatically upgraded to new patch releases during its maintenance window"
+  type        = bool
   default     = false
 }
 
 variable "surge_upgrade" {
   description = "Should upgrades bringing up new nodes before destroying the outdated nodes"
+  type = bool
   default     = true
 }
 
 variable "node_pool" {
   description = "Default node pool config"
+  type        = any
   default = {
     name       = "infra"
     size       = "s-4vcpu-8gb"
@@ -88,6 +93,7 @@ variable "node_pool" {
 
 variable "node_pools" {
   description = "List of node pools"
+  type        = list(any)
   default = [
     {
       name       = "app"
