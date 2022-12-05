@@ -189,7 +189,10 @@ function select_cluster_type()
 
         export cluster_type
     fi
+}
 
+function select_cluster_provider()
+{
     # Cluster Provider
     if [ -n "$opt_cluster_provider" ]; then
         local valid=false
@@ -819,6 +822,7 @@ function save_repo_config()
 function create_cluster()
 {
     select_cluster_type
+    select_cluster_provider
     read_config cluster_name "Cluster name"
     select_cluster_sla
 
@@ -1022,12 +1026,19 @@ function check_deprecations()
         name:cluster_name
         customer:customer_name
         sla:cluster_sla
+        :cluster_provider
     )
 
     for i in ${rename_configs[*]}; do
         local old=${i%:*}
         local new=${i#*:}
         local found=false
+
+        if [ -z "${!new}" ] && [ -z "$old" ]; then
+            select_cluster_provider
+            set_config $new="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
+            continue
+        fi
 
         if grep -q "^\s*$old\s*=" $REPO_CONF; then
             found=true
