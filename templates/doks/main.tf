@@ -1,5 +1,5 @@
 module "doks" {
-  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.8"
+  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.8.1"
 
   # cluster basics
   customer_name  = var.customer_name

@@ -62,7 +62,7 @@ variable "auto_upgrade" {
 
 variable "surge_upgrade" {
   description = "Should upgrades bringing up new nodes before destroying the outdated nodes"
-  type = bool
+  type        = bool
   default     = true
 }
 
