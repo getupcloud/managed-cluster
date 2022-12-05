@@ -31,7 +31,8 @@ spec:
       enabled: true
 
     linkerd:
-      enabled: ${ try(modules.linkerd.enabled, false) }
+      # using dashboards from grafana.com (see monitoring HR)
+      enabled: false
 
     rabbitmq:
       enabled: true
