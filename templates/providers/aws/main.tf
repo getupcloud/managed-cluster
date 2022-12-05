@@ -1,5 +1,5 @@
 module "cert-manager" {
-  count  = var.modules.cert-manager.enabled ? 1 : 0
+  count  = local.modules.cert-manager.enabled ? 1 : 0
   source = "github.com/getupcloud/terraform-module-aws-cert-manager?ref=v1.1.0"
 
   cluster_name  = var.cluster_name
@@ -13,7 +13,7 @@ module "cert-manager" {
 }
 
 module "velero" {
-  count  = var.modules.velero.enabled ? 1 : 0
+  count  = local.modules.velero.enabled ? 1 : 0
   source = "github.com/getupcloud/terraform-module-aws-velero?ref=v1.8.1"
 
   cluster_name  = var.cluster_name
