@@ -1,3 +1,4 @@
+%{ if modules.cert-manager-config.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -40,3 +41,4 @@ spec:
       aws_region: ""
       aws_zones: ""
       aws_access_key_id: ""
+%{~ endif }
