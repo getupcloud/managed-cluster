@@ -10,6 +10,7 @@ resources:
 - helmrepository.yaml
 
 patchesStrategicMerge:
+- helmrelease-cert-manager.yaml
 - helmrelease-cluster-autoscaler.yaml
 - helmrelease-external-dns.yaml
 - helmrelease-ingress-nginx.yaml

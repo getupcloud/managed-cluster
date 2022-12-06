@@ -12,8 +12,8 @@ spec:
     provider: aws
     extraArgs:
 %{~ if modules.external-dns.private }
-      - --aws-zone-type=private
-      - --annotation-filter=type=private
+    - --aws-zone-type=private
+    - --annotation-filter=type=private
 %{~ endif }
 %{~ endif }
 
