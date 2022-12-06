@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: aws-ebs-csi-driver
-      version: 2.11.1
+      version: "~> 2.11"
   install:
     createNamespace: true
     disableWait: true

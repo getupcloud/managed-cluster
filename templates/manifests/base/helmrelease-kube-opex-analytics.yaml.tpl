@@ -66,7 +66,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
-      version: 22.02.3
+      version: "~> 22.02"
   install:
     createNamespace: true
     disableWait: false

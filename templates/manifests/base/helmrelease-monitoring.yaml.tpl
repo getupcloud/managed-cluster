@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
-      version: 33.1.0
+      version: "~> 33.1"
   install:
     createNamespace: true
     disableWait: false

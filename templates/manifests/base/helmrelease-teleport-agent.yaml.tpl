@@ -51,7 +51,7 @@ spec:
   chart:
     spec:
       chart: teleport-kube-agent
-      version: "9.3.10"
+      version: "~> 9.3"
       sourceRef:
         kind: HelmRepository
         name: teleport

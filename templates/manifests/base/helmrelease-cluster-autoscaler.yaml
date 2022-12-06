@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: autoscaler
-      version: "~> 1.0.3"
+      version: "~> 1.0"
   dependsOn: []
   install:
     createNamespace: false

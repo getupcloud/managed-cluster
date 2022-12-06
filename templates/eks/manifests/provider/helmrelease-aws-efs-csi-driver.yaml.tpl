@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: aws-efs-csi-driver
-      version: ~2.2.0
+      version: "~> 2.2"
   dependsOn: []
   install:
     createNamespace: false

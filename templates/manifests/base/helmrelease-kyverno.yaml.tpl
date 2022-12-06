@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kyverno
-      version: "~> 2.5.3"
+      version: "~> 2.5"
   install:
     createNamespace: true
     disableWait: true
@@ -45,7 +45,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kyverno
-      version: "~> 2.5.5"
+      version: "~> 2.5"
   install:
     createNamespace: true
     disableWait: true

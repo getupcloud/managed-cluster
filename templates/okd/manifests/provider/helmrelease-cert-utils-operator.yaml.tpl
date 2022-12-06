@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: cert-utils-operator
-      version: 1.3.x
+      version: "~> 1.3"
   dependsOn:
   - name: cert-manager
   install:

@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jetstack
-      version: 1.8.x
+      version: "~> 1.8"
   dependsOn:
   - name: monitoring
   install:

@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kong
-      version: 2.8.0
+      version: "~> 2.8"
   install:
     disableWait: true
     remediation:

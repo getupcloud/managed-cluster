@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana
-      version: 2.10.3
+      version: "~> 2.10"
   install:
     createNamespace: true
     disableWait: false
@@ -104,7 +104,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana
-      version: 3.11.0
+      version: "~> 3.11"
   dependsOn:
   - name: loki
   install:

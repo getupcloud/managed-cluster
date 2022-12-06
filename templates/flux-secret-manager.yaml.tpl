@@ -1,5 +1,5 @@
-%{ if secret_manager.name == "kms" && secret_manager.config != null ~}
-%{ if secret_manager.config.enabled ~}
+%{ if secret_manager.name == "kms" ~}
+%{ if secret_manager.config != null && secret_manager.config.enabled ~}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
