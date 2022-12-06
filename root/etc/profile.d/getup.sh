@@ -586,11 +586,11 @@ export REPO_CONF=$REPO_DIR/repo.conf
 #export CLUSTER_TYPES="aks doks eks generic gke kind kubespray okd oke"
 #export CLUSTER_PROVIDERS="aws azure do gcp none oci"
 export CLUSTER_TYPES="aks eks generic kind kubespray okd oke"
-export CLUSTER_PROVIDERS="aws azure none oci"
+export CLUSTER_PROVIDERS="aws azure eks none oci"
 declare -A CLUSTER_TYPES_PROVIDERS
 CLUSTER_TYPES_PROVIDERS[aks]=azure
 CLUSTER_TYPES_PROVIDERS[doks]=do
-CLUSTER_TYPES_PROVIDERS[eks]=aws
+CLUSTER_TYPES_PROVIDERS[eks]=eks
 CLUSTER_TYPES_PROVIDERS[generic]="$CLUSTER_PROVIDERS"
 CLUSTER_TYPES_PROVIDERS[gke]=gcp
 CLUSTER_TYPES_PROVIDERS[kind]="$CLUSTER_PROVIDERS"
