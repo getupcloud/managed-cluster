@@ -15,9 +15,10 @@ variable "modules_defaults" {
       ingress_class = string
     })
     external-dns = object({
-      enabled        = bool
-      domain_filters = list(string)
-      private        = bool
+      enabled         = bool
+      domain_filters  = list(string)
+      hosted_zone_ids = list(string)
+      private         = bool
     })
     falco = object({
       enabled         = bool
@@ -92,9 +93,10 @@ variable "modules_defaults" {
       ingress_class = "nginx"
     }
     external-dns = {
-      enabled        = false
-      domain_filters = []
-      private        = false
+      enabled         = false
+      domain_filters  = []
+      hosted_zone_ids = []
+      private         = false
     }
     falco = {
       enabled = false
@@ -189,9 +191,10 @@ locals {
       ingress_class = try(var.modules.cert-manager-config.ingress_class, var.modules_defaults.cert-manager-config.ingress_class)
     }
     external-dns = {
-      enabled        = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
-      domain_filters = try(var.modules.external-domain_filters, var.modules_defaults.external-dns.domain_filters)
-      private        = try(var.modules.external-private, var.modules_defaults.external-dns.private)
+      enabled         = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
+      domain_filters  = try(var.modules.external-dns.domain_filters, var.modules_defaults.external-dns.domain_filters)
+      hosted_zone_ids = try(var.modules.external-dns.hosted_zone_ids, var.modules_defaults.external-dns.hosted_zone_ids)
+      private         = try(var.modules.external-dns.private, var.modules_defaults.external-dns.private)
     }
     falco = {
       enabled = try(var.modules.falco.enabled, var.modules_defaults.falco.enabled)

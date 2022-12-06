@@ -26,9 +26,10 @@ variable "modules_defaults" {
       hosted_zone_ids           = list(string)
     })
     external-dns = object({
-      enabled        = bool
-      domain_filters = list(string)
-      private        = bool
+      enabled         = bool
+      domain_filters  = list(string)
+      hosted_zone_ids = list(string)
+      private         = bool
     })
     velero = object({
       enabled                   = bool
@@ -50,9 +51,10 @@ variable "modules_defaults" {
       hosted_zone_ids           = []
     }
     external-dns = {
-      enabled        = false
-      domain_filters = []
-      private        = false
+      enabled         = false
+      domain_filters  = []
+      hosted_zone_ids = []
+      private         = false
     }
     velero = {
       enabled                   = false
@@ -76,9 +78,10 @@ locals {
       hosted_zone_ids           = try(var.modules.cert-manager.hosted_zone_ids, var.modules_defaults.cert-manager.hosted_zone_ids)
     }
     external-dns = {
-      enabled        = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
-      domain_filters = try(var.modules.external-domain_filters, var.modules_defaults.external-dns.domain_filters)
-      private        = try(var.modules.external-private, var.modules_defaults.external-dns.private)
+      enabled         = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
+      domain_filters  = try(var.modules.external-dns.domain_filters, var.modules_defaults.external-dns.domain_filters)
+      hosted_zone_ids = try(var.modules.external-dns.hosted_zone_ids, var.modules_defaults.external-dns.hosted_zone_ids)
+      private         = try(var.modules.external-dns.private, var.modules_defaults.external-dns.private)
     }
     velero = {
       enabled                   = try(var.modules.velero.enabled, var.modules_defaults.velero.enabled)
