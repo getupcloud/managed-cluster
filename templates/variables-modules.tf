@@ -175,102 +175,17 @@ variable "modules_defaults" {
   }
 }
 
+module "modules_merge" {
+  source  = "cloudposse/config/yaml//modules/deepmerge"
+  version = "0.2.0"
+  maps = [
+    var.modules_defaults,
+    var.modules
+  ]
+}
+
 locals {
-  modules = {
-    cert-manager = {
-      enabled                   = try(var.modules.cert-manager.enabled, var.modules_defaults.cert-manager.enabled)
-      cluster_oidc_issuer_url   = try(var.modules.cert-manager.cluster_oidc_issuer_url, var.modules_defaults.cert-manager.cluster_oidc_issuer_url)
-      service_account_namespace = try(var.modules.cert-manager.service_account_namespace, var.modules_defaults.cert-manager.service_account_namespace)
-      service_account_name      = try(var.modules.cert-manager.service_account_name, var.modules_defaults.cert-manager.service_account_name)
-      tags                      = try(var.modules.cert-manager.tags, var.modules_defaults.cert-manager.tags)
-      hosted_zone_ids           = try(var.modules.cert-manager.hosted_zone_ids, var.modules_defaults.cert-manager.hosted_zone_ids)
-    }
-    cert-manager-config = {
-      enabled       = try(var.modules.cert-manager-config.enabled, var.modules_defaults.cert-manager-config.enabled)
-      acme_email    = try(var.modules.cert-manager-config.acme_email, var.modules_defaults.cert-manager-config.acme_email)
-      ingress_class = try(var.modules.cert-manager-config.ingress_class, var.modules_defaults.cert-manager-config.ingress_class)
-    }
-    external-dns = {
-      enabled         = try(var.modules.external-dns.enabled, var.modules_defaults.external-dns.enabled)
-      domain_filters  = try(var.modules.external-dns.domain_filters, var.modules_defaults.external-dns.domain_filters)
-      hosted_zone_ids = try(var.modules.external-dns.hosted_zone_ids, var.modules_defaults.external-dns.hosted_zone_ids)
-      private         = try(var.modules.external-dns.private, var.modules_defaults.external-dns.private)
-    }
-    falco = {
-      enabled = try(var.modules.falco.enabled, var.modules_defaults.falco.enabled)
-      event-generator = {
-        enabled = try(var.modules.falco.event-generator.enabled, var.modules_defaults.falco.event-generator.enabled)
-      }
-      falco-exporter = {
-        enabled = try(var.modules.falco.falco-exporter.enabled, var.modules_defaults.falco.falco-exporter.enabled)
-      }
-      node-setup = {
-        enabled = try(var.modules.falco.node-setup.enabled, var.modules_defaults.falco.node-setup.enabled)
-      }
-    }
-    kong = {
-      enabled = try(var.modules.kong.enabled, var.modules_defaults.kong.enabled)
-    }
-    kube-opex-analytics = {
-      enabled = try(var.modules.kube-opex-analytics.enabled, var.modules_defaults.kube-opex-analytics.enabled)
-    }
-    kyverno = {
-      enabled = try(var.modules.kyverno.enabled, var.modules_defaults.kyverno.enabled)
-      kyverno-policies = {
-        enabled = try(var.modules.kyverno.kyverno-policies.enabled, var.modules_defaults.kyverno.kyverno-policies.enabled)
-      }
-    }
-    linkerd = {
-      enabled = try(var.modules.linkerd.enabled, var.modules_defaults.linkerd.enabled)
-      linkerd-cni = {
-        enabled = try(var.modules.linkerd.linkerd-cni.enabled, var.modules_defaults.linkerd.linkerd-cni.enabled)
-      }
-      linkerd-jaeger = {
-        enabled = try(var.modules.linkerd.linkerd-jaeger.enabled, var.modules_defaults.linkerd.linkerd-jaeger.enabled)
-      }
-      linkerd-viz = {
-        enabled  = try(var.modules.linkerd.linkerd-viz.enabled, var.modules_defaults.linkerd.linkerd-viz.enabled)
-        username = try(var.modules.linkerd.linkerd-viz.username, var.modules_defaults.linkerd.linkerd-viz.username)
-        password = try(var.modules.linkerd.linkerd-viz.password, var.modules_defaults.linkerd.linkerd-viz.password)
-        hostname = try(var.modules.linkerd.linkerd-viz.hostname, var.modules_defaults.linkerd.linkerd-viz.hostname)
-      }
-      emojivoto = {
-        enabled  = try(var.modules.linkerd.emojivoto.enabled, var.modules_defaults.linkerd.emojivoto.enabled)
-        hostname = try(var.modules.linkerd.emojivoto.hostname, var.modules_defaults.linkerd.emojivoto.hostname)
-      }
-    }
-    monitoring = {
-      enabled = try(var.modules.monitoring.enabled, var.modules_defaults.monitoring.enabled)
-      prometheus = {
-        externalUrl = try(var.modules.monitoring.prometheus.externalUrl, var.modules_defaults.monitoring.prometheus.externalUrl)
-      }
-      grafana = {
-        externalUrl   = try(var.modules.monitoring.grafana.externalUrl, var.modules_defaults.monitoring.grafana.externalUrl)
-        adminUsername = try(var.modules.monitoring.grafana.adminUsername, var.modules_defaults.monitoring.grafana.adminUsername)
-        adminPassword = try(var.modules.monitoring.grafana.adminPassword, var.modules_defaults.monitoring.grafana.adminPassword)
-      }
-    }
-    podinfo = {
-      enabled  = try(var.modules.podinfo.enabled, var.modules_defaults.podinfo.enabled)
-      hostname = try(var.modules.podinfo.hostname, var.modules_defaults.podinfo.hostname)
-    }
-    trivy = {
-      enabled = try(var.modules.trivy.enabled, var.modules_defaults.trivy.enabled)
-    }
-    velero = {
-      enabled                   = try(var.modules.velero.enabled, var.modules_defaults.velero.enabled)
-      cluster_oidc_issuer_url   = try(var.modules.velero.cluster_oidc_issuer_url, var.modules_defaults.velero.cluster_oidc_issuer_url)
-      service_account_namespace = try(var.modules.velero.service_account_namespace, var.modules_defaults.velero.service_account_namespace)
-      service_account_name      = try(var.modules.velero.service_account_name, var.modules_defaults.velero.service_account_name)
-      tags                      = try(var.modules.velero.tags, var.modules_defaults.velero.tags)
-      bucket_name               = try(var.modules.velero.bucket_name, var.modules_defaults.velero.bucket_name)
-    }
-    weave-gitops = {
-      enabled        = try(var.modules.weave-gitops.enabled, var.modules_defaults.weave-gitops.enabled)
-      admin-username = try(var.modules.weave-gitops.admin-username, var.modules_defaults.weave-gitops.admin-username)
-      admin-password = try(var.modules.weave-gitops.admin-password, var.modules_defaults.weave-gitops.admin-password)
-    }
-  }
+  modules = module.modules_merge.merged
 
   register_modules = {
     linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
