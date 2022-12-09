@@ -1,18 +1,9 @@
-module "config_deepmerge" {
-  source  = "cloudposse/config/yaml//modules/deepmerge"
-  version = "0.2.0"
-  maps = [
-    local.register_modules,
-    module.provider-modules
-  ]
-}
-
 locals {
   kubeconfig_filename = abspath(pathexpand(var.kubeconfig_filename))
 
   modules_result = {
     for name, config in local.modules : name => merge(config,
-      { output : config.enabled ? lookup(module.config_deepmerge.merged, name, tomap({})) : tomap({}) }
+      { output : config.enabled ? lookup(local.register_modules, name, tomap({})) : tomap({}) }
     )
   }
 
