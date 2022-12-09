@@ -3,7 +3,7 @@ locals {
 
   modules_result = {
     for name, config in local.modules : name => merge(config,
-      { output : config.enabled ? lookup(local.register_modules, name, tomap({})) : tomap({}) }
+      { output : config.enabled ? lookup(merge(local.register_modules, module.provider-modules), name, tomap({})) : tomap({}) }
     )
   }
 
