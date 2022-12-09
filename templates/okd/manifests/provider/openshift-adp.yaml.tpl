@@ -28,8 +28,8 @@ metadata:
 data:
   cloud: ${ base64encode(<<EOF
 [default]
-aws_access_key_id=${ modules.velero.output.config.iam_access_key_id }
-aws_secret_access_key=${ modules.velero.output.config.iam_secret_access_key }
+aws_access_key_id=${ modules.velero.output.iam_access_key_id }
+aws_secret_access_key=${ modules.velero.output.iam_secret_access_key }
 EOF
 )}
 %{~ endif }
@@ -63,10 +63,10 @@ spec:
         provider: aws
         default: true
         objectStorage:
-          bucket: ${ modules.velero.output.config.bucket_name }
+          bucket: ${ modules.velero.output.bucket_name }
           prefix: velero
         config:
-          region: ${ modules.velero.output.config.bucket_region }
+          region: ${ modules.velero.output.bucket_region }
           profile: default
         credential:
           key: cloud
@@ -75,7 +75,7 @@ spec:
     - velero:
         provider: aws
         config:
-          region: ${ modules.velero.output.config.bucket_region }
+          region: ${ modules.velero.output.bucket_region }
           profile: "default"
 %{~ endif }
 
