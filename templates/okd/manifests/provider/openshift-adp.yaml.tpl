@@ -29,7 +29,7 @@ data:
   cloud: ${ base64encode(<<EOF
 [default]
 aws_access_key_id=${ modules.velero.output.iam_access_key_id }
-aws_secret_access_key=${ modules.velero.output.iam_secret_access_key }
+aws_secret_access_key=${ modules.velero.output.iam_access_key }
 EOF
 )}
 %{~ endif }
