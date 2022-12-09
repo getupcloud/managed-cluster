@@ -54,7 +54,11 @@ check-version:
 		exit 1; \
 	fi
 
-build: build-base
+modules: templates/variables-modules-merge.tf
+templates/variables-modules-merge.tf: templates/variables-modules.tf
+	./root/usr/local/bin/make-modules $< > $@
+
+build: templates/variables-modules-merge.tf build-base
 	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE)
 
 build-base: check-version $(DOCKERFILE)

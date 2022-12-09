@@ -175,18 +175,7 @@ variable "modules_defaults" {
   }
 }
 
-module "modules_merge" {
-  source  = "cloudposse/config/yaml//modules/deepmerge"
-  version = "0.2.0"
-  maps = [
-    var.modules_defaults,
-    var.modules
-  ]
-}
-
 locals {
-  modules = module.modules_merge.merged
-
   register_modules = {
     linkerd : local.modules.linkerd.enabled ? module.linkerd[0] : tomap({})
     weave-gitops : local.modules.weave-gitops.enabled ? local.weave-gitops : tomap({})
