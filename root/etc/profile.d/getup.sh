@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-shopt -s nullglob
 shopt -s checkwinsize
 
 export INSIDE_CONTAINER=${INSIDE_CONTAINER:-false}
