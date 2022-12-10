@@ -50,10 +50,16 @@ variable "modules_defaults" {
     monitoring = object({
       enabled = bool
       prometheus = object({
-        externalUrl = string
+        externalUrl = object({
+          scheme = string
+          host   = string
+        })
       })
       grafana = object({
-        externalUrl   = string
+        externalUrl = object({
+          scheme = string
+          host   = string
+        })
         adminUsername = string
         adminPassword = string
       })
@@ -144,10 +150,16 @@ variable "modules_defaults" {
     monitoring = {
       enabled = true
       prometheus = {
-        externalUrl = "https://prometheus.example.com"
+        externalUrl = {
+          scheme = "https"
+          host   = "prometheus.example.com"
+        }
       }
       grafana = {
-        externalUrl   = "https://grafana.example.com"
+        externalUrl = {
+          scheme = "https"
+          host   = "grafana.example.com"
+        }
         adminUsername = "admin"
         adminPassword = "prom-operator"
       }

@@ -65,10 +65,10 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - ${ modules.monitoring.prometheus.externalUrl }
+          - ${ modules.monitoring.prometheus.externalUrl.host }
     #    tls:
     #    - hosts:
-    #      - ${ modules.monitoring.prometheus.externalUrl }
+    #      - ${ modules.monitoring.prometheus.externalUrl.host }
     #      secretName: prometheus-ingress-tls
 
       prometheusSpec:
@@ -580,10 +580,10 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - ${ modules.monitoring.grafana.externalUrl }
+          - ${ modules.monitoring.grafana.externalUrl.host }
     #    tls:
     #    - hosts:
-    #      - ${ modules.monitoring.grafana.externalUrl }
+    #      - ${ modules.monitoring.grafana.externalUrl.host }
     #      secretName: grafana-ingress-tls
 
     kubeApiServer:

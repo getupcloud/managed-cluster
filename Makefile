@@ -54,8 +54,8 @@ check-version:
 		exit 1; \
 	fi
 
-modules: templates/variables-modules-merge.tf
-templates/variables-modules-merge.tf: templates/variables-modules.tf
+modules: templates/variables-modules-merge.tf.json
+templates/variables-modules-merge.tf.json: templates/variables-modules.tf
 	./root/usr/local/bin/make-modules $< > $@
 
 build: templates/variables-modules-merge.tf build-base
