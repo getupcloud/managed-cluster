@@ -58,7 +58,7 @@ modules: templates/variables-modules-merge.tf.json
 templates/variables-modules-merge.tf.json: templates/variables-modules.tf
 	./root/usr/local/bin/make-modules $< > $@
 
-build: templates/variables-modules-merge.tf build-base
+build: modules build-base
 	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE)
 
 build-base: check-version $(DOCKERFILE)
