@@ -3,6 +3,7 @@
 **/.aws/*
 **/.kube/*
 **/.setup_history
+**/.provider.env
 #cluster.conf
 .teleport-config.tmp
 teleport.yaml

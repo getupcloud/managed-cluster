@@ -575,6 +575,8 @@ if $INSIDE_CONTAINER; then
     pathmunge $REPO_DIR after
     export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
     source_env "$PROVIDER_ENV"
+    export DOT_PROVIDER_ENV="$CLUSTER_DIR/.provider.env"
+    source_env "$PROVIDER_ENV"
     source_env $ROOT_DIR/.dockerenv
 else
     export REPO_DIR=$ROOT_DIR
