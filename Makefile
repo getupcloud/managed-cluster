@@ -67,7 +67,8 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt check-git update-version build-release
+release: fmt check-git update-version
+	$(MAKE) build-release
 	@echo Finished $(RELEASE) release
 
 check-git:
@@ -81,8 +82,7 @@ update-version:
 	[ -n "$$BUILD_VERSION" ] || read -e -i "$(FILE_VERSION)" -p "New version: " BUILD_VERSION
 	echo $$BUILD_VERSION > $(VERSION_TXT)
 
-build-release:
-	$(MAKE) check-tag build tag push
+build-release: check-tag build tag push
 
 check-tag:
 	@if git tag -l | grep -q '^$(RELEASE)$$'; then
