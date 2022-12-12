@@ -69,7 +69,6 @@ print-release:
 
 release: fmt check-git update-version
 	$(MAKE) build-release
-	@echo Finished $(RELEASE) release
 
 check-git:
 	@if git status --porcelain | grep '^\s*[^?]' | grep -qv version.txt; then
@@ -83,6 +82,7 @@ update-version:
 	echo $$BUILD_VERSION > $(VERSION_TXT)
 
 build-release: check-tag build tag push
+	@echo Finished $(RELEASE) release
 
 check-tag:
 	@if git tag -l | grep -q '^$(RELEASE)$$'; then
