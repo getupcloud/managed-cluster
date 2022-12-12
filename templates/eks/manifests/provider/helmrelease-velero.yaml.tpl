@@ -1,3 +1,4 @@
+%{ if modules.velero.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -44,3 +45,4 @@ spec:
 #          aws_access_key_id=                       ### TODO: UPDATE HERE ###
 #          aws_secret_access_key=                   ### TODO: UPDATE HERE ###
 #          aws_region=                              ### TODO: UPDATE HERE ###
+%{~ endif }
