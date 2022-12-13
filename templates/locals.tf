@@ -1,5 +1,5 @@
 locals {
-  kubeconfig_filename = abspath(pathexpand(var.kubeconfig_filename))
+  kubeconfig_filename = var.kubeconfig_filename != "" ? abspath(pathexpand(var.kubeconfig_filename)) : ""
 
   modules_result = {
     for name, config in local.modules : name => merge(config,
