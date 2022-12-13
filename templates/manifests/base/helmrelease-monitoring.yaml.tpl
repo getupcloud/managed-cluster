@@ -57,7 +57,7 @@ spec:
         loadBalancerIP: null
         sessionAffinity: ClientIP
       ingress:
-        enabled: false
+        enabled: ${ modules.monitoring.prometheus.ingress.enabled }
         annotations:
     #      kubernetes.io/ingress.class: nginx
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
@@ -65,11 +65,13 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - ${ modules.monitoring.prometheus.externalUrl.host }
-    #    tls:
-    #    - hosts:
-    #      - ${ modules.monitoring.prometheus.externalUrl.host }
-    #      secretName: prometheus-ingress-tls
+          - ${ modules.monitoring.prometheus.ingress.host }
+        %{ if modules.monitoring.prometheus.ingress.scheme == "https" }
+        tls:
+        - hosts:
+          - ${ modules.monitoring.prometheus.ingress.host }
+          secretName: prometheus-ingress-tls
+        %{ endif }
 
       prometheusSpec:
         replicas: 1
@@ -572,7 +574,7 @@ spec:
         #  admin_password: admin
 
       ingress:
-        enabled: false
+        enabled: ${ modules.monitoring.grafana.ingress.enabled }
         annotations:
     #      kubernetes.io/ingress.class: nginx
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
@@ -580,11 +582,13 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
     #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - ${ modules.monitoring.grafana.externalUrl.host }
-    #    tls:
-    #    - hosts:
-    #      - ${ modules.monitoring.grafana.externalUrl.host }
-    #      secretName: grafana-ingress-tls
+          - ${ modules.monitoring.grafana.ingress.host }
+        %{ if modules.monitoring.grafana.ingress.scheme == "https" }
+        tls:
+        - hosts:
+          - ${ modules.monitoring.grafana.ingress.host }
+          secretName: grafana-ingress-tls
+        %{ endif }
 
     kubeApiServer:
       enabled: false

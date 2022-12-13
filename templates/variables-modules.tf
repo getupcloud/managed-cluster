@@ -50,13 +50,15 @@ variable "modules_defaults" {
     monitoring = object({
       enabled = bool
       prometheus = object({
-        externalUrl = object({
+        ingress = object({
+          enabled = bool
           scheme = string
           host   = string
         })
       })
       grafana = object({
-        externalUrl = object({
+        ingress = object({
+          enabled = bool
           scheme = string
           host   = string
         })
@@ -150,13 +152,15 @@ variable "modules_defaults" {
     monitoring = {
       enabled = true
       prometheus = {
-        externalUrl = {
+        ingress = {
+          enabled = false
           scheme = "https"
           host   = "prometheus.example.com"
         }
       }
       grafana = {
-        externalUrl = {
+        ingress = {
+          enabled = false
           scheme = "https"
           host   = "grafana.example.com"
         }

@@ -70,15 +70,17 @@
       "monitoring": {
         "enabled": "${try(var.modules.monitoring.enabled, var.modules_defaults.monitoring.enabled)}",
         "prometheus": {
-          "externalUrl": {
-            "scheme": "${try(var.modules.monitoring.prometheus.externalUrl.scheme, var.modules_defaults.monitoring.prometheus.externalUrl.scheme)}",
-            "host": "${try(var.modules.monitoring.prometheus.externalUrl.host, var.modules_defaults.monitoring.prometheus.externalUrl.host)}"
+          "ingress": {
+            "enabled": "${try(var.modules.monitoring.prometheus.ingress.enabled, var.modules_defaults.monitoring.prometheus.ingress.enabled)}",
+            "scheme": "${try(var.modules.monitoring.prometheus.ingress.scheme, var.modules_defaults.monitoring.prometheus.ingress.scheme)}",
+            "host": "${try(var.modules.monitoring.prometheus.ingress.host, var.modules_defaults.monitoring.prometheus.ingress.host)}"
           }
         },
         "grafana": {
-          "externalUrl": {
-            "scheme": "${try(var.modules.monitoring.grafana.externalUrl.scheme, var.modules_defaults.monitoring.grafana.externalUrl.scheme)}",
-            "host": "${try(var.modules.monitoring.grafana.externalUrl.host, var.modules_defaults.monitoring.grafana.externalUrl.host)}"
+          "ingress": {
+            "enabled": "${try(var.modules.monitoring.grafana.ingress.enabled, var.modules_defaults.monitoring.grafana.ingress.enabled)}",
+            "scheme": "${try(var.modules.monitoring.grafana.ingress.scheme, var.modules_defaults.monitoring.grafana.ingress.scheme)}",
+            "host": "${try(var.modules.monitoring.grafana.ingress.host, var.modules_defaults.monitoring.grafana.ingress.host)}"
           },
           "adminUsername": "${try(var.modules.monitoring.grafana.adminUsername, var.modules_defaults.monitoring.grafana.adminUsername)}",
           "adminPassword": "${try(var.modules.monitoring.grafana.adminPassword, var.modules_defaults.monitoring.grafana.adminPassword)}"
