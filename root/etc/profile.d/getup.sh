@@ -576,7 +576,7 @@ if $INSIDE_CONTAINER; then
     export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
     source_env "$PROVIDER_ENV"
     export DOT_PROVIDER_ENV="$CLUSTER_DIR/.provider.env"
-    source_env "$PROVIDER_ENV"
+    source_env "$DOT_PROVIDER_ENV"
     source_env $ROOT_DIR/.dockerenv
 else
     export REPO_DIR=$ROOT_DIR
