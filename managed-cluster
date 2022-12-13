@@ -1311,6 +1311,7 @@ function check_update()
             ask_execute_command git merge v${latest_local_version} -Xtheirs
             current_version=$(get_current_version)
             set_config version="$latest_local_version" "Installer version" $REPO_CONF
+            exit 0
         fi
     fi
 }
