@@ -52,15 +52,15 @@ variable "modules_defaults" {
       prometheus = object({
         ingress = object({
           enabled = bool
-          scheme = string
-          host   = string
+          scheme  = string
+          host    = string
         })
       })
       grafana = object({
         ingress = object({
           enabled = bool
-          scheme = string
-          host   = string
+          scheme  = string
+          host    = string
         })
         adminUsername = string
         adminPassword = string
@@ -154,15 +154,15 @@ variable "modules_defaults" {
       prometheus = {
         ingress = {
           enabled = false
-          scheme = "https"
-          host   = "prometheus.example.com"
+          scheme  = "https"
+          host    = "prometheus.example.com"
         }
       }
       grafana = {
         ingress = {
           enabled = false
-          scheme = "https"
-          host   = "grafana.example.com"
+          scheme  = "https"
+          host    = "grafana.example.com"
         }
         adminUsername = "admin"
         adminPassword = "prom-operator"
