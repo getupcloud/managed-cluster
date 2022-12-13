@@ -4,8 +4,7 @@ kind: Kustomization
 resources:
 - ../base/
 
-patchesStrategicMerge:
-- helmrelease-falco.yaml
+patchesStrategicMerge: []
 #- excludes.yaml
 
 patchesJson6902: []
