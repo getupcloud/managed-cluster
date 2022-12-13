@@ -1,3 +1,4 @@
+%{ if modules.velero.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -5,3 +6,4 @@ metadata:
   namespace: flux-system
 spec:
   suspend: true
+%{~ endif }

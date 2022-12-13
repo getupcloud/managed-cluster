@@ -1,3 +1,4 @@
+%{ if modules.velero.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -169,3 +170,4 @@ spec:
           includeClusterResources: true
 
           snapshotVolumes: false
+%{~ endif }
