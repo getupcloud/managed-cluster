@@ -58,6 +58,12 @@ users:
 - system:serviceaccount:linkerd-viz:tap-injector
 - system:serviceaccount:linkerd-viz:web
 %{~ endif }
+%{~ if modules.linkerd.linkerd-jaeger.enabled }
+- system:serviceaccount:linkerd-jaeger:collector
+- system:serviceaccount:linkerd-jaeger:jaeger
+- system:serviceaccount:linkerd-jaeger:jaeger-injector
+- system:serviceaccount:linkerd-jaeger:namespace-metadata
+%{~ endif }
 volumes:
 - '*'
 %{~ endif }
