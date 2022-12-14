@@ -51,19 +51,19 @@ variable "modules_defaults" {
       enabled = bool
       prometheus = object({
         ingress = object({
-          enabled = bool
-          scheme  = string
-          host    = string
-          className = string
+          enabled       = bool
+          scheme        = string
+          host          = string
+          className     = string
           clusterIssuer = string
         })
       })
       grafana = object({
         ingress = object({
-          enabled = bool
-          scheme  = string
-          host    = string
-          className = string
+          enabled       = bool
+          scheme        = string
+          host          = string
+          className     = string
           clusterIssuer = string
         })
         adminUsername = string
@@ -157,19 +157,19 @@ variable "modules_defaults" {
       enabled = true
       prometheus = {
         ingress = {
-          enabled = false
-          scheme  = "https"
-          host    = "prometheus.example.com"
-          className = "nginx"
+          enabled       = false
+          scheme        = "https"
+          host          = "prometheus.example.com"
+          className     = "nginx"
           clusterIssuer = ""
         }
       }
       grafana = {
         ingress = {
-          enabled = false
-          scheme  = "https"
-          host    = "grafana.example.com"
-          className = "nginx"
+          enabled       = false
+          scheme        = "https"
+          host          = "grafana.example.com"
+          className     = "nginx"
           clusterIssuer = ""
         }
         adminUsername = "admin"
