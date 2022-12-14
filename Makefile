@@ -59,10 +59,12 @@ templates/variables-modules-merge.tf.json: templates/variables-modules.tf
 	./root/usr/local/bin/make-modules $< > $@
 
 build: modules build-base
-	docker build . -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE)
+	docker build -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
+	#buildah bud -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
 
 build-base: check-version $(DOCKERFILE)
-	docker build . -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE)
+	docker build -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE) .
+	#buildah bud -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE) .
 
 print-release:
 	@echo $(RELEASE)

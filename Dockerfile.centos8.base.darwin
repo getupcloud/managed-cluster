@@ -18,7 +18,7 @@ RUN INSTALL_PACKAGES="vim-enhanced sudo docker-ce-cli \
         dialog awscli httpie bind-utils httpd-tools \
         git net-tools nmap openssl openssl-devel gnupg \
         gettext jq rsync strace make \
-        python3-pip python3-devel libffi-devel rust cargo \
+        python38-pip python38-devel libffi-devel rust cargo \
         centos-release-rabbitmq-38.noarch" && \
     yum install -y $INSTALL_PACKAGES && \
     yum groupinstall -y 'Development Tools' && \
