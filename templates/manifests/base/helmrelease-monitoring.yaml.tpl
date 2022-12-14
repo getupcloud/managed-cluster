@@ -58,6 +58,7 @@ spec:
         sessionAffinity: ClientIP
       ingress:
         enabled: ${ modules.monitoring.prometheus.ingress.enabled }
+        ingressClassName: ${ modules.monitoring.prometheus.ingress.className }
         annotations:
     #      kubernetes.io/ingress.class: nginx
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
@@ -575,6 +576,7 @@ spec:
 
       ingress:
         enabled: ${ modules.monitoring.grafana.ingress.enabled }
+        ingressClassName: ${ modules.monitoring.grafana.ingress.className }
         annotations:
     #      kubernetes.io/ingress.class: nginx
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring

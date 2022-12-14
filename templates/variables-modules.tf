@@ -54,6 +54,7 @@ variable "modules_defaults" {
           enabled = bool
           scheme  = string
           host    = string
+          className = string
         })
       })
       grafana = object({
@@ -61,6 +62,7 @@ variable "modules_defaults" {
           enabled = bool
           scheme  = string
           host    = string
+          className = string
         })
         adminUsername = string
         adminPassword = string
@@ -156,6 +158,7 @@ variable "modules_defaults" {
           enabled = false
           scheme  = "https"
           host    = "prometheus.example.com"
+          className = "nginx"
         }
       }
       grafana = {
@@ -163,6 +166,7 @@ variable "modules_defaults" {
           enabled = false
           scheme  = "https"
           host    = "grafana.example.com"
+          className = "nginx"
         }
         adminUsername = "admin"
         adminPassword = "prom-operator"
