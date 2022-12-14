@@ -7,6 +7,12 @@ variable "api_endpoint" {
   default     = ""
 }
 
+variable "kubernetes_version" {
+  description = "Kubernetes rersion"
+  type        = string
+  default     = "1.24"
+}
+
 variable "region" {
   description = "Cluster region"
   type        = string
