@@ -6,11 +6,11 @@ metadata:
 spec:
   chart:
     spec:
-      chart: cluster-autoscaler-chart
+      chart: cluster-autoscaler
       sourceRef:
         kind: HelmRepository
         name: autoscaler
-      version: "~> 1.0"
+      version: "~> 1"
   dependsOn: []
   install:
     createNamespace: false

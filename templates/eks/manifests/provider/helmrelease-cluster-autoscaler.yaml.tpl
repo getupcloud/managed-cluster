@@ -5,10 +5,15 @@ metadata:
   namespace: flux-system
 spec:
   values:
+    image:
+      tag: v${kubernetes_version}.0
     autoDiscovery:
       clusterName: ${cluster_name}
     cloudProvider: aws
-    awsRegion: us-east-1
+    awsRegion: ${aws.region}
+    extraArgs:
+      balance-similar-node-groups: true
+      skip-nodes-with-system-pods: true
     rbac:
       serviceAccount:
         name: cluster-autoscaler

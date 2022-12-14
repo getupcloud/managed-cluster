@@ -12,6 +12,7 @@ locals {
     cluster_sla : var.cluster_sla
     cluster_type : local.cluster_type
     customer_name : var.customer_name
+    kubernetes_version : var.kubernetes_version
     modules : local.modules_result
     }, var.manifests_template_vars
   )

@@ -22,7 +22,7 @@ variable "account_id" {
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.21"
+  default     = "1.24"
 }
 
 variable "region" {
