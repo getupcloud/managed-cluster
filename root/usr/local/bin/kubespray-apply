@@ -4,6 +4,12 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-user=${1:-centos}
+if [ $# -gt 0 ]; then
+  user="$1"
+else
+  user=$(awk '/\s*#?\s*ssh_user\s*=\s".*".*/ { patsplit($3, a, /[^"]+/); print a[1] }' $TF_VARS_FILE | tail -n1) 2>/dev/null
+fi
+
+user=${user:-centos}
 
 ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $KUBESPRAY_DIR/cluster.yml
