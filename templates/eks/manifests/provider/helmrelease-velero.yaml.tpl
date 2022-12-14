@@ -8,7 +8,7 @@ spec:
   values:
     initContainers:
     - name: velero-plugin-for-aws
-      image: velero/velero-plugin-for-aws:v1.3.0
+      image: velero/velero-plugin-for-aws:v1.5.0
       volumeMounts:
       - mountPath: /target
         name: plugins

@@ -146,6 +146,8 @@ spec:
           includeClusterResources: true
 
           snapshotVolumes: true
+          volumeSnapshotLocations:
+          - default
 
       resources:
         schedule: '0 */12 * * *'
