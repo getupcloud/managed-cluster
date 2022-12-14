@@ -123,7 +123,7 @@ spec:
           volumeClaimTemplate:
             metadata:
               labels:
-                pv.label.getup.io.velero.io/exclude-from-backup: "true"
+                velero.io/exclude-from-backup: "true"
             spec:
               resources:
                 requests:
