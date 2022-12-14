@@ -74,7 +74,8 @@
             "enabled": "${try(var.modules.monitoring.prometheus.ingress.enabled, var.modules_defaults.monitoring.prometheus.ingress.enabled)}",
             "scheme": "${try(var.modules.monitoring.prometheus.ingress.scheme, var.modules_defaults.monitoring.prometheus.ingress.scheme)}",
             "host": "${try(var.modules.monitoring.prometheus.ingress.host, var.modules_defaults.monitoring.prometheus.ingress.host)}",
-            "className": "${try(var.modules.monitoring.prometheus.ingress.className, var.modules_defaults.monitoring.prometheus.ingress.className)}"
+            "className": "${try(var.modules.monitoring.prometheus.ingress.className, var.modules_defaults.monitoring.prometheus.ingress.className)}",
+            "clusterIssuer": "${try(var.modules.monitoring.prometheus.ingress.clusterIssuer, var.modules_defaults.monitoring.prometheus.ingress.clusterIssuer)}"
           }
         },
         "grafana": {
@@ -82,7 +83,8 @@
             "enabled": "${try(var.modules.monitoring.grafana.ingress.enabled, var.modules_defaults.monitoring.grafana.ingress.enabled)}",
             "scheme": "${try(var.modules.monitoring.grafana.ingress.scheme, var.modules_defaults.monitoring.grafana.ingress.scheme)}",
             "host": "${try(var.modules.monitoring.grafana.ingress.host, var.modules_defaults.monitoring.grafana.ingress.host)}",
-            "className": "${try(var.modules.monitoring.grafana.ingress.className, var.modules_defaults.monitoring.grafana.ingress.className)}"
+            "className": "${try(var.modules.monitoring.grafana.ingress.className, var.modules_defaults.monitoring.grafana.ingress.className)}",
+            "clusterIssuer": "${try(var.modules.monitoring.grafana.ingress.clusterIssuer, var.modules_defaults.monitoring.grafana.ingress.clusterIssuer)}"
           },
           "adminUsername": "${try(var.modules.monitoring.grafana.adminUsername, var.modules_defaults.monitoring.grafana.adminUsername)}",
           "adminPassword": "${try(var.modules.monitoring.grafana.adminPassword, var.modules_defaults.monitoring.grafana.adminPassword)}"
