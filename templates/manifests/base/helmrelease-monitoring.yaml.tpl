@@ -60,11 +60,12 @@ spec:
         enabled: ${ modules.monitoring.prometheus.ingress.enabled }
         ingressClassName: ${ modules.monitoring.prometheus.ingress.className }
         annotations:
-    #      kubernetes.io/ingress.class: nginx
+        %{~ if modules.monitoring.prometheus.ingress.clusterIssuer != "" }
+          cert-manager.io/cluster-issuer: ${ modules.monitoring.prometheus.ingress.clusterIssuer }
+        %{~ endif }
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
     #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     #      nginx.ingress.kubernetes.io/auth-type: basic
-    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - ${ modules.monitoring.prometheus.ingress.host }
         %{ if modules.monitoring.prometheus.ingress.scheme == "https" }
@@ -578,11 +579,12 @@ spec:
         enabled: ${ modules.monitoring.grafana.ingress.enabled }
         ingressClassName: ${ modules.monitoring.grafana.ingress.className }
         annotations:
-    #      kubernetes.io/ingress.class: nginx
+        %{~ if modules.monitoring.grafana.ingress.clusterIssuer != "" }
+          cert-manager.io/cluster-issuer: ${ modules.monitoring.grafana.ingress.clusterIssuer }
+        %{~ endif }
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
     #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     #      nginx.ingress.kubernetes.io/auth-type: basic
-    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
           - ${ modules.monitoring.grafana.ingress.host }
         %{ if modules.monitoring.grafana.ingress.scheme == "https" }
