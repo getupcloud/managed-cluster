@@ -408,7 +408,7 @@ run_as_user()
         install -o $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -m 700 /etc/skel/* $HOME/
     fi
 
-    for src in .gitconfig .ssh .tsh .vimrc; do
+    for src in .gitconfig .ssh .tsh; do
         if [ -d "/home/_host/$src" ]; then
             cp -an /home/_host/$src $HOME/
         elif [ -e "/home/_host/$src" ]; then
