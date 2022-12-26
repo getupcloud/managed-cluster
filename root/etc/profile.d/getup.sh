@@ -587,7 +587,11 @@ export REPO_CONF=$REPO_DIR/repo.conf
 #export CLUSTER_TYPES="aks doks eks generic gke kind kubespray okd oke"
 #export CLUSTER_PROVIDERS="aws azure do gcp none oci"
 export CLUSTER_TYPES="aks eks generic kind kubespray okd oke"
-export CLUSTER_PROVIDERS="aws azure eks none oci"
+export CLUSTER_PROVIDERS="aws azure do gcp oci none"
+
+# Mapping cluster types -> providers are valid only for non-managed clusters.
+# For managed clusters, code related to provider-specifc features are builtin
+# inside terraform-cluster-${type} modules.
 declare -A CLUSTER_TYPES_PROVIDERS
 CLUSTER_TYPES_PROVIDERS[aks]=none
 CLUSTER_TYPES_PROVIDERS[doks]=none
