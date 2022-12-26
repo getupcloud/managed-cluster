@@ -2,7 +2,7 @@ locals {
   kubeconfig_filename = var.kubeconfig_filename != "" ? abspath(pathexpand(var.kubeconfig_filename)) : ""
 
   modules_result = {
-    for name, config in local.modules : name => merge(config,
+    for name, config in merge(var.modules, local.modules) : name => merge(config,
       { output : config.enabled ? lookup(merge(local.register_modules, module.provider-modules), name, tomap({})) : tomap({}) }
     )
   }
