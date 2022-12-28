@@ -448,6 +448,7 @@ spec:
             jsonData:
               timeInterval: "5s"
             editable: true
+          %{~ if modules.loki.enabled }
           - name: Loki
             type: loki
             url: http://loki.logging.svc:3100
@@ -458,6 +459,7 @@ spec:
               maxLines: 5000
               manageAlerts: false
               timeout: 60
+          %{~ endif }
 
       dashboardProviders:
         dashboardproviders.yaml:
