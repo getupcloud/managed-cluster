@@ -1,4 +1,4 @@
-%{ if modules.loki.enabled ~}
+%{ if modules.logging.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

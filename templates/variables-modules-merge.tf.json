@@ -67,6 +67,9 @@
           "hostname": "${try(var.modules.linkerd.emojivoto.hostname, var.modules_defaults.linkerd.emojivoto.hostname)}"
         }
       },
+      "logging": {
+        "enabled": "${try(var.modules.logging.enabled, var.modules_defaults.logging.enabled)}"
+      },
       "monitoring": {
         "enabled": "${try(var.modules.monitoring.enabled, var.modules_defaults.monitoring.enabled)}",
         "prometheus": {

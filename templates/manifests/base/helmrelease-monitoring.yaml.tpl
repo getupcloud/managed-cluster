@@ -448,7 +448,7 @@ spec:
             jsonData:
               timeInterval: "5s"
             editable: true
-          %{~ if modules.loki.enabled }
+          %{~ if modules.logging.enabled }
           - name: Loki
             type: loki
             url: http://loki.logging.svc:3100

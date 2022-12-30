@@ -47,6 +47,9 @@ variable "modules_defaults" {
         hostname = string
       })
     })
+    logging = object({
+      enabled = bool
+    })
     monitoring = object({
       enabled = bool
       prometheus = object({
@@ -152,6 +155,9 @@ variable "modules_defaults" {
         enabled  = false
         hostname = "emojivoto.example.com"
       }
+    }
+    logging = {
+      enabled = true
     }
     monitoring = {
       enabled = true

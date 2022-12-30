@@ -22,6 +22,16 @@ SHELL         = /bin/bash
 
 default: build
 
+help:
+	@echo Target:
+	@echo '  build:      Create docker image (default)'
+	@echo '  fmt:        Run terraform fmt'
+	@echo '  import:     Download terraform variables from cluster repositories'
+	@echo '  modules:    Create templates/variables-modules-merge.tf.json'
+	@echo '  release:    Build and release a new version'
+	@echo '  test:       Run all tests from ./tests'
+	@echo '  test-help:  Show test options'
+
 CLUSTER_TYPES := $(shell ls -1 templates/*/main.tf | awk -F/ '{print $$2}')
 
 define CLUSTER_REPO_template =
