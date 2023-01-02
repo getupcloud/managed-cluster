@@ -22,15 +22,21 @@ SHELL         = /bin/bash
 
 default: build
 
+define print_targets =
+Targets: $(shell $(MAKE) -p null | grep '^$(1):' | tail -n1 | cut -d' ' -f2-)
+endef
+
+null:
+
 help:
 	@echo Target:
-	@echo '  build:      Create docker image (default)'
-	@echo '  fmt:        Run terraform fmt'
-	@echo '  import:     Download terraform variables from cluster repositories'
-	@echo '  modules:    Create templates/variables-modules-merge.tf.json'
-	@echo '  release:    Build and release a new version'
-	@echo '  test:       Run all tests from ./tests'
-	@echo '  test-help:  Show test options'
+	@echo '  build:      Create docker image (default). $(call print_targets,build)'
+	@echo '  fmt:        Run terraform fmt. $(call print_targets,fmt)'
+	@echo '  import:     Download terraform variables from cluster repositories. $(call print_targets,import)'
+	@echo '  modules:    Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
+	@echo '  release:    Build and release a new version. $(call print_targets,release)'
+	@echo '  test:       Run all tests from ./tests. $(call print_targets,test)'
+	@echo '  test-help:  Show test options. $(call print_targets,test-help)'
 
 CLUSTER_TYPES := $(shell ls -1 templates/*/main.tf | awk -F/ '{print $$2}')
 
