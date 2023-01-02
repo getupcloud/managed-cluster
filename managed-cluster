@@ -648,6 +648,7 @@ local_git_repo_host=git.flux-system.svc.cluster.local
 local_git_repo_path=/git
 local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_host}${local_git_repo_path}" # port is handled by ~/.ssh/config
 default_upstream=git@github.com:getupcloud/managed-cluster.git
+default_upstream_https=https://github.com/getupcloud/managed-cluster.git
 common_template_files=(
     manifests
     '*.*'
@@ -1278,7 +1279,7 @@ function check_update()
     cd $REPO_DIR
     info "Checking for updates (current version $current_version) ..."
 
-    if [ "$(git_remote upstream)" != "$default_upstream" ]; then
+    if [ "$(git_remote upstream)" != "$default_upstream" ] && [ "$(git_remote upstream)" != "$default_upstream_https" ]; then
         info "Remote upstream doesn't matches $default_upstream"
         info "Execute \`$0 remote-setup\` and try again."
         return
