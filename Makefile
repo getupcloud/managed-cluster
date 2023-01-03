@@ -30,13 +30,14 @@ null:
 
 help:
 	@echo Target:
-	@echo '  build:      Create docker image (default). $(call print_targets,build)'
-	@echo '  fmt:        Run terraform fmt. $(call print_targets,fmt)'
-	@echo '  import:     Download terraform variables from cluster repositories. $(call print_targets,import)'
-	@echo '  modules:    Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
-	@echo '  release:    Build and release a new version. $(call print_targets,release)'
-	@echo '  test:       Run all tests from ./tests. $(call print_targets,test)'
-	@echo '  test-help:  Show test options. $(call print_targets,test-help)'
+	@echo '  build:              Create docker image (default). $(call print_targets,build)'
+	@echo '  fmt:                Run terraform fmt. $(call print_targets,fmt)'
+	@echo '  import:             Download terraform variables from cluster repositories. $(call print_targets,import)'
+	@echo '  modules:            Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
+	@echo '  release:            Build and release a new version. $(call print_targets,release)'
+	@echo '  test:               Run all tests from ./tests. $(call print_targets,test)'
+	@echo '  test-help:          Show test options. $(call print_targets,test-help)'
+	@echo '  show-modules-vars:  Print modules.* from all manifests'
 
 CLUSTER_TYPES := $(shell ls -1 templates/*/main.tf | awk -F/ '{print $$2}')
 
@@ -73,6 +74,9 @@ check-version:
 modules: templates/variables-modules-merge.tf.json
 templates/variables-modules-merge.tf.json: templates/variables-modules.tf
 	./root/usr/local/bin/make-modules $< > $@
+
+show-modules-vars:
+	grep 'modules\.[^[:space:],)}]\+' -r templates/*/manifests  templates/manifests/ -oh | sort -u
 
 build: modules build-base
 	docker build -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
