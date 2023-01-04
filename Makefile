@@ -36,6 +36,7 @@ help:
 	@echo '  modules:            Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
 	@echo '  release:            Build and release a new version. $(call print_targets,release)'
 	@echo '  test:               Run all tests from ./tests. $(call print_targets,test)'
+	@echo '  test-iter:          Iterable tests. $(call print_targets,test-iter)'
 	@echo '  test-help:          Show test options. $(call print_targets,test-help)'
 	@echo '  show-modules-vars:  Print modules.* from all manifests'
 
