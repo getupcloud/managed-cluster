@@ -23,7 +23,7 @@ SHELL         = /bin/bash
 default: build
 
 define print_targets =
-Targets: $(shell $(MAKE) -p null | grep '^$(1):' | tail -n1 | cut -d' ' -f2-)
+Targets:$(shell $(MAKE) -p null | grep '^$(1):' | tail -n1 | cut -d: -f2-)
 endef
 
 null:
