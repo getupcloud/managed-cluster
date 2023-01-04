@@ -44,7 +44,6 @@ spec:
     serviceAccount:
       create: true
       name: "ecr-credentials-sync"
-      annotations:
-        eks.amazonaws.com/role-arn: ${try(modules.ecr.output.iam_role_arn, "")}
+      roleArn: ${try(modules.ecr.output.iam_role_arn, "")}
 %{~ endif }
 %{~ endif }
