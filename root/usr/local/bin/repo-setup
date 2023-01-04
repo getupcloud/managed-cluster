@@ -2,7 +2,11 @@
 
 set -eu
 
-source /etc/profile.d/getup.sh
+if ${INSIDE_CONTAINER:-false}; then
+    source /etc/profile.d/getup.sh
+else
+    source $REPO_DIR/root/etc/profile.d/getup.sh
+fi
 source repo-git-config-setup
 
 info Switching to $REPO_DIR
@@ -69,7 +73,15 @@ fi
 
 # upload flux ssh deploy key
 #info Checking ssh key
-local_ssh_key_fingerprint=$(ssh-keygen -l -E sha256 -f $CLUSTER_DIR/identity.pub | awk '{print $2}')
+pub_key="identity.pub"
+for dir in "${CLUSTER_DIR-:}" "$REPO_DIR"; do
+    if [ -n "$dir" ] && [ -e "$dir/$pub_key" ]; then
+        pub_key="$dir/$pub_key"
+        break
+    fi
+done
+
+local_ssh_key_fingerprint=$(ssh-keygen -l -E sha256 -f $pub_key | awk '{print $2}')
 remote_ssh_key_fingerprints=(
   $(PAGER= gh api repos/$gh_owner/$gh_name/keys | jq '.[]|.key' -r | ssh-keygen -l -E sha256 -f - | awk '{print $2}')
 )
@@ -85,12 +97,12 @@ if [ ${#remote_ssh_key_fingerprints[*]} -gt 0 ]; then
 fi
 
 if $found; then
-  info "Ssh key $CLUSTER_DIR/identity.pub ($local_ssh_key_fingerprint) already registered at repo $origin"
+  info "Ssh key $pub_key ($local_ssh_key_fingerprint) already registered at repo $origin"
 else
-  info "Uploading ssh key: $CLUSTER_DIR/identity.pub ($local_ssh_key_fingerprint)"
+  info "Uploading ssh key: $pub_key ($local_ssh_key_fingerprint)"
 
   if ! PAGER= gh api repos/$gh_owner/$gh_name/keys \
-      -f "key=$(<$CLUSTER_DIR/identity.pub)" -f read_only=false -f title="managed-cluster-${cluster_name}-${cluster_type}"; then
+      -f "key=$(<$pub_key)" -f read_only=false -f title="managed-cluster${customer_name:+-$customer_name}${cluster_name:+-$cluster_name}${cluster_type:+-$cluster_type}"; then
           warn "Failed adding key"
   fi
 fi

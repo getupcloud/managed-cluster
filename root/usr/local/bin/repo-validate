@@ -5,6 +5,7 @@ set -eu
 source /etc/profile.d/getup.sh
 
 KUSTOMIZE_BUILD=/tmp/.kustomize_build.yaml
+
 if ask_execute_command kustomize build /cluster/manifests/cluster/ -o $KUSTOMIZE_BUILD; then
     echo Passed
 fi

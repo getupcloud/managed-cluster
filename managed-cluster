@@ -31,6 +31,166 @@ if [ -t 0 ]; then
     COLOR_RESET="$(tput sgr0)"
 fi
 
+function usage()
+{
+    echo "Managed Cluster - v$current_version"
+    echo "Usage: $0 COMMAND [OPTIONS...] "
+    echo "Create and manage kubernetes clusters. Each customer have one repository, with one or more clusters inside \$CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/)."
+    if [ -z "$command" ]; then
+        echo
+        echo "Available commands and options:"
+        echo
+        echo "    -d, --debug            Turn bash debug messages on (set -x). Implies --verbose."
+        echo "    -h, --help             This help message."
+        echo "    -v, --verbose          Turn verbose messages on."
+        echo "    -U, --no-check-update  Do not check for updates from upstream repo (default: false)."
+    else
+        echo
+        echo "Run \`$0 --help\` for full help."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "create" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Creates a new cluster from ./templates/\$cluster_type into CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/)." "$COLOR_RESET"
+        echo
+        echo "     -c, --customer-name NAME       Customer name."
+        echo "         --force                    Force create even if CLUSTER-DIR exists."
+        echo "     -f, --flux-git-repo URL        Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -l, --local-git-repo           Use cluster-internal git server '$local_git_repo'. (default: false)"
+        echo "     -k, --ssh-key-type             SSH key type (default: $ssh_key_type)."
+        echo "         --ssh-key-length           SSH key length, depends on ssh key type."
+        echo "     -H, --ssh-host                 SSH host (default: $ssh_host)."
+        echo "     -n, --cluster-name NAME        Unique name for new cluster."
+        echo "     -o, --origin REMOTE            Overwrite ORIGIN remote address (default: $default_origin_fmt)."
+        echo "     -p, --cluster-provider NAME    Cluster provider: $CLUSTER_PROVIDERS."
+        echo "     -s, --cluster-sla VALUE        Cluster SLA: high, low, none (default: $opt_cluster_sla)."
+        echo "     -t, --cluster-type NAME        Cluster type: $CLUSTER_TYPES."
+        echo "     -u, --upstream REMOTE          Overwrite UPSTREAM remote address (default: $default_upstream)."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "create-repo" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> create-repo [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Createa a new repository without creating any cluster." "$COLOR_RESET"
+        echo
+        echo "     -c, --customer-name NAME       Customer name."
+        echo "     -f, --flux-git-repo URL        Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -l, --local-git-repo           Use cluster-internal git server '$local_git_repo'. (default: false)"
+        echo "     -k, --ssh-key-type             SSH key type (default: $ssh_key_type)."
+        echo "         --ssh-key-length           SSH key length, depends on ssh key type."
+        echo "     -H, --ssh-host                 SSH host (default: $ssh_host)."
+        echo "     -o, --origin REMOTE            Overwrite ORIGIN remote address (default: $default_origin_fmt)."
+        echo "     -p, --cluster-provider NAME    Cluster provider: One of $CLUSTER_PROVIDERS."
+        echo "     -u, --upstream REMOTE          Overwrite UPSTREAM remote address (default: $default_upstream)."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "start" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
+        echo
+        echo "     -e, --env-file FILE                   Export environment files from FILE (file format: name=\"value\")"
+        echo "         --force-docker-image-build        Force building local docker image."
+        echo "     -i, --image NAME                      Image name (default: $(get_docker_image))."
+        echo "         --no-sudo                         Dont use 'sudo' to run docker."
+        echo "     -p, --port-range $port_range          Exposes container port range into host using format FIRST:LAST."
+        echo "     -r, --run-as-root                     Run container as root."
+        echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "repo_pull" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Pulls from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "update" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> update" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Fetch 'upstream' remote and merge from a newer version." "$COLOR_RESET"
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "sync_template" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> sync-template [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Sync files from ./templates/\$cluster_type into CLUSTER-DIR." "$COLOR_RESET"
+        echo
+        echo "         --force                    Force template sync."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "remote_setup" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> remote-setup [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Update local remote upstream." "$COLOR_RESET"
+        echo
+        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
+        echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
+        echo "     -o, --origin REMOTE        Define ORIGIN remote address."
+        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "update_ssh_key" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> update-ssh-key [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Creates a new ssh key (doesn't pushes to git repo)." "$COLOR_RESET"
+        echo
+        echo "     -k, --ssh-key-type              New SSH key type (default: $ssh_key_type)."
+        echo "     -l, --ssh-key-length            SSH key length, depends on ssh key type."
+    fi
+
+    if [ -z "$_command" ] || [ "$_command" == "install_teleport_agent" ]; then
+        echo "${COLOR_BOLD}$COLOR_GREEN"
+        echo "  -> install-teleport-agent" "$COLOR_RESET${COLOR_BOLD}"
+        echo "     Installs teleport-agent as a systemd service" "$COLOR_RESET"
+        echo
+    fi
+
+#    if [ -z "$command" ] || [ "$command" == "import-variables" ]; then
+#        echo "$COLOR_GREEN"
+#        echo "  -> import-variables [PREFIX SOURCE]...  Adds PREFIX to terraform variables from SOURCE." "$COLOR_RESET"
+#    fi
+
+    if [ -z "$_command" ]; then
+        echo
+        echo "  SSH default key lengths:"
+        echo "    rsa: $ssh_key_length_rsa"
+        echo "    dsa: $ssh_key_length_dsa"
+        echo "    ecdsa: $ssh_key_length_ecdsa"
+    fi
+
+    if [ $# -gt 0 ]; then
+        echo
+        echo -e "${COLOR_RED}$@${COLOR_RESET}"
+        exit_code=1
+    fi
+
+    exit ${exit_code:-0}
+}
+
+function invalid_argument()
+{
+    case "$1" in
+        -*)
+            usage "Invalid option[${BASH_LINENO[0]}]: $@"
+        ;;
+        *)
+            usage "Invalid or missing parameter[${BASH_LINENO[0]}]: $@"
+    esac
+}
+
+function dump_options()
+{
+    echo Current options:
+    for i in command debug verbose force ssh_key_type ssh_key_length ssh_host \
+        standalone docker_command port_range run_as_root \
+        docker_image force_docker_image_build cluster_dir \
+        import_var_prefixes import_var_sources local_git_repo
+        do
+        echo "  ${!i@A}"
+    done
+}
+
 function copy_from_template_common()
 {
     if [ -z "$TEMPLATES_DIR" ] || [ -z "$CLUSTER_DIR" ]; then
@@ -268,23 +428,29 @@ function set_local_git_repo()
 
 function generate_ssh_key()
 {
-    local _key_priv=$CLUSTER_DIR/identity
-    local _key_pub=$CLUSTER_DIR/identity.pub
-    local _kh=$CLUSTER_DIR/known_hosts
-
-    if ! [ -e $_key_priv ]; then
-        info "Generating $_key_priv ($ssh_key_length bits)"
-        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $_key_priv -N "" -C "$customer_name/$cluster_name/$cluster_type"
+    if [ "$1" == repo ]; then
+        local key_priv=$REPO_DIR/identity
+        local key_pub=$REPO_DIR/identity.pub
+        local kh=$REPO_DIR/known_hosts
     else
-        info Using existing $_key_priv
+        local key_priv=$CLUSTER_DIR/identity
+        local key_pub=$CLUSTER_DIR/identity.pub
+        local kh=$CLUSTER_DIR/known_hosts
     fi
 
-    if ! [ -e $_key_pub ]; then
-        ssh-keygen -yf $_key_priv > $_key_pub
+    if ! [ -e $key_priv ]; then
+        info "Generating $key_priv ($ssh_key_length bits)"
+        ssh-keygen -t $ssh_key_type -b $ssh_key_length -f $key_priv -N "" -C "$customer_name${cluster_name:+/$cluster_name}/${cluster_type:+/$cluster_type}"
+    else
+        info Using existing $key_priv
+    fi
+
+    if ! [ -e $key_pub ]; then
+        ssh-keygen -yf $key_priv > $key_pub
     fi
 
     if $opt_local_git_repo; then
-        info "Generating static $_kh for $ssh_host"
+        info "Generating static $kh for $ssh_host"
         local static_known_hosts=(
             "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGCqvxcZO6VUWq+mz3ybMgsVDJbVGeYF02hCCsnrdoLD/pZyijfjp3UCVlMj2lMhJz6iFwhnSi8w+3EkYGPn3ws="
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/sYED/XeGeSv5PFFA9XE7DLdIkUpjDYD4XD3a7n0Gc"
@@ -293,10 +459,10 @@ function generate_ssh_key()
 
         for i in "${static_known_hosts[@]}"; do
             echo "$ssh_host $i"
-        done >$_kh
+        done >$kh
     else
-        info "Generating $_kh for $ssh_host: ssh-keyscan $ssh_host"
-        ssh-keyscan $ssh_host &>$_kh
+        info "Generating $kh for $ssh_host: ssh-keyscan $ssh_host"
+        ssh-keyscan $ssh_host &>$kh
     fi
 }
 
@@ -475,156 +641,6 @@ function start_container()
     eval $sudo $docker_run
 }
 
-###########
-## Start ##
-###########
-
-function usage()
-{
-    echo "Managed Cluster - v$current_version"
-    echo "Usage: $0 COMMAND [OPTIONS...] "
-    echo "Creates and manage CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/) from outside manager container."
-    if [ -z "$command" ]; then
-        echo
-        echo "Available commands and options:"
-        echo
-        echo "    -d, --debug            Turn bash debug messages on (set -x). Implies --verbose."
-        echo "    -h, --help             This help message."
-        echo "    -v, --verbose          Turn verbose messages on."
-        echo "    -U, --no-check-update  Do not check for updates from upstream repo (default: false)."
-    else
-        echo
-        echo "Run \`$0 --help\` for full help."
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "create" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> create [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Creates a new cluster from ./templates/\$cluster_type into CLUSTER-DIR (./clusters/\$cluster_name/\$cluster_type/)." "$COLOR_RESET"
-        echo
-        echo "     -c, --customer-name NAME       Customer name."
-        echo "         --force                    Force create even if CLUSTER-DIR exists."
-        echo "     -f, --flux-git-repo URL        Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
-        echo "     -l, --local-git-repo           Use cluster-internal git server '$local_git_repo'. (default: false)"
-        echo "     -k, --ssh-key-type             SSH key type (default: $ssh_key_type)."
-        echo "         --ssh-key-length           SSH key length, depends on ssh key type."
-        echo "     -H, --ssh-host                 SSH host (default: $ssh_host)."
-        echo "     -n, --cluster-name NAME        Unique name for new cluster."
-        echo "     -u, --upstream REMOTE          Define UPSTREAM remote address (default: $default_upstream)."
-        echo "     -o, --origin REMOTE            Define ORIGIN remote address."
-        echo "     -p, --cluster-provider NAME    Cluster provider: $CLUSTER_PROVIDERS."
-        echo "     -s, --cluster-sla VALUE        Cluster SLA: high, low, none (default: $opt_cluster_sla)."
-        echo "     -t, --cluster-type NAME        Cluster type: $CLUSTER_TYPES."
-        echo "     -u, --upstream REMOTE          Define UPSTREAM remote address (default: $default_upstream)."
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "start" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> start [CLUSTER-DIR] [OPTIONS...] [--] [params...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Start container for a cluster, passing optional \`docker run -- params\`." "$COLOR_RESET"
-        echo
-        echo "     -e, --env-file FILE                   Export environment files from FILE (file format: name=\"value\")"
-        echo "         --force-docker-image-build        Force building local docker image."
-        echo "     -i, --image NAME                      Image name (default: $(get_docker_image))."
-        echo "         --no-sudo                         Dont use 'sudo' to run docker."
-        echo "     -p, --port-range $port_range          Exposes container port range into host using format FIRST:LAST."
-        echo "     -r, --run-as-root                     Run container as root."
-        echo "     -s, --standalone                      Start from standalone dir \`./standalone\`."
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "repo_pull" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> repo-pull" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Pulls from both remotes 'upstream' and 'origin'." "$COLOR_RESET"
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "update" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> update" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Fetch 'upstream' remote and merge from a newer version." "$COLOR_RESET"
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "sync_template" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> sync-template [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Sync files from ./templates/\$cluster_type into CLUSTER-DIR." "$COLOR_RESET"
-        echo
-        echo "         --force                    Force template sync."
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "remote_setup" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> remote-setup [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Update local remote upstream." "$COLOR_RESET"
-        echo
-        echo "     -f, --flux-git-repo URL    Define flux git repository address. Defaults to ORIGIN. (format: ssh://user@host/path/to/repo)."
-        echo "     -l, --local-git-repo       Use cluster-internal git server '$local_git_repo'. (default: false)"
-        echo "     -o, --origin REMOTE        Define ORIGIN remote address."
-        echo "     -u, --upstream REMOTE      Define UPSTREAM remote address (default: $default_upstream)."
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "update_ssh_key" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> update-ssh-key [CLUSTER-DIR] [OPTIONS...]" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Creates a new ssh key (doesn't pushes to git repo)." "$COLOR_RESET"
-        echo
-        echo "     -k, --ssh-key-type              New SSH key type (default: $ssh_key_type)."
-        echo "     -l, --ssh-key-length            SSH key length, depends on ssh key type."
-    fi
-
-    if [ -z "$_command" ] || [ "$_command" == "install_teleport_agent" ]; then
-        echo "${COLOR_BOLD}$COLOR_GREEN"
-        echo "  -> install-teleport-agent" "$COLOR_RESET${COLOR_BOLD}"
-        echo "     Installs teleport-agent as a systemd service" "$COLOR_RESET"
-        echo
-    fi
-
-#    if [ -z "$command" ] || [ "$command" == "import-variables" ]; then
-#        echo "$COLOR_GREEN"
-#        echo "  -> import-variables [PREFIX SOURCE]...  Adds PREFIX to terraform variables from SOURCE." "$COLOR_RESET"
-#    fi
-
-    if [ -z "$_command" ]; then
-        echo
-        echo "  SSH default key lengths:"
-        echo "    rsa: $ssh_key_length_rsa"
-        echo "    dsa: $ssh_key_length_dsa"
-        echo "    ecdsa: $ssh_key_length_ecdsa"
-    fi
-
-    if [ $# -gt 0 ]; then
-        echo
-        echo -e "${COLOR_RED}$@${COLOR_RESET}"
-        exit_code=1
-    fi
-
-    exit ${exit_code:-0}
-}
-
-function invalid_argument()
-{
-    case "$1" in
-        -*)
-            usage "Invalid option[${BASH_LINENO[0]}]: $@"
-        ;;
-        *)
-            usage "Invalid or missing parameter[${BASH_LINENO[0]}]: $@"
-    esac
-}
-
-function dump_options()
-{
-    echo Current options:
-    for i in command debug verbose force ssh_key_type ssh_key_length ssh_host \
-        standalone docker_command port_range run_as_root \
-        docker_image force_docker_image_build cluster_dir \
-        import_var_prefixes import_var_sources local_git_repo
-        do
-        echo "  ${!i@A}"
-    done
-}
-
-
 ##########
 ## MAIN ##
 ##########
@@ -647,6 +663,7 @@ local_git_repo_user=git
 local_git_repo_host=git.flux-system.svc.cluster.local
 local_git_repo_path=/git
 local_git_repo="ssh://${local_git_repo_user}@${local_git_repo_host}${local_git_repo_path}" # port is handled by ~/.ssh/config
+default_origin_fmt=git@github.com:getupcloud/managed-cluster-\${customer_name}.git
 default_upstream=git@github.com:getupcloud/managed-cluster.git
 default_upstream_https=https://github.com/getupcloud/managed-cluster.git
 common_template_files=(
@@ -797,7 +814,7 @@ function create_repo_config()
     elif [ -z "$origin" ]; then
         if [ -z "$opt_origin" ]; then
             origin="$(git-url $(git_remote origin) url2ssh)"
-            origin=${origin%.git}-$customer_name.git
+            origin=$(eval echo $default_origin_fmt)
         fi
         read_config origin "Set ORIGIN remote"
     fi
@@ -846,6 +863,99 @@ function save_cluster_config()
     set_config cluster_provider="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
     set_config cluster_name="$cluster_name" "Cluster Name" $CLUSTER_CONF
     set_config cluster_sla="$cluster_sla" "Cluster SLA" $CLUSTER_CONF
+}
+
+##########################
+## COMMAND: create-repo ##
+##########################
+
+function getopt_cr() { _command=create_repo && getopt_create_repo "$@"; }
+function getopt_create_repo()
+{
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h|--help)
+                usage
+            ;;
+            --force)
+                force=true
+            ;;
+            -f|--flux-git-repo)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_flux_git_repo=$1
+            ;;
+            -l|--local-git-repo)
+                opt_local_git_repo=true
+            ;;
+            -o|--origin)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_origin=$1
+            ;;
+            -u|--upstream)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_upstream=$1
+            ;;
+            -c|--customer-name)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                opt_customer_name=$1
+            ;;
+            -k|--ssh-key-type)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                ssh_key_type=$1
+            ;;
+            --ssh-key-length)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                ssh_key_length=$1
+            ;;
+            -H|--ssh-host)
+                [ $# -lt 2 ] && invalid_argument $1
+                shift
+                ssh_host=$1
+            ;;
+            *)
+                invalid_argument $1
+        esac
+        shift
+    done
+
+    if $opt_local_git_repo; then
+        set_local_git_repo
+    fi
+
+    if [ $ssh_key_length -eq 0 ]; then
+        local key_len=ssh_key_length_$ssh_key_type
+        ssh_key_length=${!key_len}
+    fi
+}
+
+function command_cr() { _command=create_repo && command_create_repo "$@"; }
+function command_create_repo()
+{
+    set -e
+
+    create_repo_config
+
+    if ! has_remote upstream; then
+        line
+        info Current remotes:
+        git remote -v
+
+        update_git_remotes
+
+        line
+        info New remotes:
+        git remote -v
+    fi
+
+    generate_ssh_key repo
+    repo-setup
+    repo-push
 }
 
 #####################################
@@ -1383,6 +1493,7 @@ function command_update_ssh_key()
     fi
 
     generate_ssh_key
+    generate_ssh_key repo
 }
 
 ##########

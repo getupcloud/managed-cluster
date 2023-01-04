@@ -548,7 +548,7 @@ fi
 
 function update_globals()
 {
-    if [ -d $CLUSTER_DIR ]; then
+    if [ -v CLUSTER_DIR ] && [ -d "$CLUSTER_DIR" ]; then
         export CLUSTER_CONF="$CLUSTER_DIR/cluster.conf"
         source_env "$CLUSTER_CONF"
     fi

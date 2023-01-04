@@ -2,7 +2,11 @@
 
 set -eu
 
-source /etc/profile.d/getup.sh
+if ${INSIDE_CONTAINER:-false}; then
+    source /etc/profile.d/getup.sh
+else
+    source $REPO_DIR/root/etc/profile.d/getup.sh
+fi
 
 cd $REPO_DIR
 

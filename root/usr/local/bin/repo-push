@@ -2,7 +2,11 @@
 
 set -eu
 
-source /etc/profile.d/getup.sh
+if ${INSIDE_CONTAINER:-false}; then
+    source /etc/profile.d/getup.sh
+else
+    source $REPO_DIR/root/etc/profile.d/getup.sh
+fi
 source repo-git-config-setup
 
 info Switching to $REPO_DIR
@@ -23,19 +27,26 @@ if ! is_local_git_repo && ! repo-exists; then
     ask_execute_command repo-setup
 fi
 
-repo-validate
+if ${INSIDE_CONTAINER:-false}; then
+    repo-validate
+    REPO_FILES="repo.conf clusters/$cluster_name/$cluster_type"
+    COMMIT_MESSAGE="Automatic commit: clusters/$cluster_name/$cluster_type"
+else
+    REPO_FILES="repo.conf identity identity.pub known_hosts"
+    COMMIT_MESSAGE="Automatic commit: repo/$customer_name"
+fi
 
 FZF_PREVIEW="
-if [ {1} == '??' ]; then
-  [ -d {2} ] && tree {2} || cat {2}
-else
-  git diff --color {2}
-fi
+    if [ {1} == '??' ]; then
+        [ -d {2} ] && tree {2} || cat {2}
+    else
+        git diff --color {2}
+    fi
 "
 
 if ask "Select files to commit now? [Y/n]"; then
     FILES_TO_COMMIT=(
-        $(git status --short repo.conf clusters/$cluster_name/$cluster_type | fzf -0 --ansi --reverse --multi --disabled \
+        $(git status --short $REPO_FILES | fzf -0 --ansi --reverse --multi --disabled \
             --header='---[ Select files to commit (ctrl+a to select all) ]---' \
             --preview "$FZF_PREVIEW" \
             --bind 'ctrl-a:select-all' \
@@ -52,7 +63,7 @@ if ask "Select files to commit now? [Y/n]"; then
         info Commiting files:
         printf '+ %s\n' "${FILES_TO_COMMIT[@]}"
         git add "${FILES_TO_COMMIT[@]}"
-        git commit "${FILES_TO_COMMIT[@]}" -m "Automatic commit: clusters/$cluster_name/$cluster_type"
+        git commit "${FILES_TO_COMMIT[@]}" -m "$COMMIT_MESSAGE"
     fi
 fi
 
