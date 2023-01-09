@@ -1138,7 +1138,10 @@ function check_deprecations()
         customer:customer_name
         sla:cluster_sla
         :cluster_provider
+        aws_modules:modules
     )
+
+    local TERRAFORM_TFVARS=$CLUSTER_DIR/terraform.tfvars
 
     for i in ${rename_configs[*]}; do
         local old=${i%:*}
@@ -1146,22 +1149,31 @@ function check_deprecations()
         local found=false
 
         if [ -z "${!new}" ] && [ -z "$old" ]; then
-            select_cluster_provider
-            set_config $new="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
-            continue
+            case "$new" in
+                cluster_provider)
+                    select_cluster_provider
+                    set_config $new="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
+                    continue
+                ;;
+            esac
         fi
 
-        if grep -q "^\s*$old\s*=" $REPO_CONF; then
-            found=true
-            file=$REPO_CONF
-        elif grep -q "^\s*$old\s*=" $CLUSTER_CONF; then
-            found=true
-            file=$CLUSTER_CONF
-        fi
+        {
+            if grep -q "^\s*$old\s*=" $REPO_CONF; then
+                found=true
+                file=$REPO_CONF
+            elif grep -q "^\s*$old\s*=" $CLUSTER_CONF; then
+                found=true
+                file=$CLUSTER_CONF
+            elif grep -q "^\s*$old\s*=" $TERRAFORM_TFVARS; then
+                found=true
+                file=$TERRAFORM_TFVARS
+            fi
+        } 2>/dev/null
 
         if $found; then
             if ask "Replace deprecated config '$old' for '$new' into file $file? [Y/n]"; then
-                sed -i -e "s/^\s*$old\([\s]*=\)/$new\1/g" $file
+                sed -i -e "s/^\s*$old\(\s*=\)/$new\1/g" $file
             fi
         fi
     done
