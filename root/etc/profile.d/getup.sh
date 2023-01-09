@@ -45,6 +45,19 @@ source_env()
     load_opt a
 }
 
+source_env_tf()
+{
+    if ! [ -e "$1" ]; then
+        verb "Reading $1: not found"
+        return
+    fi
+    source_env "$1"
+    save_opt a
+    set -a
+    eval $(awk -F= '/^[^#]/{printf("TF_VAR_%s=\"$%s\"\n", $1, $1)}' "$1")
+    load_opt a
+}
+
 # copy from /etc/profile
 pathmunge () {
     case ":${PATH}:" in
@@ -550,7 +563,7 @@ function update_globals()
 {
     if [ -v CLUSTER_DIR ] && [ -d "$CLUSTER_DIR" ]; then
         export CLUSTER_CONF="$CLUSTER_DIR/cluster.conf"
-        source_env "$CLUSTER_CONF"
+        source_env_tf "$CLUSTER_CONF"
     fi
 
     if [ -v cluster_type ]; then
@@ -575,6 +588,7 @@ if $INSIDE_CONTAINER; then
     pathmunge $REPO_DIR after
     export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
     source_env "$PROVIDER_ENV"
+    source_env_tf "$PROVIDER_ENV"
     export DOT_PROVIDER_ENV="$CLUSTER_DIR/.provider.env"
     source_env "$DOT_PROVIDER_ENV"
     source_env $ROOT_DIR/.dockerenv
