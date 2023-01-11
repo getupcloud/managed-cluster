@@ -41,4 +41,13 @@ spec:
       aws_region: ""
       aws_zones: ""
       aws_access_key_id: ""
+
+    %{ if modules.cert-manager-config.cloudflare_enabled ~}
+    cluster_issuer_dns01_cloudflare:
+      enabled: true
+      cloudflare_zones: ${ modules.cert-manager-config.cloudflare_zones }
+      cloudflare_email: ${ modules.cert-manager-config.cloudflare_email }
+      cloudflare_token: ${ modules.cert-manager-config.cloudflare_token }
+    %{~ endif }
+
 %{~ endif }

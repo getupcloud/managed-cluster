@@ -10,9 +10,13 @@ variable "modules_defaults" {
       hosted_zone_ids           = list(string)
     })
     cert-manager-config = object({
-      enabled       = bool
-      acme_email    = string
-      ingress_class = string
+      enabled            = bool
+      acme_email         = string
+      ingress_class      = string
+      cloudflare_enabled = bool
+      cloudflare_zones   = list(string)
+      cloudflare_email   = string
+      cloudflare_token   = string
     })
     external-dns = object({
       enabled         = bool
@@ -103,9 +107,13 @@ variable "modules_defaults" {
       hosted_zone_ids           = []
     }
     cert-manager-config = {
-      enabled       = false
-      acme_email    = "change.me@example.com"
-      ingress_class = "nginx"
+      enabled            = false
+      acme_email         = "change.me@example.com"
+      ingress_class      = "nginx"
+      cloudflare_enabled = false
+      cloudflare_zones   = []
+      cloudflare_email   = "change.me@example.com"
+      cloudflare_token   = ""
     }
     external-dns = {
       enabled         = false
