@@ -11,6 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
+      version: "~> 0.2"
   dependsOn:
     - name: cert-manager
   install:
@@ -45,7 +46,10 @@ spec:
     %{ if modules.cert-manager-config.cloudflare_enabled ~}
     cluster_issuer_dns01_cloudflare:
       enabled: true
-      cloudflare_zones: ${ modules.cert-manager-config.cloudflare_zones }
+      cloudflare_zones:
+      %{ for zone in modules.cert-manager-config.cloudflare_zones }
+      - ${ zone }
+      %{ endfor }
       cloudflare_email: ${ modules.cert-manager-config.cloudflare_email }
       cloudflare_token: ${ modules.cert-manager-config.cloudflare_token }
     %{~ endif }
