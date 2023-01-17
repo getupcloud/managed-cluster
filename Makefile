@@ -38,6 +38,8 @@ help:
 	@echo '  test:               Run all tests from ./tests. $(call print_targets,test)'
 	@echo '  test-iter:          Iterable tests. $(call print_targets,test-iter)'
 	@echo '  test-help:          Show test options. $(call print_targets,test-help)'
+	@echo '  push-git:           Push code to github'
+	@echo '  push-image:         Push image to $(IMAGE_HOST)'
 	@echo '  show-modules-vars:  Print modules.* from all manifests'
 
 CLUSTER_TYPES := $(shell ls -1 templates/*/main.tf | awk -F/ '{print $$2}')
