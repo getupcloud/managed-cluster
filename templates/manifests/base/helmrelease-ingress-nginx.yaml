@@ -32,9 +32,18 @@ spec:
         # enable after install in order to avoid ingress deadlock
         enabled: false
 
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
           - weight: 100
             preference:
               matchExpressions:
@@ -42,6 +51,7 @@ spec:
                 operator: In
                 values:
                 - infra
+
       resources:
         limits:
           cpu: 300m
@@ -100,17 +110,28 @@ spec:
           # service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
           # service.beta.kubernetes.io/aws-load-balancer-type: external
 
-      tolerations:
-      - effect: NoSchedule
-        key: dedicated
-        value: infra
-      - effect: NoSchedule
-        key: CriticalAddonsOnly
-
     defaultBackend:
       enabled: true
-      nodeSelector:
-        role: infra
+
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - infra
 
       resources:
         limits:
@@ -119,13 +140,6 @@ spec:
         requests:
           cpu: 20m
           memory: 32Mi
-
-      tolerations:
-      - effect: NoSchedule
-        key: dedicated
-        value: infra
-      - effect: NoSchedule
-        key: CriticalAddonsOnly
 
     rbac:
       create: true

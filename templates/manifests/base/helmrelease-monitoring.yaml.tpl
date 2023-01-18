@@ -42,14 +42,24 @@ spec:
           memory: 128Mi
 
       tolerations:
-      - key: dedicated
-        value: infra
-        effect: NoSchedule
-      - key: CriticalAddonsOnly
+      - operator: Exists
         effect: NoSchedule
 
-      nodeSelector:
-        role: infra
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - infra
 
     prometheus:
       service:
@@ -110,14 +120,24 @@ spec:
         probeNamespaceSelector: {}
 
         tolerations:
-        - key: dedicated
-          value: infra
-          effect: NoSchedule
-        - key: CriticalAddonsOnly
+        - operator: Exists
           effect: NoSchedule
 
-        nodeSelector:
-          role: infra
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: node-role.kubernetes.io/infra
+                  operator: Exists
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: role
+                  operator: In
+                  values:
+                  - infra
 
         storageSpec:
           volumeClaimTemplate:
@@ -136,14 +156,24 @@ spec:
         logFormat: logfmt
 
         tolerations:
-        - key: dedicated
-          value: infra
-          effect: NoSchedule
-        - key: CriticalAddonsOnly
+        - operator: Exists
           effect: NoSchedule
 
-        nodeSelector:
-          role: infra
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: node-role.kubernetes.io/infra
+                  operator: Exists
+            - weight: 100
+              preference:
+                matchExpressions:
+                - key: role
+                  operator: In
+                  values:
+                  - infra
 
         resources:
           limits:
@@ -402,14 +432,24 @@ spec:
         sessionAffinity: ClientIP
 
       tolerations:
-      - key: dedicated
-        value: infra
-        effect: NoSchedule
-      - key: CriticalAddonsOnly
+      - operator: Exists
         effect: NoSchedule
 
-      nodeSelector:
-        role: infra
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - infra
 
       deploymentStrategy:
         type: Recreate

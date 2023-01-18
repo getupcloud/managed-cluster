@@ -65,14 +65,24 @@ spec:
       enabled: false
 
     tolerations:
-    - effect: NoSchedule
-      key: dedicated
-      value: infra
-    - effect: NoSchedule
-      key: CriticalAddonsOnly
+    - operator: Exists
+      effect: NoSchedule
 
-    nodeSelector:
-      role: infra
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: node-role.kubernetes.io/infra
+              operator: Exists
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: role
+              operator: In
+              values:
+              - infra
 
     resources:
       limits:
