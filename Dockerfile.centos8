@@ -1,4 +1,4 @@
-FROM ghcr.io/getupcloud/managed-cluster-base:v1.5.42-alpha103
+FROM ghcr.io/getupcloud/managed-cluster-base:v1.5.42-alpha104
 
 ENV \
     DOCTL_VERSION="1.63.1" \
