@@ -614,8 +614,8 @@ function start_container()
     if [ -e "$SSH_AUTH_SOCK" ]; then
         docker_run_options_defaults+=(
             -v "$SSH_AUTH_SOCK:$SSH_AUTH_SOCK"
-            --env "SSH_AGENT_PID:$SSH_AGENT_PID"
-            --env "SSH_AUTH_SOCK:$SSH_AUTH_SOCK"
+            --env "SSH_AGENT_PID=$SSH_AGENT_PID"
+            --env "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
         )
     fi
 
