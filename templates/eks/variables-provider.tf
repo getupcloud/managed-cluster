@@ -206,18 +206,12 @@ variable "fargate_private_subnet_ids" {
 
 # Variables `auth_*`: auto-gen IAM->EKS auth users mapping as defined by:
 # {
-#   "userarn": "arn:aws:iam::${auth_account_id}:user/${auth_iam_users[*]}"
+#   "userarn": "arn:aws:iam::${account_id}:user/${auth_iam_users[*]}"
 #   "username": ${auth_default_username}
 #   "groups": ${auth_default_groups}
 # }
 #
 # Concatenates with `auth_map_users` below
-
-variable "auth_account_id" {
-  description = "AWS AccountId for IAM ARN users. Use `self` for EKS account ID."
-  type        = string
-  default     = "self"
-}
 
 variable "auth_iam_users" {
   description = "List of IAM users to allow kubernetes access. Example: [\"eks-admin\"]"
