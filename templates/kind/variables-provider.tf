@@ -2,13 +2,13 @@
 
 variable "kubernetes_version" {
   description = "Kubernetes version"
-  type = string
+  type        = string
   default     = "1.20"
 }
 
 variable "kubeadm_config_patches" {
   description = "Patches to apply on each node group"
-  type = any
+  type        = any
   default = {
     master : []
 
