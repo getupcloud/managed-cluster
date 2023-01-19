@@ -671,12 +671,24 @@ spec:
 
     kube-state-metrics:
       tolerations:
-      - key: dedicated
-        value: infra
+      - operator: Exists
         effect: NoSchedule
 
-      nodeSelector:
-        role: infra
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - infra
 
     kubeScheduler:
       enabled: false
