@@ -427,6 +427,8 @@ spec:
             continue: false
 
     grafana:
+      image:
+        tag: 8.5.15
       service:
         type: ClusterIP
         sessionAffinity: ClientIP
