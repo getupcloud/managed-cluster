@@ -65,10 +65,10 @@ RUN cd /usr/local/bin && \
         chmod +x oh-my-bash.install && \
         echo "Execute 'oh-my-bash.install' to install OH-MY-BASH" && \
     curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
-    chmod -R +x /usr/local/bin && \
     curl -kL https://gist.github.com/caruccio/3fe4cb8949419b093c5c5c9b3ac33631/raw/97915ca848e6e5689868c9fa00c3412479e2f9c3/kubectl-extract \
         -o /usr/local/bin/kubectl-extract && \
-    chmod +x /usr/local/bin/kubectl-extract
+    chmod +x /usr/local/bin/kubectl-extract && \
+    chmod -R +x /usr/local/bin
 
 RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/' -e 's/aarch64/arm64/') && \
     curl -skL  https://github.com/kubernetes-sigs/krew/releases/download/${KREW_VERSION}/krew-${KERNEL_MACHINE}.tar.gz \

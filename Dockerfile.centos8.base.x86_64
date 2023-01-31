@@ -32,7 +32,7 @@ RUN \
 
 
 RUN alternatives --set python3 /usr/bin/python3.8 && \
-    pip3 install giturlparse.py pyyaml python-hcl2==3.0.5 && \
+    pip3 install giturlparse.py pyyaml ruamel-yaml python-hcl2==3.0.5 && \
     curl -Lv https://github.com/junegunn/fzf/releases/download/0.29.0/fzf-0.29.0-linux_amd64.tar.gz \
         | sudo tar xzvf - -C /usr/local/bin && \
     curl -Lv https://github.com/Wilfred/difftastic/releases/download/0.27.0/difft-x86_64-unknown-linux-gnu.tar.gz \
