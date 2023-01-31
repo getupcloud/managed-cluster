@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
-      version: "0.2.2"
+      version: "~> 1.0"
   install:
     createNamespace: true
     disableWait: false
@@ -27,18 +27,16 @@ spec:
   values:
     secret:
       name: ecr-credentials
-      namespaceSelector: flux-system
+      ## Use empty object {} to copy secret.name to all namespaces
+      namespaceLabelSelector:
+        app.kubernetes.io/instance: flux-system
     awsAccountId: "${aws.account_id}"
     ecr:
-      region: "${aws.region}" 
+      region: "${aws.region}"
 
-    schedule: "0 */6 * * *"
-
-    nodeSelector: {}
-
-    tolerations: []
-
-    affinity: {}
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
 
 %{~ if modules.ecr.output.iam_role_arn != ""}
     serviceAccount:
