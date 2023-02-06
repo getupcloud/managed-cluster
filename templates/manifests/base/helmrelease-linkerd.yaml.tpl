@@ -312,7 +312,7 @@ spec:
     jaegerUrl: "jaeger.linkerd-jaeger.svc:16686"
 %{~ endif }
     grafana:
-      externalUrl: ${ modules.monitoring.grafana.externalUrl.scheme }://${ modules.monitoring.grafana.externalUrl.host }
+      externalUrl: ${ modules.monitoring.grafana.ingress.scheme }://${ modules.monitoring.grafana.ingress.host }
 
     tolerations:
     - effect: NoSchedule
