@@ -1,6 +1,12 @@
 ## Cluster type specific variables
 ## Copy to toplevel
 
+variable "kubernetes_version" {
+  description = "Kubernetes version"
+  type        = string
+  default     = "1.24"
+}
+
 variable "generic_post_create" {
   description = "Scripts to execute after cluster is created."
   type        = list(string)
