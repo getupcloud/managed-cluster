@@ -12,8 +12,6 @@ else
   user=$(awk '/\s*#?\s*ssh_user\s*=\s".*".*/ { patsplit($3, a, /[^"]+/); print a[1] }' $TF_VARS_FILE | tail -n1) 2>/dev/null
 fi
 
-user=${1:-centos}
-
 out=/tmp/.dialog
 exec 3>$out
 eval dialog \
