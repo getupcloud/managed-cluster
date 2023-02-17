@@ -366,10 +366,8 @@ get_latest_version()
 fmt_version()
 {
     local v="$1"
-    v=${v//[.-]/ }
-    v=${v/alpha/1}
-    v=${v/beta/2}
-    printf "%03d" $v
+    v=( ${v//[.-]/ } )
+    printf "%03d" ${v[0]} ${v[1]} ${v[2]}
 }
 
 update_ca_certificates()
