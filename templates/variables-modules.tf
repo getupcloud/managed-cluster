@@ -30,6 +30,7 @@ variable "modules_defaults" {
       falco-exporter  = object({ enabled = bool })
       node-setup      = object({ enabled = bool })
     })
+    istio               = object({ enabled = bool })
     kube-opex-analytics = object({ enabled = bool })
     kong                = object({ enabled = bool })
     kyverno = object({
@@ -132,6 +133,9 @@ variable "modules_defaults" {
       node-setup = {
         enabled = true
       }
+    }
+    istio = {
+      enabled = false
     }
     kong = {
       enabled = false

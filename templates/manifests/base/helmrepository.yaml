@@ -242,3 +242,12 @@ metadata:
 spec:
   interval: 1h
   url: https://charts.gitlab.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: istio
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://istio-release.storage.googleapis.com/charts

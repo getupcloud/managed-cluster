@@ -40,6 +40,9 @@
           "enabled": "${try(var.modules.falco.node-setup.enabled, var.modules_defaults.falco.node-setup.enabled)}"
         }
       },
+      "istio": {
+        "enabled": "${try(var.modules.istio.enabled, var.modules_defaults.istio.enabled)}"
+      },
       "kong": {
         "enabled": "${try(var.modules.kong.enabled, var.modules_defaults.kong.enabled)}"
       },
