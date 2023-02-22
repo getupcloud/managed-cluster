@@ -1,7 +1,8 @@
 %{ if modules.istio.enabled ~}
 
-## Istio
-########
+###########
+## Istio ##
+###########
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -117,8 +118,11 @@ spec:
     - effect: NoSchedule
       operator: Exists
 
-## Kiali
-########
+%{ if modules.istio.kiali.enabled ~}
+
+###########
+## Kiali ##
+###########
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -161,4 +165,39 @@ spec:
   auth:
     strategy: anonymous
 
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - ${ modules.istio.kiali.ingress.host }
+    port:
+      name: ${ modules.istio.kiali.ingress.port.name }
+      number: ${ modules.istio.kiali.ingress.port.number }
+      protocol: ${ modules.istio.kiali.ingress.port.protocol }
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  gateways:
+  - kiali
+  hosts:
+  - ${ modules.istio.kiali.ingress.host }
+  http:
+  - route:
+    - destination:
+        host: kiali
+        port:
+          number: 20001
+%{~ endif }
 %{~ endif }

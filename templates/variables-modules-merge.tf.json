@@ -41,7 +41,15 @@
         }
       },
       "istio": {
-        "enabled": "${try(var.modules.istio.enabled, var.modules_defaults.istio.enabled)}"
+        "enabled": "${try(var.modules.istio.enabled, var.modules_defaults.istio.enabled)}",
+        "kiali": {
+          "enabled": "${try(var.modules.istio.kiali.enabled, var.modules_defaults.istio.kiali.enabled)}",
+          "ingress": {
+            "name": "${try(var.modules.istio.kiali.ingress.name, var.modules_defaults.istio.kiali.ingress.name)}",
+            "number": "${try(var.modules.istio.kiali.ingress.number, var.modules_defaults.istio.kiali.ingress.number)}",
+            "protocol": "${try(var.modules.istio.kiali.ingress.protocol, var.modules_defaults.istio.kiali.ingress.protocol)}"
+          }
+        }
       },
       "kong": {
         "enabled": "${try(var.modules.kong.enabled, var.modules_defaults.kong.enabled)}"

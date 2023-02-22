@@ -30,7 +30,20 @@ variable "modules_defaults" {
       falco-exporter  = object({ enabled = bool })
       node-setup      = object({ enabled = bool })
     })
-    istio               = object({ enabled = bool })
+    istio = object({
+      enabled = bool
+      kiali = object({
+        enabled = bool
+        ingress = object({
+          host = string
+          port = object({
+            name     = string
+            number   = number
+            protocol = string
+          })
+        })
+      })
+    })
     kube-opex-analytics = object({ enabled = bool })
     kong                = object({ enabled = bool })
     kyverno = object({
@@ -136,6 +149,14 @@ variable "modules_defaults" {
     }
     istio = {
       enabled = false
+      kiali = {
+        enabled = false
+        ingress = {
+          name     = "kiali.example.com"
+          number   = 80
+          protocol = "HTTP"
+        }
+      }
     }
     kong = {
       enabled = false
