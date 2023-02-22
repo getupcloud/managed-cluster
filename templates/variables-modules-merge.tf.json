@@ -45,9 +45,12 @@
         "kiali": {
           "enabled": "${try(var.modules.istio.kiali.enabled, var.modules_defaults.istio.kiali.enabled)}",
           "ingress": {
-            "name": "${try(var.modules.istio.kiali.ingress.name, var.modules_defaults.istio.kiali.ingress.name)}",
-            "number": "${try(var.modules.istio.kiali.ingress.number, var.modules_defaults.istio.kiali.ingress.number)}",
-            "protocol": "${try(var.modules.istio.kiali.ingress.protocol, var.modules_defaults.istio.kiali.ingress.protocol)}"
+            "host": "${try(var.modules.istio.kiali.ingress.host, var.modules_defaults.istio.kiali.ingress.host)}",
+            "port": {
+              "name": "${try(var.modules.istio.kiali.ingress.port.name, var.modules_defaults.istio.kiali.ingress.port.name)}",
+              "number": "${try(var.modules.istio.kiali.ingress.port.number, var.modules_defaults.istio.kiali.ingress.port.number)}",
+              "protocol": "${try(var.modules.istio.kiali.ingress.port.protocol, var.modules_defaults.istio.kiali.ingress.port.protocol)}"
+            }
           }
         }
       },

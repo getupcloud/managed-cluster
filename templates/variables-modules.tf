@@ -152,9 +152,12 @@ variable "modules_defaults" {
       kiali = {
         enabled = false
         ingress = {
-          name     = "kiali.example.com"
-          number   = 80
-          protocol = "HTTP"
+          host = "kiali.example.com"
+          port = {
+            name     = "http"
+            number   = 80
+            protocol = "HTTP"
+          }
         }
       }
     }
