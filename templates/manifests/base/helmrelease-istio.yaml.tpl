@@ -1,4 +1,8 @@
 %{ if modules.istio.enabled ~}
+
+## Istio
+########
+
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -81,7 +85,7 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: istio-gateway
+  name: istio-ingressgateway
   namespace: flux-system
 spec:
   chart:
@@ -100,7 +104,7 @@ spec:
     remediation:
       retries: -1
   interval: 5m
-  releaseName: istio-gateway
+  releaseName: istio-ingressgateway
   storageNamespace: istio-system
   targetNamespace: istio-system
   dependsOn:
@@ -112,4 +116,49 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
+
+## Kiali
+########
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kiali-operator
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: kiali-operator
+      sourceRef:
+        kind: HelmRepository
+        name: kiali
+      version: "~> 1"
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: kiali-operator
+  storageNamespace: kiali-operator
+  targetNamespace: kiali-operator
+  values:
+    cr:
+      create: true
+      namespace: istio-system
+
+---
+apiVersion: kiali.io/v1alpha1
+kind: Kiali
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  auth:
+    strategy: anonymous
+
 %{~ endif }
