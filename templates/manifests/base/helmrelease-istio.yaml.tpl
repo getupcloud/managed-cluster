@@ -181,6 +181,8 @@ spec:
   releaseName: kiali
   storageNamespace: istio-system
   targetNamespace: istio-system
+  dependsOn:
+  - name: kiali-operator
   values:
     templates:
     - |-
