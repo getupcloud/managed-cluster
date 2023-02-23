@@ -156,48 +156,76 @@ spec:
       namespace: istio-system
 
 ---
-apiVersion: kiali.io/v1alpha1
-kind: Kiali
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
   name: kiali
-  namespace: istio-system
+  namespace: flux-system
 spec:
-  auth:
-    strategy: anonymous
+  chart:
+    spec:
+      chart: templater
+      sourceRef:
+        kind: HelmRepository
+        name: getupcloud
+      version: "~> 1"
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: kiali
+  storageNamespace: istio-system
+  targetNamespace: istio-system
+  values:
+    templates:
+    - |-
+      apiVersion: kiali.io/v1alpha1
+      kind: Kiali
+      metadata:
+        name: kiali
+        namespace: istio-system
+      spec:
+        auth:
+          strategy: anonymous
 
----
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  name: kiali
-  namespace: istio-system
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - ${ modules.istio.kiali.ingress.host }
-    port:
-      name: ${ modules.istio.kiali.ingress.port.name }
-      number: ${ modules.istio.kiali.ingress.port.number }
-      protocol: ${ modules.istio.kiali.ingress.port.protocol }
+    - |-
+      apiVersion: networking.istio.io/v1beta1
+      kind: Gateway
+      metadata:
+        name: kiali
+        namespace: istio-system
+      spec:
+        selector:
+          istio: ingressgateway
+        servers:
+        - hosts:
+          - ${ modules.istio.kiali.ingress.host }
+          port:
+            name: ${ modules.istio.kiali.ingress.port.name }
+            number: ${ modules.istio.kiali.ingress.port.number }
+            protocol: ${ modules.istio.kiali.ingress.port.protocol }
 
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
-  name: kiali
-  namespace: istio-system
-spec:
-  gateways:
-  - kiali
-  hosts:
-  - ${ modules.istio.kiali.ingress.host }
-  http:
-  - route:
-    - destination:
-        host: kiali
-        port:
-          number: 20001
+    - |-
+      apiVersion: networking.istio.io/v1beta1
+      kind: VirtualService
+      metadata:
+        name: kiali
+        namespace: istio-system
+      spec:
+        gateways:
+        - kiali
+        hosts:
+        - ${ modules.istio.kiali.ingress.host }
+        http:
+        - route:
+          - destination:
+              host: kiali
+              port:
+                number: 20001
 %{~ endif }
 %{~ endif }
