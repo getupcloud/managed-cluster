@@ -139,7 +139,7 @@ spec:
         name: kiali
       version: "~> 1"
   install:
-    createNamespace: false
+    createNamespace: true
     disableWait: false
     remediation:
       retries: -1
