@@ -154,12 +154,15 @@ spec:
     cr:
       create: true
       namespace: istio-system
+      spec:
+        auth:
+          strategy: anonymous
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: kiali
+  name: kiali-ingress
   namespace: flux-system
 spec:
   chart:
@@ -178,23 +181,13 @@ spec:
     remediation:
       retries: -1
   interval: 5m
-  releaseName: kiali
+  releaseName: kiali-ingress
   storageNamespace: istio-system
   targetNamespace: istio-system
   dependsOn:
   - name: kiali-operator
   values:
     templates:
-    - |-
-      apiVersion: kiali.io/v1alpha1
-      kind: Kiali
-      metadata:
-        name: kiali
-        namespace: istio-system
-      spec:
-        auth:
-          strategy: anonymous
-
     - |-
       apiVersion: networking.istio.io/v1beta1
       kind: Gateway
