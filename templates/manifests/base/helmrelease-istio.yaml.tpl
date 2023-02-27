@@ -201,9 +201,18 @@ spec:
         - hosts:
           - ${ modules.istio.kiali.ingress.host }
           port:
-            name: ${ modules.istio.kiali.ingress.port.name }
-            number: ${ modules.istio.kiali.ingress.port.number }
-            protocol: ${ modules.istio.kiali.ingress.port.protocol }
+            name: http
+            number: 80
+            protocol: HTTP
+        - hosts:
+          - ${ modules.istio.kiali.ingress.host }
+          port:
+            name: https
+            number: 443
+            protocol: HTTPS
+          tls:
+            credentialName: kiali-ingress-tls
+            mode: SIMPLE
 
     - |-
       apiVersion: networking.istio.io/v1beta1
