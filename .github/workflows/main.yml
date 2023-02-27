@@ -19,7 +19,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -45,6 +45,9 @@ jobs:
       run: docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-base:v${{ env.VERSION }}
       continue-on-error: true
 
+  build:
+    runs-on: ubuntu-latest
+    steps:
     - name: Build and push
       id: docker_build
       if: failure() && steps.pull_base_image.outcome == 'failure'    
