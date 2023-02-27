@@ -48,10 +48,10 @@ jobs:
   build:
     needs: prepare
     runs-on: ubuntu-latest
+    if: failure() && steps.pull_base_image.outcome == 'failure'   
     steps:
     - name: Build and push
       id: docker_build
-      if: failure() && steps.pull_base_image.outcome == 'failure'    
       uses: docker/build-push-action@v2
       with:
         context: .
