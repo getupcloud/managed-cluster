@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - "main"
+
+permissions:
+  packages: write
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Set variables
+      run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        
+    - name: Login to GHCR
+      uses: docker/login-action@v2
+      with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+    - name: Pull base image
+      id: pull_base_image
+      run: docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-base:v$VERSION
+      continue-on-error: true
+
+    - name: Build and push
+      id: docker_build
+      run: echo falhou step anterior
+      if: failure() && steps.pull_base_image.outcome == 'failure'    
+
+#    - name: Build and push
+#      id: docker_build
+#      uses: docker/build-push-action@v2
+#      if: failure() && steps.pull_base_image.outcome == 'failure'      
+#      with:
+#        context: .
+#        push: ${{ github.event_name != 'pull_request' }}
+#        tags: ${{ steps.meta.outputs.tags }}
+#        labels: ${{ steps.meta.outputs.labels }}
+#        build-args: ${{ inputs.build-args }}
+#
+#    - name: GHCR-Action
+#      uses: getupcloud/ghcr-action@v1
+#      with:
+#        token: ${{ secrets.GITHUB_TOKEN }}
+#        dockerfile: Dockerfile.centos8.base.x86_64
