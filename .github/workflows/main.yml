@@ -1,4 +1,4 @@
-name: ci
+name: Build and Push
 
 on: workflow_dispatch
   #push:
@@ -37,7 +37,7 @@ jobs:
           
     - name: Pull base image
       id: pull_base_image
-      run: docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-base:v$VERSION
+      run: docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}-base:v${{ env.VERSION }}
       continue-on-error: true
 
     - name: Build and push
