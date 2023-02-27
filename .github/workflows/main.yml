@@ -51,7 +51,7 @@ jobs:
         pull: true
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
-        tags: ${{ env.IMAGE }}-base:v${{ env.VERSION }} ${{ env.IMAGE_NAME }}-base:latest
+        tags: ${{ env.IMAGE }}-base:v${{ env.VERSION }},${{ env.IMAGE }}-base:latest
         
 #
 #    - name: GHCR-Action
