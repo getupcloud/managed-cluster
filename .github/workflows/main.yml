@@ -41,6 +41,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Pull (Base image)
+      id: docker_pull_base
+      run: docker pull ${{ env.IMAGE }}-base:${{ env.RELEASE }} || true
+
     - name: Build and push (Base image)
       id: docker_build_base
       uses: docker/build-push-action@v2
