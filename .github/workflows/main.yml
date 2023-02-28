@@ -29,9 +29,9 @@ jobs:
     - name: Set variables
       id: prep
       run: |-
-        echo ::set-output name=VERSION::$(cat version.txt)
-        echo ::set-output name=RELEASE::v$(cat version.txt)
-        echo ::set-output name=GIT_COMMIT::${GITHUB_SHA:0:7}
+        echo VERSION=$(cat version.txt) >> $GITHUB_OUTPUT
+        echo RELEASE=v$(cat version.txt) >> $GITHUB_OUTPUT
+        echo GIT_COMMIT=${GITHUB_SHA:0:7} >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
       id: buildx
