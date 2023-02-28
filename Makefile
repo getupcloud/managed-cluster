@@ -94,7 +94,11 @@ print-release:
 	@echo $(RELEASE)
 
 # Build and release from CI/CD (github actions for now)
-release: fmt lint check-git update-version tag-git push-git
+release: fmt lint check-git update-version
+	$(MAKE) git-release
+
+git-release: tag-git push-git
+	@echo Finished $(RELEASE) release
 
 # Locally build and release (manual process)
 local-release: fmt check-git update-version
