@@ -34,7 +34,8 @@ help:
 	@echo '  fmt:                Run terraform fmt. $(call print_targets,fmt)'
 	@echo '  import:             Download terraform variables from cluster repositories. $(call print_targets,import)'
 	@echo '  modules:            Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
-	@echo '  release:            Build and release a new version. $(call print_targets,release)'
+	@echo '  release:            Release a new version (source only). $(call print_targets,release)'
+	@echo '  local-release:      Build locally and release a new version. $(call print_targets,local-release)'
 	@echo '  test:               Run all tests from ./tests. $(call print_targets,test)'
 	@echo '  test-iter:          Iterable tests. $(call print_targets,test-iter)'
 	@echo '  test-help:          Show test options. $(call print_targets,test-help)'
@@ -92,7 +93,11 @@ build-base: check-version $(DOCKERFILE)
 print-release:
 	@echo $(RELEASE)
 
-release: fmt check-git update-version
+# Build and release from CI/CD (github actions for now)
+release: fmt lint check-git update-version tag-git push-git
+
+# Locally build and release (manual process)
+local-release: fmt check-git update-version
 	$(MAKE) build-release
 
 check-git:
