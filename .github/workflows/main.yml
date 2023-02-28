@@ -54,7 +54,7 @@ jobs:
       with:
         context: .
         builder: ${{ steps.buildx.outputs.name }}
-        file: Dockerfile.centos8.base.x86_64
+        file: Dockerfile
         pull: false
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
