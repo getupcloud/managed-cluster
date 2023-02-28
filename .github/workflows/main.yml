@@ -1,109 +1,75 @@
----
-#------------------------------------------------------
-#                        Header
-#------------------------------------------------------
-# Action name and Its triggers
-name: Check Dockerfile and Scan Image
+name: Build and Release
+
 on: workflow_dispatch
-# on:
-#   push:
-#     branches:
-#       - main
+  #push:
+  #  branches:
+  #    - "**"
+  #  tags:
+  #    - "v*.*.*"
+  #pull_request:
+  #  branches:
+  #   - "main"
 
-#------------------------------------------------------
-#                      Variables
-#------------------------------------------------------
+permissions:
+  packages: write
+  contents: read
+
 env:
-  container_name: "getupcloud/cluster"
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository }}
 
-#------------------------------------------------------
-#                 Beginning of the jobs
-#------------------------------------------------------
 jobs:
-  #----------------------------------------------------
-  #             Job 01 - Dockerfile Linter
-  #----------------------------------------------------
-  lint:
-    name: Dockerfile Linter
-    runs-on: ubuntu-20.04
-    continue-on-error: true
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
     steps:
-      #---------------------step 01-01-----------------
-      - name: Checkout
-        uses: actions/checkout@v2
-      #---------------------step 01-02-----------------
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile
-      #---------------------step 01-03-----------------
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile.centos8
-      #---------------------step 01-04-----------------
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile.centos8.base
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Set variables
+      id: prep
+      run: |-
+        echo ::set-output name=VERSION::$(cat version.txt)
+        echo ::set-output name=RELEASE::v$(cat version.txt)
+        echo ::set-output name=GIT_COMMIT::${GITHUB_SHA:0:7}
 
-  #----------------------------------------------------
-  #                 job 02 - Build Image
-  #----------------------------------------------------
-  build:
-    name: Build Image
-    needs: lint
-    runs-on: ubuntu-20.04
-    steps:
-      #---------------------step 02-01-----------------
-      - name: Checkout
-        uses: actions/checkout@v2
-      #---------------------step 02-02-----------------
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      #---------------------step 02-03-----------------
-      - name: Get Version
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-      #---------------------step 02-04-----------------        
-      - name: Build Image
-        run: |
-          make
-          docker save ${{ env.container_name }}:${{ env.VERSION }} > /tmp/image.tar
-      #---------------------step 02-05-----------------
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: image
-          path: /tmp/image.tar
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@master
 
-  #----------------------------------------------------
-  #            job 03 - Image Scan with Trivy
-  #----------------------------------------------------
-  scan:
-    name: Image Scan
-    needs: build
-    runs-on: ubuntu-20.04
-    steps:
-      #---------------------step 03-01-----------------
-      - name: Checkout code
-        uses: actions/checkout@v2
-      #---------------------step 03-02-----------------
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: image
-          path: /tmp
-      #---------------------step 03-03-----------------
-      - name: Load Image
-        run: |
-          docker load --input /tmp/image.tar
-      #---------------------step 03-04-----------------
-      - name: Get Version
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV          
-      #---------------------step 03-05-----------------
-      - name: Image Scan with Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.container_name }}:${{ env.VERSION }}
-          format: "table"
-          exit-code: "1"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+    - name: Login to GHCR
+      uses: docker/login-action@v2
+      with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-cache-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-cache-buildx
+
+    - name: Build and push
+      id: docker_build_base
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        builder: ${{ steps.buildx.outputs.name }}
+        file: Dockerfile.centos8.base.x86_64
+        pull: false
+        push: true
+        build-args: VERSION=${{ steps.prep.outputs.VERSION }} RELEASE=${{ steps.prep.outputs.RELEASE }} GIT_COMMIT=${{ steps.prep.outputs.GIT_COMMIT}}
+        tags: ${{ steps.prep.outputs.IMAGE }}-base:latest,${{ steps.prep.outputs.IMAGE }}-base:${{ steps.prep.outputs.RELEASE }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+    # Temp fix - cache grows too fast
+    # https://github.com/docker/build-push-action/issues/252
+    # https://github.com/moby/buildkit/issues/1896
+    - name: Move cache
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
