@@ -1,4 +1,4 @@
-FROM ghcr.io/getupcloud/managed-cluster-base:v1.5.55
+FROM quay.io/centos/centos:stream8
 
 ARG GIT_COMMIT
 ARG VERSION
