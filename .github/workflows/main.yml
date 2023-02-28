@@ -1,4 +1,4 @@
-name: Build and Push
+name: Build and Release
 
 on: workflow_dispatch
   #push:
@@ -19,7 +19,7 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  release:
+  name: Build and Release
   runs-on: ubuntu-latest
     steps:
     - name: Checkout
