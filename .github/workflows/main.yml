@@ -51,7 +51,7 @@ jobs:
       with:
         context: .
         file: Dockerfile.centos8.base.x86_64
-        pull: true
+        pull: false
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
         tags: ${{ env.IMAGE }}-base:latest,${{ env.IMAGE }}-base:${{ env.RELEASE }}
@@ -62,7 +62,7 @@ jobs:
       with:
         context: .
         file: Dockerfile.centos8
-        pull: true
+        pull: false
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
         tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ env.RELEASE }}
