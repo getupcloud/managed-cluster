@@ -29,9 +29,9 @@ jobs:
     - name: Set variables
       id: prep
       run: |-
-        echo VERSION=$(cat version.txt) >> $GITHUB_OUTPUT
-        echo RELEASE=v$(cat version.txt) >> $GITHUB_OUTPUT
-        echo GIT_COMMIT=${GITHUB_SHA:0:7} >> $GITHUB_OUTPUT
+        echo VERSION=$(cat version.txt) >> $GITHUB_ENV
+        echo RELEASE=v$(cat version.txt) >> $GITHUB_ENV
+        echo GIT_COMMIT=${GITHUB_SHA:0:7} >> $GITHUB_ENV
 
     - name: Set up Docker Buildx
       id: buildx
@@ -61,8 +61,8 @@ jobs:
         file: Dockerfile.centos8.base.x86_64
         pull: false
         push: true
-        build-args: VERSION=${{ steps.prep.outputs.VERSION }} RELEASE=${{ steps.prep.outputs.RELEASE }} GIT_COMMIT=${{ steps.prep.outputs.GIT_COMMIT}}
-        tags: ${{ steps.prep.outputs.IMAGE }}-base:latest,${{ steps.prep.outputs.IMAGE }}-base:${{ steps.prep.outputs.RELEASE }}
+        build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
+        tags: ${{ env.IMAGE }}-base:latest,${{ env.IMAGE }}-base:${{ env.RELEASE }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
