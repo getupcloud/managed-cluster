@@ -42,20 +42,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push
-      id: docker_build
+    - name: Build and push (Base image)
+      id: docker_build_base
       uses: docker/build-push-action@v2
       with:
         context: .
         file: Dockerfile.centos8.base.x86_64
         pull: true
+        push: false
+        build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
+        tags: ${{ env.IMAGE }}-base:v${{ env.VERSION }},${{ env.IMAGE }}-base:${{ env.VERSION }}
+
+    - name: Build and push (Final image)
+      id: docker_build_final
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: Dockerfile.centos8
+        pull: true
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
-        tags: ${{ env.IMAGE }}-base:v${{ env.VERSION }},${{ env.IMAGE }}-base:latest
-        
-#
-#    - name: GHCR-Action
-#      uses: getupcloud/ghcr-action@v1
-#      with:
-#        token: ${{ secrets.GITHUB_TOKEN }}
-#        dockerfile: Dockerfile.centos8.base.x86_64
+        tags: ${{ env.IMAGE }}:v${{ env.VERSION }},${{ env.IMAGE }}:${{ env.VERSION }}
