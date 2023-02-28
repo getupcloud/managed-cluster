@@ -51,7 +51,7 @@ jobs:
         pull: true
         push: false
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
-        tags: ${{ env.IMAGE }}-base:v${{ env.VERSION }},${{ env.IMAGE }}-base:${{ env.VERSION }}
+        tags: ${{ env.IMAGE }}-base:latest,${{ env.IMAGE }}-base:${{ env.VERSION }}
 
     - name: Build and push (Final image)
       id: docker_build_final
@@ -62,4 +62,4 @@ jobs:
         pull: true
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
-        tags: ${{ env.IMAGE }}:v${{ env.VERSION }},${{ env.IMAGE }}:${{ env.VERSION }}
+        tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ env.VERSION }}
