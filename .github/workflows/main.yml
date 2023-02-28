@@ -1,14 +1,10 @@
 name: Build and Release
 
-on: workflow_dispatch
-  #push:
-  #  branches:
-  #    - "**"
-  #  tags:
-  #    - "v*.*.*"
-  #pull_request:
-  #  branches:
-  #   - "main"
+#on: workflow_dispatch
+on:
+  push:
+    tags:
+      - "v*.*.*"
 
 permissions:
   packages: write
@@ -25,7 +21,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      
+
     - name: Set variables
       id: prep
       run: |-
