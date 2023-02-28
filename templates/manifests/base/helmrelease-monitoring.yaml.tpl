@@ -149,6 +149,30 @@ spec:
                 requests:
                   storage: 100Gi
 
+%{~if modules.istio.enabled }
+        additionalScrapeConfigs:
+        - job_name: 'istiod'
+          kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+              - istio-system
+          relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: istiod;http-monitoring
+
+        - job_name: 'envoy-stats'
+          metrics_path: /stats/prometheus
+          kubernetes_sd_configs:
+          - role: pod
+
+          relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_container_port_name]
+            action: keep
+            regex: '.*-envoy-prom'
+%{~ endif }
+
     alertmanager:
       alertmanagerSpec:
         replicas: 2
@@ -516,6 +540,17 @@ spec:
             options:
               path: /var/lib/grafana/dashboards/default
 
+%{~if modules.istio.enabled }
+          - name: istio
+            orgId: 1
+            folder: "Istio"
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/istio
+%{~ endif }
+
       dashboards:
         default:
 %{~if modules.linkerd.enabled }
@@ -600,10 +635,44 @@ spec:
             revision: 3
             datasource: prometheus
 %{ endif }
+%{~if modules.istio.enabled }
+        istio:
+          istio-controle-plane:
+            gnetId: 7645
+            datasource: prometheus
+            revision: 146
+          istio-mesh:
+            gnetId: 7639
+            datasource: prometheus
+            revision: 146
+          istio-performance:
+            gnetId: 11829
+            datasource: prometheus
+            revision: 146
+          istio-service:
+            gnetId: 7636
+            datasource: prometheus
+            revision: 146
+          istio-workload:
+            gnetId: 7630
+            datasource: prometheus
+            revision: 146
+          istio-wasm:
+            gnetId: 13277
+            datasource: prometheus
+            revision: 103
+%{ endif }
+
       adminUsername: ${ modules.monitoring.grafana.adminUsername }
       adminPassword: ${ modules.monitoring.grafana.adminPassword }
 
       grafana.ini:
+        alerting:
+          enabled: false
+
+        unified_alerting:
+          enabled: true
+
         auth.anonymous:
           enabled: false
           org_name: Main Org.

@@ -36,11 +36,6 @@ variable "modules_defaults" {
         enabled = bool
         ingress = object({
           host = string
-          port = object({
-            name     = string
-            number   = number
-            protocol = string
-          })
         })
       })
     })
@@ -153,11 +148,6 @@ variable "modules_defaults" {
         enabled = false
         ingress = {
           host = "kiali.example.com"
-          port = {
-            name     = "http"
-            number   = 80
-            protocol = "HTTP"
-          }
         }
       }
     }
