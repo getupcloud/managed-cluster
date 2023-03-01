@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: trivy-operator-polr-adapter
-      version: "~> 0.1"
+      version: "~> 0.3"
   dependsOn:
   - name: trivy-operator
   - name: policy-reporter
