@@ -6,12 +6,10 @@ ARCH                 := $(shell uname -m | tr '[:upper:]' '[:lower:]')
 
 IMAGE_HOST           ?= ghcr.io
 IMAGE_NAME           ?= getupcloud/managed-cluster
-IMAGE_BASE            = $(addsuffix /,$(IMAGE_HOST))$(IMAGE_NAME)-base
 IMAGE                 = $(addsuffix /,$(IMAGE_HOST))$(IMAGE_NAME)
 
 GIT_COMMIT           ?= $(shell git log --pretty=format:"%h" -n 1)
-DOCKERFILE           := Dockerfile.centos8
-DOCKERFILE_BASE      := Dockerfile.centos8.base.$(ARCH)
+DOCKERFILE           := Dockerfile
 DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION) --build-arg RELEASE=$(RELEASE)
 
 SEMVER_REGEX := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
@@ -82,13 +80,9 @@ templates/variables-modules-merge.tf.json: templates/variables-modules.tf
 show-modules-vars:
 	grep 'modules\.[^[:space:],)}]\+' -r templates/*/manifests  templates/manifests/ -oh | sort -u
 
-build: modules build-base
+build: modules
 	docker build -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
 	#buildah bud -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
-
-build-base: check-version $(DOCKERFILE)
-	docker build -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE) .
-	#buildah bud -f $(DOCKERFILE_BASE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE_BASE):$(RELEASE) .
 
 print-release:
 	@echo $(RELEASE)
@@ -127,12 +121,11 @@ check-tag:
 tag: tag-git tag-image
 
 tag-git:
-	git commit -m "Built release v$(VERSION)" $(VERSION_TXT) $(DOCKERFILE_BASE) $(DOCKERFILE)
+	git commit -m "Built release v$(VERSION)" $(VERSION_TXT)
 	git tag $(RELEASE)
 
 tag-image:
 	docker tag $(IMAGE):$(RELEASE) $(IMAGE):latest
-	docker tag $(IMAGE_BASE):$(RELEASE) $(IMAGE_BASE):latest
 
 push: push-git push-image
 
@@ -144,13 +137,6 @@ push-git:
 push-image:
 	docker push $(IMAGE):$(RELEASE)
 	docker push $(IMAGE):latest
-	docker push $(IMAGE_BASE):$(RELEASE)
-	docker push $(IMAGE_BASE):latest
-
-.PHONY: $(DOCKERFILE)
-
-$(DOCKERFILE):
-	sed -i -e "s|FROM .*|FROM $(IMAGE_BASE):$(RELEASE)|" $(DOCKERFILE)
 
 fmt:
 	terraform fmt -recursive
