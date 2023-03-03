@@ -10,11 +10,34 @@ ENV CLUSTER_DIR="/cluster" \
     REPO_DIR="/repo" \
     INSIDE_CONTAINER=true \
     TERM="xterm-256color" \
-    PATH=$PATH:/opt/krew/bin
+    PATH=$PATH:/opt/krew/bin \
+    DOCTL_VERSION="1.63.1" \
+    FLUX_VERSIONS="v0.15.3" \
+    GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
+    HCL2JSON_VERSION="v0.3.3" \
+    KIND_VERSION="v0.11.1" \
+    KREW_PLUGINS="access-matrix deprecations explore get-all kurt kvaps/node-shell lineage modify-secret outdated score sniff tree" \
+    KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
+    KREW_VERSION="v0.4.2" \
+    KREW_ROOT="/opt/krew" \
+    KUBECONFIG="${CLUSTER_DIR}/.kube/config" \
+    KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
+    OC_VERSION="4.11.0-0.okd-2022-12-02-145640" \
+    OSH="/etc/oh-my-bash" \
+    TERRAFORM_VERSION="1.0.9" \
+    TF_DATA_DIR="${CLUSTER_DIR}/.terraform" \
+    TF_IN_AUTOMATION="true" \
+    TF_LOG="INFO" \
+    TF_LOG_PROVIDER="INFO" \
+    TF_LOG_CORE="WARN" \
+    TF_LOG_PATH="${CLUSTER_DIR}/terraform.log" \
+    TF_PLAN_FILE="${CLUSTER_DIR}/terraform.tfplan" \
+    TF_VARS_FILE="${CLUSTER_DIR}/terraform.tfvars" \
+    VELERO_VERSION="1.6.2" \
+    PATH="$PATH:$KREW_ROOT/bin"
+
 
 WORKDIR $CLUSTER_DIR
-
-COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
 
 RUN dnf install -y 'dnf-command(config-manager)' && \
     dnf config-manager --set-enabled powertools && \
@@ -44,9 +67,9 @@ RUN alternatives --set python3 /usr/bin/python3.8 && \
         | sudo tar xzvf - -C /usr/local/bin && \
     curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
-        unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
-        rm -f op_linux_amd64_v1.12.3.zip
+#RUN curl -kLO https://cache.agilebits.com/dist/1P/op/pkg/v1.12.3/op_linux_amd64_v1.12.3.zip && \
+#        unzip op_linux_amd64_v1.12.3.zip -d /usr/local/bin && \
+#        rm -f op_linux_amd64_v1.12.3.zip
 
 RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh > /etc/oci-install.sh && \
     chmod +x /etc/oci-install.sh && \
@@ -54,39 +77,12 @@ RUN curl -skL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/in
         --install-dir /opt/oci \
         --exec-dir /usr/local/bin/ \
         --script-dir /usr/local/bin/ \
-        --rc-file-path /etc/profile.d/oci.sh
-
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+        --rc-file-path /etc/profile.d/oci.sh && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     sudo ./aws/install && \
     rm -rf aws awscliv2.zip && \
     aws --version
-
-ENV \
-    DOCTL_VERSION="1.63.1" \
-    FLUX_VERSIONS="v0.15.3" \
-    GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
-    HCL2JSON_VERSION="v0.3.3" \
-    KIND_VERSION="v0.11.1" \
-    KREW_PLUGINS="access-matrix deprecations explore get-all kurt kvaps/node-shell lineage modify-secret outdated score sniff tree" \
-    KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
-    KREW_VERSION="v0.4.2" \
-    KREW_ROOT="/opt/krew" \
-    KUBECONFIG="${CLUSTER_DIR}/.kube/config" \
-    KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
-    OC_VERSION="4.11.0-0.okd-2022-12-02-145640" \
-    OSH="/etc/oh-my-bash" \
-    TERRAFORM_VERSION="1.0.9" \
-    TF_DATA_DIR="${CLUSTER_DIR}/.terraform" \
-    TF_IN_AUTOMATION="true" \
-    TF_LOG="INFO" \
-    TF_LOG_PROVIDER="INFO" \
-    TF_LOG_CORE="WARN" \
-    TF_LOG_PATH="${CLUSTER_DIR}/terraform.log" \
-    TF_PLAN_FILE="${CLUSTER_DIR}/terraform.tfplan" \
-    TF_VARS_FILE="${CLUSTER_DIR}/terraform.tfvars" \
-    VELERO_VERSION="1.6.2" \
-    PATH="$PATH:$KREW_ROOT/bin"
 
 RUN cd /usr/local/bin && \
     curl -skLO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
@@ -154,7 +150,7 @@ RUN cd /etc/profile.d && \
 
 COPY root/ /
 COPY root/etc/skel/ /root/
-COPY Dockerfile.* /
+COPY Dockerfile /
 
 RUN echo $VERSION > /.version && \
     echo $RELEASE > /.release && \

@@ -1,3 +1,4 @@
+repo.conf
 cluster.conf
 clusters
 **/.terraform
