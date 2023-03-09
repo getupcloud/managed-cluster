@@ -109,6 +109,8 @@ function usage()
         echo "${COLOR_BOLD}$COLOR_GREEN"
         echo "  -> update" "$COLOR_RESET${COLOR_BOLD}"
         echo "     Fetch 'upstream' remote and merge from a newer version." "$COLOR_RESET"
+        echo
+        echo "         --force                    Force version check."
     fi
 
     if [ -z "$_command" ] || [ "$_command" == "sync_template" ]; then
@@ -1328,6 +1330,9 @@ function getopt_update()
             -h|--help)
                 usage
             ;;
+            -f|--force)
+                force=true
+            ;;
             *)
                 invalid_argument $1
         esac
@@ -1420,7 +1425,11 @@ function check_update()
         'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
         | jq '.[0].name' -r | cut -c 2-)
 
-    if [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
+    if $force; then
+        warn "Forcing update"
+    fi
+
+    if $force || [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
         has_updates=true
         if _default=n ask "Remote repo has newer version (latest local: v$latest_local_version, latest remote: v$latest_remote_version). Download now? [y/N]"; then
             repo_fetch_remote upstream
@@ -1428,7 +1437,7 @@ function check_update()
         fi
     fi
 
-    if [ "$(fmt_version $latest_local_version)" -gt "$(fmt_version $version)" ]; then
+    if $force || [ "$(fmt_version $latest_local_version)" -gt "$(fmt_version $version)" ]; then
         has_updates=true
         if _default=n ask "Upgrade to newer version ${latest_local_version}? [y/N]"; then
             ask_execute_command git merge v${latest_local_version} -Xtheirs
