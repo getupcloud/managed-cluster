@@ -8,9 +8,10 @@ SHELL ["/bin/bash", "-x", "-c"]
 
 ENV CLUSTER_DIR="/cluster" \
     REPO_DIR="/repo" \
-    INSIDE_CONTAINER=true \
-    TERM="xterm-256color" \
-    PATH=$PATH:/opt/krew/bin \
+    KREW_ROOT="/opt/krew" \
+    INSIDE_CONTAINER="true"
+
+ENV TERM="xterm-256color" \
     DOCTL_VERSION="1.63.1" \
     FLUX_VERSIONS="v0.15.3" \
     GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
@@ -19,7 +20,6 @@ ENV CLUSTER_DIR="/cluster" \
     KREW_PLUGINS="access-matrix deprecations explore get-all kurt kvaps/node-shell lineage modify-secret outdated score sniff tree" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.2" \
-    KREW_ROOT="/opt/krew" \
     KUBECONFIG="${CLUSTER_DIR}/.kube/config" \
     KUBECTL_VERSIONS="v1.18.18 v1.19.10 v1.20.6 v1.21.0" \
     OC_VERSION="4.11.0-0.okd-2022-12-02-145640" \
