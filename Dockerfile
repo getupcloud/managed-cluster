@@ -36,6 +36,7 @@ ENV CLUSTER_DIR="/cluster" \
     VELERO_VERSION="1.6.2" \
     PATH="$PATH:$KREW_ROOT/bin"
 
+COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
 
 WORKDIR $CLUSTER_DIR
 
