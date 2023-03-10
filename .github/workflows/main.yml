@@ -1,7 +1,7 @@
 name: Build and Release
 
-#on: workflow_dispatch
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*.*.*"
@@ -44,9 +44,9 @@ jobs:
       uses: actions/cache@v2
       with:
         path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-cache-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-cache-buildx
+        key: ${{ runner.os }}-cache-buildx
+        #restore-keys: |
+        #  ${{ runner.os }}-cache-buildx
 
     - name: Build and push
       id: build
