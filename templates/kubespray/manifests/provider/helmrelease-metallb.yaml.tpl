@@ -28,9 +28,11 @@ spec:
   targetNamespace: metallb
   values:
     prometheus:
+      namespace: monitoring
+      serviceAccount: monitoring-kube-prometheus-prometheus
       serviceMonitor:
         enabled: true
-        interval: 5m
+        # interval: 5m ## waiting for https://github.com/metallb/metallb/pull/1857
       prometheusRule:
         enabled: true
 
@@ -59,23 +61,54 @@ spec:
         - effect: NoSchedule
           operator: Exists
 ---
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
-  name: metallb
-  namespace: metallb
+  name: metallb-config
+  namespace: flux-system
 spec:
-  addresses:
-%{~ for range in modules.metallb.addresses }
-  - %{ range }
-%{~ endfor }
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: metallb
-  namespace: metallb
-spec:
-  ipAddressPools:
-  - metallb
+  chart:
+    spec:
+      chart: templater
+      sourceRef:
+        kind: HelmRepository
+        name: getupcloud
+      version: "~> 1"
+  dependsOn:
+    - name: metallb
+  install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: metallb-config
+  storageNamespace: metallb
+  targetNamespace: metallb
+  values:
+    templates:
+    - |-
+      apiVersion: metallb.io/v1beta1
+      kind: IPAddressPool
+      metadata:
+        name: metallb
+        namespace: metallb
+      spec:
+        addresses:
+      %{~ for range in modules.metallb.addresses }
+        - ${ range }
+      %{~ endfor }
+    - |-
+      apiVersion: metallb.io/v1beta1
+      kind: L2Advertisement
+      metadata:
+        name: metallb
+        namespace: metallb
+      spec:
+        ipAddressPools:
+        - metallb
 %{~ endif }
