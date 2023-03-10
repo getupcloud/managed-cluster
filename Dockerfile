@@ -1,9 +1,5 @@
 FROM quay.io/centos/centos:stream8
 
-ARG GIT_COMMIT
-ARG VERSION
-ARG RELEASE
-
 SHELL ["/bin/bash", "-x", "-c"]
 
 ENV CLUSTER_DIR="/cluster" \
@@ -152,6 +148,10 @@ RUN cd /etc/profile.d && \
 COPY root/ /
 COPY root/etc/skel/ /root/
 COPY Dockerfile /
+
+ARG GIT_COMMIT
+ARG VERSION
+ARG RELEASE
 
 RUN echo $VERSION > /.version && \
     echo $RELEASE > /.release && \
