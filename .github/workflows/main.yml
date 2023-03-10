@@ -40,32 +40,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-cache-buildx
-        #restore-keys: |
-        #  ${{ runner.os }}-cache-buildx
-
     - name: Build and push
       id: build
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v4
       with:
         context: .
         builder: ${{ steps.buildx.outputs.name }}
         file: Dockerfile
-        pull: false
         push: true
         build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
         tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ env.RELEASE }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new
-
-    # Temp fix - cache grows too fast
-    # https://github.com/docker/build-push-action/issues/252
-    # https://github.com/moby/buildkit/issues/1896
-    - name: Move cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
