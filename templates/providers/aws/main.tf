@@ -31,5 +31,5 @@ module "ebs-csi" {
   source = "github.com/getupcloud/terraform-module-aws-ebs-csi?ref=v0.1"
 
   cluster_name            = var.cluster_name
-  cluster_oidc_issuer_url = var.modules.velero.cluster_oidc_issuer_url
+  cluster_oidc_issuer_url = var.modules.ebs-csi.cluster_oidc_issuer_url
 }
