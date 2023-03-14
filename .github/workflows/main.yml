@@ -48,7 +48,10 @@ jobs:
         builder: ${{ steps.buildx.outputs.name }}
         file: Dockerfile
         push: true
-        build-args: VERSION=${{ env.VERSION }} RELEASE=${{ env.RELEASE }} GIT_COMMIT=${{ env.GIT_COMMIT}}
+        build-args: |
+          VERSION=${{ env.VERSION }}
+          RELEASE=${{ env.RELEASE }}
+          GIT_COMMIT=${{ env.GIT_COMMIT}}
         tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ env.RELEASE }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
