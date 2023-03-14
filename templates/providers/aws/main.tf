@@ -25,3 +25,11 @@ module "velero" {
   tags                      = var.modules.velero.tags
   bucket_name               = var.modules.velero.bucket_name
 }
+
+module "ebs-csi" {
+  count  = var.modules.ebs-csi.enabled ? 1 : 0
+  source = "github.com/getupcloud/terraform-module-aws-ebs-csi?ref=v0.1"
+
+  cluster_name            = var.cluster_name
+  cluster_oidc_issuer_url = var.modules.velero.cluster_oidc_issuer_url
+}

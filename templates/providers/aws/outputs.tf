@@ -5,3 +5,7 @@ output "cert-manager" {
 output "velero" {
   value = var.modules.velero.enabled ? module.velero[0] : {}
 }
+
+output "ebs-csi" {
+  value = var.modules.ebs-csi.enabled ? module.ebs-csi[0] : {}
+}
