@@ -104,6 +104,9 @@
           },
           "adminUsername": "${try(var.modules.monitoring.grafana.adminUsername, var.modules_defaults.monitoring.grafana.adminUsername)}",
           "adminPassword": "${try(var.modules.monitoring.grafana.adminPassword, var.modules_defaults.monitoring.grafana.adminPassword)}"
+        },
+        "tempo": {
+          "enabled": "${try(var.modules.monitoring.tempo.enabled, var.modules_defaults.monitoring.tempo.enabled)}"
         }
       },
       "podinfo": {

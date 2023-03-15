@@ -85,6 +85,9 @@ variable "modules_defaults" {
         adminUsername = string
         adminPassword = string
       })
+      tempo = object({
+        enabled  = bool
+      })
     })
     podinfo = object({
       enabled  = bool
@@ -206,6 +209,9 @@ variable "modules_defaults" {
         }
         adminUsername = "admin"
         adminPassword = "prom-operator"
+      }
+      tempo = {
+        enabled = false
       }
     }
     podinfo = {

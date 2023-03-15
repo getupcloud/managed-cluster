@@ -19,6 +19,7 @@ resources:
 - helmrelease-monitoring.yaml
 - helmrelease-policy-reporter.yaml
 - helmrelease-teleport-agent.yaml
+- helmrelease-tempo.yaml
 - helmrelease-trivy-operator-polr-adapter.yaml
 - helmrelease-trivy-operator.yaml
 - helmrelease-velero.yaml

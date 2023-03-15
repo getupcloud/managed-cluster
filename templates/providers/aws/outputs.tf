@@ -1,11 +1,11 @@
 output "cert-manager" {
-  value = var.modules.cert-manager.enabled ? module.cert-manager[0] : {}
+  value = try(var.modules.cert-manager.enabled, false) ? module.cert-manager[0] : {}
 }
 
 output "velero" {
-  value = var.modules.velero.enabled ? module.velero[0] : {}
+  value = try(var.modules.velero.enabled, false) ? module.velero[0] : {}
 }
 
 output "ebs-csi" {
-  value = var.modules.ebs-csi.enabled ? module.ebs-csi[0] : {}
+  value = try(var.modules.ebs-csi.enabled, false) ? module.ebs-csi[0] : {}
 }
