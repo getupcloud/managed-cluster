@@ -27,9 +27,10 @@ def verify_dir(dir):
     k = load(open(k_path, 'r'), Loader=Loader)
     res = k.get('resources', None) or []
     psm = k.get('patchesStrategicMerge', None) or []
+    pp = [ p['path'] for p in k.get('patches', []) if 'path' in p ]
     resources = sorted([
         os.path.abspath(PurePath(dir, r))
-        for r in (res + psm)
+        for r in (res + psm + pp)
     ])
     files = sorted([
         os.path.abspath(f) for f in glob.glob(os.path.join(dir, "*"))
