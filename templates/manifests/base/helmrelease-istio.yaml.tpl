@@ -61,6 +61,10 @@ spec:
   dependsOn:
   - name: istio-base
   values:
+    meshConfig:
+      accessLogFile: /dev/stdout
+      accessLogEncoding: TEXT
+
     pilot:
       nodeSelector:
         node-role.kubernetes.io/infra: ""
