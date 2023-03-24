@@ -137,6 +137,10 @@ spec:
 
       snippets:
         extraRelabelConfigs:
+        # keep all kubernetes labels
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        # remove hashing labels in order to decrease cardinality
         - action: labeldrop
           regex: __meta_kubernetes_pod_label_.*_hash
 
