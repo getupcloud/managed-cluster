@@ -86,7 +86,7 @@ variable "modules_defaults" {
         adminPassword = string
       })
       tempo = object({
-        enabled  = bool
+        enabled = bool
       })
     })
     podinfo = object({
