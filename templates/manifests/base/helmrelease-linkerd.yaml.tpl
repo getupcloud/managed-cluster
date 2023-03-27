@@ -150,7 +150,7 @@ spec:
           request: 10m
         memory:
           limit: 50Mi
-          request: 10Mi
+          request: 15Mi
 
     podMonitor:
       enabled: true
