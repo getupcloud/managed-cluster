@@ -1,3 +1,4 @@
+%{~ if modules.linkerd.enabled }
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -5,3 +6,4 @@ metadata:
   namespace: linkerd-viz
 spec:
   ingressClassName: openshift-default
+%{~ endif }

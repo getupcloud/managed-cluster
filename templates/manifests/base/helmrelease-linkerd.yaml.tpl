@@ -147,10 +147,10 @@ spec:
       resources:
         cpu:
           limit: 100m
-          request: 10m
+          #request: 10m
         memory:
           limit: 50Mi
-          request: 15Mi
+          #request: 15Mi
 
     podMonitor:
       enabled: true
