@@ -553,7 +553,7 @@ spec:
 
       dashboards:
         default:
-%{~if modules.linkerd.enabled }
+%{~if modules.trivy.enabled }
           trivy-image-vulnerability:
             gnetId: 17214
             revision: 1
