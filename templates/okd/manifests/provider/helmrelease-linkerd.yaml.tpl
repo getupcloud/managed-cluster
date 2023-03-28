@@ -1,4 +1,4 @@
-%{~ if modules.linkerd.enabled }
+%{~ if modules.linkerd.enabled && modules.linkerd.linkerd-viz.enabled}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
