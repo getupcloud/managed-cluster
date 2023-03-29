@@ -61,3 +61,23 @@ spec:
         type: gp3
       annotations:
         storageclass.kubernetes.io/is-default-class: "true"
+    sidecars:
+      attacher:
+        image:
+          repository: registry.k8s.io/sig-storage/csi-attacher
+      livenessProbe:
+        image:
+          repository: registry.k8s.io/sig-storage/livenessprobe 
+      nodeDriverRegistrar:
+        image:
+          repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
+      provisioner:
+        image:
+          repository: registry.k8s.io/sig-storage/csi-provisioner 
+      resizer:
+        image:
+          repository: registry.k8s.io/sig-storage/csi-resizer
+      snapshotter:
+        image:
+          repository: registry.k8s.io/sig-storage/csi-snapshotter
+

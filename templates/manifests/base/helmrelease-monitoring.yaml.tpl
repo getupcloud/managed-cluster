@@ -741,6 +741,8 @@ spec:
           maxUnavailable: "20%"
 
     kube-state-metrics:
+      image:
+        repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
       tolerations:
       - operator: Exists
         effect: NoSchedule
