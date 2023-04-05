@@ -28,8 +28,8 @@ spec:
     secret:
       name: ecr-credentials
       ## Use empty object {} to copy secret.name to all namespaces
-      namespaceLabelSelector:
-        app.kubernetes.io/instance: flux-system
+      #namespaceLabelSelector:
+      #  app.kubernetes.io/instance: flux-system
     awsAccountId: "${aws.account_id}"
     ecr:
       region: "${aws.region}"
