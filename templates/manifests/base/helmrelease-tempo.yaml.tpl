@@ -57,4 +57,7 @@ spec:
     tempo:
       multitenancyEnabled: false
       retention: 48h
+      metricsGenerator:
+        enabled: true
+        remoteWriteUrl: "http://monitoring-kube-prometheus-prometheus:9090/api/v1/write"
 %{~ endif ~}

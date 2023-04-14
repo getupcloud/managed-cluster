@@ -78,12 +78,12 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
         hosts:
           - ${ modules.monitoring.prometheus.ingress.host }
-        %{ if modules.monitoring.prometheus.ingress.scheme == "https" }
+        %{~ if modules.monitoring.prometheus.ingress.scheme == "https" }
         tls:
         - hosts:
           - ${ modules.monitoring.prometheus.ingress.host }
           secretName: prometheus-ingress-tls
-        %{ endif }
+        %{~ endif }
 
       prometheusSpec:
         replicas: 1
@@ -148,6 +148,10 @@ spec:
               resources:
                 requests:
                   storage: 100Gi
+
+%{~ if modules.monitoring.tempo.enabled }
+        enableRemoteWriteReceiver: true
+%{~ endif }
 
 %{~if modules.istio.enabled }
         additionalScrapeConfigs:
@@ -505,18 +509,11 @@ spec:
         datasources.yaml:
           apiVersion: 1
           datasources:
-          - name: prometheus
-            type: prometheus
-            access: proxy
-            orgId: 1
-            url: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090/
-            isDefault: false
-            jsonData:
-              timeInterval: "5s"
-            editable: true
           %{~ if modules.logging.enabled }
           - name: Loki
             type: loki
+            uid: loki
+            editable: true
             url: http://loki.logging.svc:3100
             basicAuth: false
             access: proxy
@@ -525,6 +522,54 @@ spec:
               maxLines: 5000
               manageAlerts: false
               timeout: 60
+              derivedFields:
+              - datasourceUid: tempo
+                matcherRegex: "traceID=(\\w+)"
+                name: TraceID
+                url: "$$${__value.raw}"
+          %{~ endif }
+          %{~ if modules.monitoring.tempo.enabled }
+          - name: Tempo
+            type: tempo
+            uid: tempo
+            editable: true
+            url: http://tempo:3100
+            basicAuth: false
+            access: proxy
+            isDefault: false
+            jsonData:
+              timeout: 60
+              httpMethod: GET
+              tracesToLogs:
+                datasourceUid: loki
+                mapTagNamesEnabled: true
+                mappedTags:
+                - key: host.name
+                  value: pod
+                spanStartTimeShift: '-15m'
+                spanEndTimeShift: '15m'
+                filterByTraceID: true
+                filterBySpanID: false
+              tracesToMetrics:
+                datasourceUid: prometheus
+                tags:
+                - key: host.name
+                  value: pod
+                spanStartTimeShift: '-15m'
+                spanEndTimeShift: '15m'
+                queries:
+                - name: 'Pod CPU'
+                  query: 'sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{$$$__tags, container!="POD"}) by (container)'
+                - name: 'Pod Memory'
+                  query: 'sum(container_memory_working_set_bytes{$$$__tags, job="kubelet", metrics_path="/metrics/cadvisor", container!="POD", image!=""}) by (container)'
+              serviceMap:
+                datasourceUid: prometheus
+              search:
+                hide: false
+              nodeGraph:
+                enabled: true
+              lokiSearch:
+                datasourceUid: loki
           %{~ endif }
 
       dashboardProviders:
@@ -553,7 +598,7 @@ spec:
 
       dashboards:
         default:
-%{~if modules.trivy.enabled }
+%{~if modules.linkerd.enabled }
           trivy-image-vulnerability:
             gnetId: 17214
             revision: 1
@@ -634,7 +679,7 @@ spec:
             gnetId: 15488
             revision: 3
             datasource: prometheus
-%{ endif }
+%{~ endif }
 %{~if modules.istio.enabled }
         istio:
           istio-controle-plane:
@@ -661,7 +706,7 @@ spec:
             gnetId: 13277
             datasource: prometheus
             revision: 103
-%{ endif }
+%{~ endif }
 
       adminUsername: ${ modules.monitoring.grafana.adminUsername }
       adminPassword: ${ modules.monitoring.grafana.adminPassword }
@@ -673,16 +718,22 @@ spec:
         unified_alerting:
           enabled: true
 
+        feature_toggles:
+          traceToMetrics: true
+
         auth.anonymous:
           enabled: false
           org_name: Main Org.
           org_role: Admin
+
         auth:
           disable_login_form: false
           disable_signout_menu: false
+
         auth.basic:
           # enabled=true is required by grafana config-reloader
           enabled: true
+
         # Admin user/pass comes from a secret
         #security:
         #  admin_user: admin
@@ -700,12 +751,12 @@ spec:
     #      nginx.ingress.kubernetes.io/auth-type: basic
         hosts:
           - ${ modules.monitoring.grafana.ingress.host }
-        %{ if modules.monitoring.grafana.ingress.scheme == "https" }
+        %{~ if modules.monitoring.grafana.ingress.scheme == "https" }
         tls:
         - hosts:
           - ${ modules.monitoring.grafana.ingress.host }
           secretName: grafana-ingress-tls
-        %{ endif }
+        %{~ endif }
 
     kubeApiServer:
       enabled: false
@@ -741,8 +792,6 @@ spec:
           maxUnavailable: "20%"
 
     kube-state-metrics:
-      image:
-        repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
       tolerations:
       - operator: Exists
         effect: NoSchedule
