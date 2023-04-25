@@ -24,6 +24,7 @@ module "eks" {
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
+  flux_install_file       = var.flux_install_file
   manifests_template_vars = local.manifests_template_vars
 
   # provider specific

@@ -66,6 +66,12 @@ variable "flux_version" {
   default     = "v0.35.0"
 }
 
+variable "flux_install_file" {
+  description = "Use this file to install flux instead default files. Using this options will ignore var.flux_version"
+  type        = string
+  default     = ""
+}
+
 variable "flux_wait" {
   description = "Wait for all manifests to apply"
   type        = bool
