@@ -227,8 +227,6 @@ variable "modules_defaults" {
           className     = "nginx"
           clusterIssuer = ""
         }
-        adminUsername = "admin"
-        adminPassword = "prom-operator"
       }
       tempo = {
         enabled = false
