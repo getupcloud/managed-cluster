@@ -66,6 +66,7 @@ spec:
         type: ClusterIP
         loadBalancerIP: null
         sessionAffinity: ClientIP
+
       ingress:
         enabled: ${ modules.monitoring.prometheus.ingress.enabled }
         ingressClassName: ${ modules.monitoring.prometheus.ingress.className }
@@ -90,6 +91,9 @@ spec:
         retention: 7d
         scrapeInterval: 30s
         enableAdminAPI: true
+
+        enableFeatures:
+        - exemplar-storage
 
         resources:
           limits:
@@ -216,20 +220,23 @@ spec:
         sessionAffinity: ClientIP
 
       ingress:
-        enabled: false
+        enabled: ${ modules.monitoring.alertmanager.ingress.enabled }
+        ingressClassName: ${ modules.monitoring.alertmanager.ingress.className }
         annotations:
-    #      kubernetes.io/ingress.class: nginx
+        %{~ if modules.monitoring.alertmanager.ingress.clusterIssuer != "" }
+          cert-manager.io/cluster-issuer: ${ modules.monitoring.alertmanager.ingress.clusterIssuer }
+        %{~ endif }
     #      nginx.ingress.kubernetes.io/auth-realm: Authentication Required - Monitoring
     #      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     #      nginx.ingress.kubernetes.io/auth-type: basic
-    #      cert-manager.io/cluster-issuer: letsencrypt-staging-http01
         hosts:
-          - alertmanager.example.com
-    #    tls:
-    #    - hosts:
-    #      - alertmanager.example.com
-    #      secretName: lertmanager-ingress-tls
-
+          - ${ modules.monitoring.alertmanager.ingress.host }
+        %{~ if modules.monitoring.alertmanager.ingress.scheme == "https" }
+        tls:
+        - hosts:
+          - ${ modules.monitoring.alertmanager.ingress.host }
+          secretName: alertmanager-ingress-tls
+        %{~ endif }
 
       config:
         global:
@@ -457,6 +464,13 @@ spec:
     grafana:
       image:
         tag: 8.5.15
+
+      sidecar:
+        datasources:
+          exemplarTraceIdDestinations:
+            datasourceUid: tempo
+            traceIdLabelName: traceID
+
       service:
         type: ClusterIP
         sessionAffinity: ClientIP
@@ -497,13 +511,7 @@ spec:
           cpu: 50m
           memory: 128Mi
 
-      env:
-        GF_EXPLORE_ENABLED: "true"
-
-      plugins:
-        - grafana-kubernetes-app
-        - camptocamp-prometheus-alertmanager-datasource
-        - grafana-clock-panel
+      env: {}
 
       datasources:
         datasources.yaml:
@@ -519,7 +527,7 @@ spec:
             access: proxy
             isDefault: false
             jsonData:
-              maxLines: 5000
+              maxLines: 2000
               manageAlerts: false
               timeout: 60
               derivedFields:
@@ -774,7 +782,6 @@ spec:
     nodeExporter:
       enabled: true
 
-
     prometheus-node-exporter:
       #priorityClassName: high-priority
 
@@ -792,6 +799,9 @@ spec:
           maxUnavailable: "20%"
 
     kube-state-metrics:
+      extraArgs:
+      - --metric-labels-allowlist=nodes=[eks.amazonaws.com/capacityType]
+
       tolerations:
       - operator: Exists
         effect: NoSchedule

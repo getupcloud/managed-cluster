@@ -15,4 +15,5 @@ patchesStrategicMerge:
 - helmrelease-cluster-autoscaler.yaml
 - helmrelease-external-dns.yaml
 - helmrelease-ingress-nginx.yaml
+- helmrelease-monitoring.yaml
 - helmrelease-velero.yaml

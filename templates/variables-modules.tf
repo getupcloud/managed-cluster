@@ -85,6 +85,15 @@ variable "modules_defaults" {
         adminUsername = string
         adminPassword = string
       })
+      alertmanager = object({
+        ingress = object({
+          enabled       = bool
+          scheme        = string
+          host          = string
+          className     = string
+          clusterIssuer = string
+        })
+      })
       tempo = object({
         enabled = bool
       })
@@ -204,6 +213,17 @@ variable "modules_defaults" {
           enabled       = false
           scheme        = "https"
           host          = "grafana.example.com"
+          className     = "nginx"
+          clusterIssuer = ""
+        }
+        adminUsername = "admin"
+        adminPassword = "prom-operator"
+      }
+      alertmanager = {
+        ingress = {
+          enabled       = false
+          scheme        = "https"
+          host          = "alertmanager.example.com"
           className     = "nginx"
           clusterIssuer = ""
         }
