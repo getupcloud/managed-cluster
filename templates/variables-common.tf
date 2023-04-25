@@ -47,6 +47,7 @@ variable "customer_name" {
 variable "cluster_provider" {
   description = "Cluster provider name"
   type        = string
+  default     = "none"
 
   validation {
     condition     = contains(["aws", "azure", "do", "gcp", "none", "oci"], var.cluster_provider)
