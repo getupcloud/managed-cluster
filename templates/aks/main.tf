@@ -44,6 +44,7 @@ module "aks" {
   sku_tier             = var.sku_tier
   tags                 = var.tags
   tenant_id            = var.tenant_id
+  outbound_type        = var.outbound_type
 
   private_cluster_enabled                           = var.private_cluster_enabled
   api_server_authorized_ip_ranges                   = var.api_server_authorized_ip_ranges
