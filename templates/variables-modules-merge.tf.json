@@ -105,6 +105,17 @@
           "adminUsername": "${try(var.modules.monitoring.grafana.adminUsername, var.modules_defaults.monitoring.grafana.adminUsername)}",
           "adminPassword": "${try(var.modules.monitoring.grafana.adminPassword, var.modules_defaults.monitoring.grafana.adminPassword)}"
         },
+        "alertmanager": {
+          "ingress": {
+            "enabled": "${try(var.modules.monitoring.alertmanager.ingress.enabled, var.modules_defaults.monitoring.alertmanager.ingress.enabled)}",
+            "scheme": "${try(var.modules.monitoring.alertmanager.ingress.scheme, var.modules_defaults.monitoring.alertmanager.ingress.scheme)}",
+            "host": "${try(var.modules.monitoring.alertmanager.ingress.host, var.modules_defaults.monitoring.alertmanager.ingress.host)}",
+            "className": "${try(var.modules.monitoring.alertmanager.ingress.className, var.modules_defaults.monitoring.alertmanager.ingress.className)}",
+            "clusterIssuer": "${try(var.modules.monitoring.alertmanager.ingress.clusterIssuer, var.modules_defaults.monitoring.alertmanager.ingress.clusterIssuer)}"
+          },
+          "adminUsername": "${try(var.modules.monitoring.alertmanager.adminUsername, var.modules_defaults.monitoring.alertmanager.adminUsername)}",
+          "adminPassword": "${try(var.modules.monitoring.alertmanager.adminPassword, var.modules_defaults.monitoring.alertmanager.adminPassword)}"
+        },
         "tempo": {
           "enabled": "${try(var.modules.monitoring.tempo.enabled, var.modules_defaults.monitoring.tempo.enabled)}"
         }
