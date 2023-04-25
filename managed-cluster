@@ -291,7 +291,7 @@ function sync_from_template()
 
 function merge_requires()
 {
-    local requires_txt=( $CLUSTER_DIR/requires.txt $TEMPLATE_DIR/requires.txt )
+    local requires_txt=( $CLUSTER_DIR/requires-custom.txt $TEMPLATE_DIR/requires.txt )
     local source_requires_tf=$TEMPLATES_DIR/requires.tf
     local target_requires_tf=$CLUSTER_DIR/requires.tf
     local requires="$(cat ${requires_txt[*]} 2>/dev/null | sed -e 's|^|    |' -e 's|/|\\/|g' -e 's|$|\\|' -e '$s|$|\n|' )"
