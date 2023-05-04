@@ -66,6 +66,7 @@ spec:
 
       extraArgs:
         enable-ssl-passthrough: "false"
+        #default-ssl-certificate: "ingress-nginx/default-ssl-certificate" ## "<namespace>/<secret_name>"
 
       config:
         #proxy-protocol: "True"
