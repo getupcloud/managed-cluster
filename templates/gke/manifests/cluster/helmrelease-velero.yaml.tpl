@@ -32,7 +32,7 @@ spec:
       provider: gcp
       backupStorageLocation:
         name: default
-        prefix: velero/${ cluster_id }
+        prefix: velero/${ cluster_name }-${ suffix }
         bucket: ${ velero_gcp_bucket }
         config:
 

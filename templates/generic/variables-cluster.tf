@@ -4,7 +4,7 @@
 variable "generic_post_create" {
   description = "Scripts to execute after cluster is created."
   type        = list(string)
-  default     = ["./generic-post-create.sh"]
+  default     = []
 }
 
 variable "api_endpoint" {

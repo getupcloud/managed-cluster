@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v1.22"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=main" ## v1.22
 
   # cluster basics
   customer_name  = var.customer_name
@@ -8,14 +8,14 @@ module "gke" {
   use_kubeconfig = var.use_kubeconfig
   pre_create     = var.pre_create
   post_create    = var.post_create
-  gke_modules    = var.gke_modules
+  modules        = local.modules_result
 
   # monitoring and operations
-  cronitor_enabled           = var.cronitor_enabled
-  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
-  cronitor_notification_list = local.cronitor_notification_list
-  opsgenie_enabled           = var.opsgenie_enabled
-  teleport_auth_token        = var.teleport_auth_token
+  cronitor_enabled            = var.cronitor_enabled
+  cronitor_pagerduty_key      = var.cronitor_pagerduty_key
+  cronitor_notification_lists = var.cronitor_notification_lists
+  opsgenie_enabled            = var.opsgenie_enabled
+  teleport_auth_token         = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo
