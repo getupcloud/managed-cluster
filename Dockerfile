@@ -47,7 +47,7 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
 
 RUN \
     INSTALL_PACKAGES="https://github.com/cli/cli/releases/download/v2.4.0/gh_2.4.0_linux_amd64.rpm \
-        vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk \
+        vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk google-cloud-sdk-gke-gcloud-auth-plugin \
         dialog httpie bind-utils httpd-tools iproute iputils tree \
         git net-tools nmap openssl openssl-devel bc \
         gettext jq rsync strace sshpass pv procps-ng \
