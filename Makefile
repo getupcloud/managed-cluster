@@ -15,6 +15,9 @@ DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION
 SEMVER_REGEX := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
 SHELL         = /bin/bash
 
+COLOR_GREEN  := $(shell tput setaf 2)
+COLOR_RESET  := $(shell tput sgr0)
+
 .ONESHELL:
 .EXPORT_ALL_VARIABLES:
 
@@ -56,8 +59,18 @@ define CLUSTER_REPO_template =
 			for i in provider cluster; do
 				url=$$base_url/$${ref:-main}/variables-$$i.tf
 				file=templates/$(1)/variables-$$i.tf
-				echo -n "Downloading: $(1) $$url"
-				curl --fail -sL $$url -o $$file && printf "\r[    OK    ]" || printf "\r[ NotFound ]"
+				md5_old=$$(md5sum $$file 2>/dev/null || true)
+				echo -n ">Downloading: $(1) $$url"
+				if ! curl --fail -sL $$url -o $$file; then
+					printf "\r[ Not Found ]"
+				else
+					md5_new=$$(md5sum $$file)
+					if [ "$$md5_old" != "$$md5_new" ]; then
+						printf "\r[  $(COLOR_GREEN)Changed$(COLOR_RESET)  ]"
+					else
+						printf "\r[ Unchanged ]"
+					fi
+				fi
 				echo
 			done
 		done
