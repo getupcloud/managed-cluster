@@ -102,6 +102,9 @@ spec:
     serviceMonitor:
       enabled: true
       interval: 60s
+
+    rbac:
+      pspEnabled: false
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
