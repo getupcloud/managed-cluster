@@ -46,7 +46,7 @@ spec:
       useSecret: true
       secretContents:
         cloud: |
-          ${indent(6, base64decode(try(velero_gcp_credentials, "")))}
+          ${indent(6, base64decode(try(modules.velero.output.credentials, "")))}
 
     tolerations:
     - effect: NoSchedule
