@@ -33,20 +33,20 @@ spec:
       backupStorageLocation:
         name: default
         prefix: velero/${ cluster_name }-${ suffix }
-        bucket: ${ velero_gcp_bucket }
+        bucket: ${ modules.velero.output.bucket_name }
         config:
 
       volumeSnapshotLocation:
         name: default
         config:
-          project: ${ velero_gcp_project }
-          snapshotLocation: ${ velero_gcp_region }
+          project: ${ gcp.project_id }
+          snapshotLocation: ${ gcp.region }
 
     credentials:
       useSecret: true
       secretContents:
         cloud: |
-          ${indent(6, base64decode(velero_gcp_credentials))}
+          ${indent(6, base64decode(try(velero_gcp_credentials, "")))}
 
     tolerations:
     - effect: NoSchedule
