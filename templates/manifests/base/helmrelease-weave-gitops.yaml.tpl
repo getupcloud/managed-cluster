@@ -8,6 +8,7 @@ spec:
   chart:
     spec:
       chart: weave-gitops
+      version: "~> 4.0"
       sourceRef:
         kind: HelmRepository
         name: weave-gitops
