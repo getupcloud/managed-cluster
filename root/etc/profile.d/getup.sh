@@ -598,7 +598,7 @@ export TEMPLATES_DIR=$REPO_DIR/templates
 export REPO_CONF=$REPO_DIR/repo.conf
 #export CLUSTER_TYPES="aks doks eks generic gke kind kubespray okd oke"
 #export CLUSTER_PROVIDERS="aws azure do gcp none oci"
-export CLUSTER_TYPES="aks eks generic kind kubespray okd oke"
+export CLUSTER_TYPES="aks eks generic gke kind kubespray okd oke"
 export CLUSTER_PROVIDERS="aws azure do gcp oci none"
 
 # Mapping cluster types -> providers are valid only for non-managed clusters.
