@@ -74,10 +74,6 @@
           "username": "${try(var.modules.linkerd.linkerd-viz.username, var.modules_defaults.linkerd.linkerd-viz.username)}",
           "password": "${try(var.modules.linkerd.linkerd-viz.password, var.modules_defaults.linkerd.linkerd-viz.password)}",
           "hostname": "${try(var.modules.linkerd.linkerd-viz.hostname, var.modules_defaults.linkerd.linkerd-viz.hostname)}"
-        },
-        "emojivoto": {
-          "enabled": "${try(var.modules.linkerd.emojivoto.enabled, var.modules_defaults.linkerd.emojivoto.enabled)}",
-          "hostname": "${try(var.modules.linkerd.emojivoto.hostname, var.modules_defaults.linkerd.emojivoto.hostname)}"
         }
       },
       "logging": {
@@ -118,9 +114,18 @@
           "enabled": "${try(var.modules.monitoring.tempo.enabled, var.modules_defaults.monitoring.tempo.enabled)}"
         }
       },
-      "podinfo": {
-        "enabled": "${try(var.modules.podinfo.enabled, var.modules_defaults.podinfo.enabled)}",
-        "hostname": "${try(var.modules.podinfo.hostname, var.modules_defaults.podinfo.hostname)}"
+      "demos": {
+        "emojivoto": {
+          "enabled": "${try(var.modules.demos.emojivoto.enabled, var.modules_defaults.demos.emojivoto.enabled)}",
+          "hostname": "${try(var.modules.demos.emojivoto.hostname, var.modules_defaults.demos.emojivoto.hostname)}"
+        },
+        "podinfo": {
+          "enabled": "${try(var.modules.demos.podinfo.enabled, var.modules_defaults.demos.podinfo.enabled)}",
+          "hostname": "${try(var.modules.demos.podinfo.hostname, var.modules_defaults.demos.podinfo.hostname)}"
+        },
+        "tns": {
+          "enabled": "${try(var.modules.demos.tns.enabled, var.modules_defaults.demos.tns.enabled)}"
+        }
       },
       "trivy": {
         "enabled": "${try(var.modules.trivy.enabled, var.modules_defaults.trivy.enabled)}"

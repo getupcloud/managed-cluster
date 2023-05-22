@@ -55,10 +55,6 @@ variable "modules_defaults" {
         password = string
         hostname = string
       })
-      emojivoto = object({
-        enabled  = bool
-        hostname = string
-      })
     })
     logging = object({
       enabled = bool
@@ -98,9 +94,16 @@ variable "modules_defaults" {
         enabled = bool
       })
     })
-    podinfo = object({
-      enabled  = bool
-      hostname = string
+    demos = object({
+      emojivoto = object({
+        enabled  = bool
+        hostname = string
+      })
+      podinfo = object({
+        enabled  = bool
+        hostname = string
+      })
+      tns = object({ enabled  = bool })
     })
     trivy = object({ enabled = bool })
     velero = object({
@@ -189,10 +192,6 @@ variable "modules_defaults" {
         password = "admin"
         hostname = "linkerd-viz.example.com"
       }
-      emojivoto = {
-        enabled  = false
-        hostname = "emojivoto.example.com"
-      }
     }
     logging = {
       enabled = true
@@ -232,9 +231,18 @@ variable "modules_defaults" {
         enabled = false
       }
     }
-    podinfo = {
-      enabled  = false
-      hostname = "podinfo.example.com"
+    demos = {
+      emojivoto = {
+        enabled  = false
+        hostname = "emojivoto.example.com"
+      }
+      podinfo = {
+        enabled  = false
+        hostname = "podinfo.example.com"
+      }
+      tns = {
+        enabled  = false
+      }
     }
     trivy = {
       enabled = false

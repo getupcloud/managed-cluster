@@ -6,7 +6,7 @@
 #    Added annotation linkerd.io/inject=enabled
 #    Created Ingress
 #
-%{~ if modules.linkerd.emojivoto.enabled }
+%{~ if modules.demos.emojivoto.enabled }
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -248,7 +248,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: ${ modules.linkerd.emojivoto.hostname }
+  - host: ${ modules.demos.emojivoto.hostname }
     http:
       paths:
       - backend:
@@ -260,6 +260,6 @@ spec:
         pathType: Prefix
   tls:
   - hosts:
-    - ${ modules.linkerd.emojivoto.hostname }
+    - ${ modules.demos.emojivoto.hostname }
     secretName: emojivoto-tls
 %{ endif }
