@@ -103,7 +103,7 @@ variable "modules_defaults" {
         enabled  = bool
         hostname = string
       })
-      tns = object({ enabled  = bool })
+      tns = object({ enabled = bool })
     })
     trivy = object({ enabled = bool })
     velero = object({
@@ -241,7 +241,7 @@ variable "modules_defaults" {
         hostname = "podinfo.example.com"
       }
       tns = {
-        enabled  = false
+        enabled = false
       }
     }
     trivy = {
