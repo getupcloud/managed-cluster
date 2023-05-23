@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: news
+  namespace: tns
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: news-tns.127.0.0.1.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: app
+            port:
+              number: 80
+        path: /
+        pathType: Prefix

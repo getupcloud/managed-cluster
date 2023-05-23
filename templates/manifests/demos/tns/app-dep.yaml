@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: app
+  template:
+    metadata:
+      labels:
+        name: app
+    spec:
+      containers:
+      - name: app
+        image: grafana/tns-app:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - -log.level=debug
+        - http://db
+        ports:
+        - name: http-metrics
+          containerPort: 80
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: JAEGER_AGENT_HOST
+          value: tempo.monitoring.svc.cluster.local
+        - name: JAEGER_TAGS
+          value: cluster=demo,app=api,namespace=$(NAMESPACE)
+        - name: JAEGER_SAMPLER_TYPE
+          value: const
+        - name: JAEGER_SAMPLER_PARAM
+          value: "1"

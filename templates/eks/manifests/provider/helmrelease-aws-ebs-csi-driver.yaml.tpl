@@ -30,14 +30,31 @@ spec:
         annotations:
           eks.amazonaws.com/role-arn: ${try(modules.ebs-csi.output.iam_role_arn, "")}
 
-      nodeSelector:
-        role: infra
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/infra
+                operator: Exists
+          - weight: 90
+            preference:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - infra
+
 
       tolerations:
-      - key: dedicated
-        value: infra
-        operator: Equal
+      - operator: Exists
         effect: NoSchedule
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+        tolerationSeconds: 300
 
       limits:
         cpu: 100m
@@ -61,23 +78,3 @@ spec:
         type: gp3
       annotations:
         storageclass.kubernetes.io/is-default-class: "true"
-    sidecars:
-      attacher:
-        image:
-          repository: registry.k8s.io/sig-storage/csi-attacher
-      livenessProbe:
-        image:
-          repository: registry.k8s.io/sig-storage/livenessprobe 
-      nodeDriverRegistrar:
-        image:
-          repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
-      provisioner:
-        image:
-          repository: registry.k8s.io/sig-storage/csi-provisioner 
-      resizer:
-        image:
-          repository: registry.k8s.io/sig-storage/csi-resizer
-      snapshotter:
-        image:
-          repository: registry.k8s.io/sig-storage/csi-snapshotter
-
