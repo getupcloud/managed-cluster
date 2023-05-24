@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: eks
-      version: "~> 1"
+      version: "~> 1.4"
   install:
     createNamespace: true
     disableWait: false

@@ -1,3 +1,4 @@
+%{~ if modules.demos.emojivoto.enabled ~}
 # Source https://run.linkerd.io/emojivoto.yml
 #
 # Changelog:
@@ -6,7 +7,6 @@
 #    Added annotation linkerd.io/inject=enabled
 #    Created Ingress
 #
-%{~ if modules.demos.emojivoto.enabled }
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -262,4 +262,4 @@ spec:
   - hosts:
     - ${ modules.demos.emojivoto.hostname }
     secretName: emojivoto-tls
-%{ endif }
+%{~ endif }

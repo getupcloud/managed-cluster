@@ -82,6 +82,14 @@ variable "eks_addons" {
   #     "addon_version": "v1.9.0-eksbuild.1",  ## required
   #     "resolve_conflicts": "OVERWRITE"       ## default
   #   }
+  #   coredns: {
+  #     addon_version: "v1.9.3-eksbuild.3",
+  #     resolve_conflicts: "OVERWRITE"
+  #   }
+  #   kube-proxy: {
+  #     addon_version: "v1.24.10-eksbuild.2",
+  #     resolve_conflicts: "OVERWRITE"
+  #   }
   # }
 }
 

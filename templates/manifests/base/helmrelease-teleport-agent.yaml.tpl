@@ -92,4 +92,6 @@ spec:
               operator: In
               values:
               - infra
+    podSecurityPolicy:
+      enabled: false
 %{~ endif }

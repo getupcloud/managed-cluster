@@ -95,6 +95,7 @@ variable "modules_defaults" {
       })
     })
     demos = object({
+      enabled = bool
       emojivoto = object({
         enabled  = bool
         hostname = string
@@ -232,6 +233,7 @@ variable "modules_defaults" {
       }
     }
     demos = {
+      enabled = true
       emojivoto = {
         enabled  = false
         hostname = "emojivoto.example.com"

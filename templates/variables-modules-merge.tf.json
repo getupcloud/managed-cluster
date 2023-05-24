@@ -115,6 +115,7 @@
         }
       },
       "demos": {
+        "enabled": "${try(var.modules.demos.enabled, var.modules_defaults.demos.enabled)}",
         "emojivoto": {
           "enabled": "${try(var.modules.demos.emojivoto.enabled, var.modules_defaults.demos.emojivoto.enabled)}",
           "hostname": "${try(var.modules.demos.emojivoto.hostname, var.modules_defaults.demos.emojivoto.hostname)}"
