@@ -26,7 +26,7 @@ def verify_dir(dir):
     k_path = os.path.join(dir, 'kustomization.yaml')
     k = load(open(k_path, 'r'), Loader=Loader)
     if not k:
-        continue
+        return
     res = k.get('resources', None) or []
     psm = k.get('patchesStrategicMerge', None) or []
     pp = [ p['path'] for p in k.get('patches', []) if 'path' in p ]
@@ -46,8 +46,6 @@ def verify_dir(dir):
 
     for r_dir in [ r for r in resources if os.path.isdir(r) ]:
         verify_dir(r_dir)
-
-    return
 
 if os.path.isdir(dir):
     verify_dir(dir)
