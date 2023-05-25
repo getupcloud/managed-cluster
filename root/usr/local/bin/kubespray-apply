@@ -12,4 +12,10 @@ fi
 
 user=${user:-centos}
 
-ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $KUBESPRAY_DIR/cluster.yml
+playbook=$KUBESPRAY_DIR/cluster.yml
+
+if [ ${0##*/} == "kubespray-upgrade" ]; then
+  playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
+fi
+
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $playbook
