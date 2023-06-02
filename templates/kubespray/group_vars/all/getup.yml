@@ -1,1 +1,8 @@
 kubelet_rotate_server_certificates: true
+
+# https://github.com/postfinance/kubelet-csr-approver/blob/main/charts/kubelet-csr-approver/values.yaml
+kubelet_csr_approver_values:
+  # optional, permits to bypass dns resolution checks. default: false
+  bypassDnsResolution: true
+  # number of DNS SAN names allowed in a certificate request. defaults to 1
+  allowedDnsNames: 3
