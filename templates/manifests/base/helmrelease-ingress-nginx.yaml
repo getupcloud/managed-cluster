@@ -90,9 +90,6 @@ spec:
         serviceMonitor:
           enabled: true
 
-      podSecurityPolicy:
-        enabled: true
-
       service:
         enabled: true
         type: LoadBalancer
