@@ -65,7 +65,8 @@ spec:
       enabled: false
 
     tolerations:
-    - operator: Exists
+    - key: dedicated
+      value: infra
       effect: NoSchedule
 
     affinity:
@@ -148,7 +149,8 @@ spec:
           regex: __meta_kubernetes_pod_label_.*_hash
 
     tolerations:
-    - operator: Exists
+    - key: dedicated
+      value: infra
       effect: NoSchedule
 
     resources:

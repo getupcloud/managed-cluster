@@ -42,8 +42,9 @@ spec:
       logSyslog: true
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 %{ if modules.falco.falco-exporter.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -85,8 +86,9 @@ spec:
       namespace: monitoring
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 %{~ endif }
 %{ if modules.falco.event-generator.enabled ~}
 ---
@@ -181,8 +183,9 @@ spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 10
       tolerations:
-      - effect: NoSchedule
-        operator: Exists
+      - key: dedicated
+        value: infra
+        effect: NoSchedule
       volumes:
       - hostPath:
           path: /

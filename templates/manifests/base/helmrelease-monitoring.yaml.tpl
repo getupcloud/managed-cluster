@@ -42,7 +42,8 @@ spec:
           memory: 128Mi
 
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:
@@ -53,7 +54,7 @@ spec:
               matchExpressions:
               - key: node-role.kubernetes.io/infra
                 operator: Exists
-          - weight: 100
+          - weight: 90
             preference:
               matchExpressions:
               - key: role
@@ -124,7 +125,8 @@ spec:
         probeNamespaceSelector: {}
 
         tolerations:
-        - operator: Exists
+        - key: dedicated
+          value: infra
           effect: NoSchedule
 
         affinity:
@@ -188,7 +190,8 @@ spec:
         logFormat: logfmt
 
         tolerations:
-        - operator: Exists
+        - key: dedicated
+          value: infra
           effect: NoSchedule
 
         affinity:
@@ -199,7 +202,7 @@ spec:
                 matchExpressions:
                 - key: node-role.kubernetes.io/infra
                   operator: Exists
-            - weight: 100
+            - weight: 90
               preference:
                 matchExpressions:
                 - key: role
@@ -476,7 +479,8 @@ spec:
         sessionAffinity: ClientIP
 
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:
@@ -487,7 +491,7 @@ spec:
               matchExpressions:
               - key: node-role.kubernetes.io/infra
                 operator: Exists
-          - weight: 100
+          - weight: 90
             preference:
               matchExpressions:
               - key: role
@@ -803,7 +807,8 @@ spec:
       - --metric-labels-allowlist=nodes=[eks.amazonaws.com/capacityType]
 
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:
@@ -814,7 +819,7 @@ spec:
               matchExpressions:
               - key: node-role.kubernetes.io/infra
                 operator: Exists
-          - weight: 100
+          - weight: 90
             preference:
               matchExpressions:
               - key: role

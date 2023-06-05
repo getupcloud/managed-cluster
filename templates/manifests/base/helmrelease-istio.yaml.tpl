@@ -70,8 +70,9 @@ spec:
         node-role.kubernetes.io/infra: ""
 
       tolerations:
-      - effect: NoSchedule
-        operator: Exists
+      - key: dedicated
+        value: infra
+        effect: NoSchedule
 
       # Resources for a small pilot install
       resources:
@@ -119,8 +120,9 @@ spec:
       node-role.kubernetes.io/infra: ""
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 
 ---
 apiVersion: telemetry.istio.io/v1alpha1

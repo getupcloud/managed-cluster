@@ -139,8 +139,9 @@ spec:
     cniEnabled: ${ modules.linkerd.linkerd-cni.enabled }
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 
     proxyInit:
       runAsRoot: true
@@ -216,8 +217,9 @@ spec:
     nodeSelector:
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 %{~ endif }
 
 %{~ if modules.linkerd.linkerd-viz.enabled }
@@ -315,8 +317,9 @@ spec:
       externalUrl: ${ modules.monitoring.grafana.ingress.scheme }://${ modules.monitoring.grafana.ingress.host }
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 %{~ endif }
 
 %{~ if modules.linkerd.linkerd-jaeger.enabled }

@@ -89,6 +89,7 @@ spec:
       role: infra
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 %{~ endif }

@@ -33,7 +33,8 @@ spec:
         enabled: false
 
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:
@@ -44,7 +45,7 @@ spec:
               matchExpressions:
               - key: node-role.kubernetes.io/infra
                 operator: Exists
-          - weight: 100
+          - weight: 90
             preference:
               matchExpressions:
               - key: role
@@ -115,7 +116,8 @@ spec:
       enabled: true
 
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:
@@ -126,7 +128,7 @@ spec:
               matchExpressions:
               - key: node-role.kubernetes.io/infra
                 operator: Exists
-          - weight: 100
+          - weight: 90
             preference:
               matchExpressions:
               - key: role

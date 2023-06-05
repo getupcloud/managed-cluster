@@ -696,10 +696,9 @@ spec:
     # Tolerations for pod assignment
     # Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
     tolerations: 
-    - effect: NoSchedule
-      operator: Exists
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
     
     # Node labels for pod assignment
     # Ref: https://kubernetes.io/docs/user-guide/node-selection/

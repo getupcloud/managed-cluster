@@ -34,8 +34,9 @@ spec:
               - infra
 
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 
 %{~ if length(modules.external-dns.domain_filters) > 0 }
     domainFilters:

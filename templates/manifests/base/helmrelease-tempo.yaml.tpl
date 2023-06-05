@@ -43,7 +43,8 @@ spec:
               - infra
 
     tolerations:
-    - operator: Exists
+    - key: dedicated
+      value: infra
       effect: NoSchedule
 
     persistence:

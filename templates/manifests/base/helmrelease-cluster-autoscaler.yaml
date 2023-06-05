@@ -23,8 +23,9 @@ spec:
   targetNamespace: kube-system
   values:
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 
     affinity:
       nodeAffinity:

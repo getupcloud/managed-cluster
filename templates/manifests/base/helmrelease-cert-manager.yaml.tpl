@@ -35,7 +35,8 @@ spec:
         enabled: true
 
     tolerations:
-    - operator: Exists
+    - key: dedicated
+      value: infra
       effect: NoSchedule
 
     affinity:
@@ -51,7 +52,8 @@ spec:
 
     cainjector:
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:
@@ -67,7 +69,8 @@ spec:
 
     webhook:
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
 
       affinity:

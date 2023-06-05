@@ -77,7 +77,8 @@ spec:
       ${indent(6, yamlencode(teleport_labels))}
 
     tolerations:
-    - operator: Exists
+    - key: dedicated
+      value: infra
       effect: NoSchedule
 
     affinity:
@@ -88,10 +89,14 @@ spec:
             matchExpressions:
             - key: node-role.kubernetes.io/infra
               operator: Exists
+        - weight: 90
+          preference:
+            matchExpressions:
             - key: role
               operator: In
               values:
               - infra
+
     podSecurityPolicy:
       enabled: false
 %{~ endif }
