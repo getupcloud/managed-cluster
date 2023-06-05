@@ -1,5 +1,5 @@
 module "eks" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.1.1"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.1.3"
 
   # cluster basics
   customer_name       = var.customer_name
