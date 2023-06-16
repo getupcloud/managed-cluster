@@ -12,7 +12,7 @@ module "eks" {
   post_create         = var.post_create
   modules             = local.modules_result
   dump_debug          = var.dump_debug
-
+  
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled
   cronitor_pagerduty_key      = var.cronitor_pagerduty_key
@@ -37,7 +37,9 @@ module "eks" {
   eks_addons                    = var.eks_addons
   eks_pre_create                = var.eks_pre_create
   eks_post_create               = var.eks_post_create
+  endpoint_public_access        = var.endpoint_public_access
   endpoint_public_access_cidrs  = var.endpoint_public_access_cidrs
+  endpoint_private_access       = var.endpoint_private_access
   endpoint_private_access_cidrs = var.endpoint_private_access_cidrs
   node_groups_defaults          = var.node_groups_defaults
   node_groups                   = var.node_groups
