@@ -12,7 +12,7 @@ module "eks" {
   post_create         = var.post_create
   modules             = local.modules_result
   dump_debug          = var.dump_debug
-  
+
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled
   cronitor_pagerduty_key      = var.cronitor_pagerduty_key
