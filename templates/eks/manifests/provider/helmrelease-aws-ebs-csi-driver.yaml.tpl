@@ -48,7 +48,8 @@ spec:
 
 
       tolerations:
-      - operator: Exists
+      - key: dedicated
+        value: infra
         effect: NoSchedule
       - key: CriticalAddonsOnly
         operator: Exists
