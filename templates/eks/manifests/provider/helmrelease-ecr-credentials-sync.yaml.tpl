@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: getupcloud
-      version: "~> 1"
+      version: "~> 2"
   install:
     createNamespace: true
     disableWait: false
