@@ -95,6 +95,7 @@ show-modules-vars:
 
 build: modules
 	docker build -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
+	docker tag $(IMAGE):$(RELEASE) $(IMAGE):latest
 	#buildah bud -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
 
 print-release:
