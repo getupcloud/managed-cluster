@@ -12,6 +12,7 @@ ENV TERM="xterm-256color" \
     FLUX_VERSIONS="v0.15.3" \
     GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
     HCL2JSON_VERSION="v0.3.3" \
+    HELM_PLUGINS="https://github.com/helm/helm-mapkubeapis" \
     KIND_VERSION="v0.11.1" \
     KREW_PLUGINS="access-matrix deprecations explore get-all kurt kvaps/node-shell lineage modify-secret outdated score sniff tree" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
@@ -50,7 +51,7 @@ RUN \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk google-cloud-sdk-gke-gcloud-auth-plugin \
         dialog httpie bind-utils httpd-tools iproute iputils tree \
         git net-tools nmap openssl openssl-devel bc \
-        gettext jq rsync strace sshpass pv procps-ng \
+        gettext jq rsync strace sshpass pv procps-ng traceroute \
         python38-pip python38-devel libffi-devel rust cargo" && \
     dnf install -y $INSTALL_PACKAGES && \
     dnf clean all && \
@@ -139,7 +140,10 @@ RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/
     for plugin in ${KREW_PLUGINS}; do \
         kubectl krew install $plugin; \
     done && \
-    chmod -R 777 $KREW_ROOT
+    chmod -R 777 $KREW_ROOT && \
+    for plugin in ${HELM_PLUGINS}; do \
+        helm plugin install $plugin; \
+    done
 
 RUN cd /etc/profile.d && \
     curl -skL https://raw.githubusercontent.com/jonmosco/kube-ps1/master/kube-ps1.sh > bash_ps1_kubernetes.sh && \
@@ -161,6 +165,5 @@ RUN echo $VERSION > /.version && \
     rsync /etc/skel/ /root/ && \
     chmod -R +x /etc/profile.d/ && \
     chmod 777 /usr/share
-
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
