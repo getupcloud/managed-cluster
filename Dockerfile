@@ -18,7 +18,8 @@ ENV TERM="xterm-256color" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.2" \
     KUBECONFIG="${CLUSTER_DIR}/.kube/config" \
-    KUBECTL_VERSIONS="v1.21.14 v1.22.17 v1.23.17 v1.24.14 v1.25.10" \
+    KUBECTL_VERSIONS="v1.21.14 v1.22.17 v1.23.17 v1.24.14 v1.25.10 v1.26.9 v1.27.6" \
+    KUBELOGIN_VERSION="v0.0.32" \
     OC_VERSION="4.11.0-0.okd-2022-12-02-145640" \
     OSH="/etc/oh-my-bash" \
     TERRAFORM_VERSION="1.0.9" \
@@ -123,7 +124,7 @@ RUN cd /usr/local/bin && \
     curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
     curl -kL https://gist.github.com/caruccio/3fe4cb8949419b093c5c5c9b3ac33631/raw/97915ca848e6e5689868c9fa00c3412479e2f9c3/kubectl-extract \
         -o /usr/local/bin/kubectl-extract && \
-    curl -OkL https://github.com/Azure/kubelogin/releases/download/v0.0.29/kubelogin-linux-amd64.zip && \
+    curl -OkL https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip && \
         unzip kubelogin-linux-amd64.zip && mv bin/linux_amd64/kubelogin ./ && rm -rf bin kubelogin-linux-amd64.zip && \
     chmod +x /usr/local/bin/kubectl-extract && \
     chmod -R +x /usr/local/bin
