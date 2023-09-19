@@ -373,7 +373,7 @@ fmt_version()
 update_ca_certificates()
 {
     if [ -e $CLUSTER_DIR/cacerts.crt ]; then
-        cp -vf $CLUSTER_DIR/cacerts.crt /etc/pki/ca-trust/source/anchors/custom-cacerts.crt
+        sudo cp -vf $CLUSTER_DIR/cacerts.crt /etc/pki/ca-trust/source/anchors/custom-cacerts.crt
         sudo update-ca-trust
     fi
 }
