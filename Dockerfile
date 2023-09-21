@@ -9,7 +9,7 @@ ENV CLUSTER_DIR="/cluster" \
 
 ENV TERM="xterm-256color" \
     DOCTL_VERSION="1.63.1" \
-    FLUX_VERSIONS="v0.15.3" \
+    FLUX_VERSIONS="v0.15.3 v0.41.2" \
     GOOGLE_APPLICATION_CREDENTIALS="${CLUSTER_DIR}/service-account.json" \
     HCL2JSON_VERSION="v0.3.3" \
     HELM_PLUGINS="https://github.com/helm/helm-mapkubeapis" \
