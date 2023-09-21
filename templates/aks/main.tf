@@ -1,5 +1,5 @@
 module "aks" {
-  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.2"
+  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.3"
 
   # cluster basics
   customer_name  = var.customer_name
@@ -45,6 +45,10 @@ module "aks" {
   tags                 = var.tags
   tenant_id            = var.tenant_id
   outbound_type        = var.outbound_type
+
+  # oidc & workload identity
+  oidc_issuer_enabled       = var.oidc_issuer_enabled
+  workload_identity_enabled = var.workload_identity_enabled
 
   private_cluster_enabled                           = var.private_cluster_enabled
   api_server_authorized_ip_ranges                   = var.api_server_authorized_ip_ranges

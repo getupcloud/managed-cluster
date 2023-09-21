@@ -3,6 +3,18 @@ variable "subscription_id" {
   type        = string
 }
 
+variable "workload_identity_enabled" {
+  type        = bool
+  description = "Specifies whether Azure AD Workload Identity should be enabled for the Cluster. Defaults to false."
+  default     = false
+}
+
+variable "oidc_issuer_enabled" {
+  type        = bool
+  description = "(Optional) Enable or Disable the OIDC issuer URL"
+  default     = false
+}
+
 variable "rbac_aad_admin_group_names" {
   description = "Group name of groups with admin access."
   type        = list(string)
