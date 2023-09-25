@@ -1,5 +1,5 @@
 module "aks" {
-  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.3"
+  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.4"
 
   # cluster basics
   customer_name  = var.customer_name
