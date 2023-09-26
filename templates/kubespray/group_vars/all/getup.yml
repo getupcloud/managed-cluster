@@ -1,3 +1,5 @@
+kubeconfig_localhost: true
+
 kubelet_rotate_server_certificates: true
 
 # https://github.com/postfinance/kubelet-csr-approver/blob/main/charts/kubelet-csr-approver/values.yaml
