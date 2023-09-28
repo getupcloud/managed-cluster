@@ -57,6 +57,8 @@ spec:
                 operator: Exists
 
     speaker:
+      frr:
+        enabled: false
       tolerations:
         - effect: NoSchedule
           operator: Exists
