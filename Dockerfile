@@ -150,7 +150,9 @@ RUN cd /etc/profile.d && \
     curl -skL https://raw.githubusercontent.com/jonmosco/kube-ps1/master/kube-ps1.sh > bash_ps1_kubernetes.sh && \
     chmod +x bash_ps1_kubernetes.sh && \
     curl -skL https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh > bash_ps1_git.sh && \
-    chmod +x bash_ps1_git.sh
+    chmod +x bash_ps1_git.sh && \
+    kubectl completion bash > kubectl_completion.sh && \
+    chmod +x kubectl_completion.sh
 
 COPY root/ /
 COPY root/etc/skel/ /root/
