@@ -246,6 +246,30 @@ variable "enable_private_nodes" {
   default     = false
 }
 
+variable "enable_binary_authorization" {
+  description = "Enable BinAuthZ Admission controller"
+  type        = bool
+  default     = false
+}
+
+variable "monitoring_enable_managed_prometheus" {
+  description = "Configuration for Managed Service for Prometheus. Whether or not the managed collection is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "monitoring_enabled_components" {
+  description = "List of services to monitor: SYSTEM_COMPONENTS, WORKLOADS. Empty list is default GKE configuration."
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_cost_allocation" {
+  description = "Enables Cost Allocation Feature and the cluster name and namespace of your GKE workloads appear in the labels field of the billing export to BigQuery"
+  type        = bool
+  default     = false
+}
+
 variable "master_authorized_networks" {
   description = "List of master authorized networks. If none are provided, disallow external access (except the cluster node IPs, which GKE automatically whitelists)."
   type        = list(object({ cidr_block = string, display_name = string }))

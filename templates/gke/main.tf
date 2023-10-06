@@ -1,14 +1,18 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v2.1.1"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v2.2.0"
 
   # cluster basics
-  customer_name  = var.customer_name
-  cluster_name   = var.cluster_name
-  cluster_sla    = var.cluster_sla
-  use_kubeconfig = var.use_kubeconfig
-  pre_create     = var.pre_create
-  post_create    = var.post_create
-  modules        = local.modules_result
+  customer_name                        = var.customer_name
+  cluster_name                         = var.cluster_name
+  cluster_sla                          = var.cluster_sla
+  use_kubeconfig                       = var.use_kubeconfig
+  pre_create                           = var.pre_create
+  post_create                          = var.post_create
+  modules                              = local.modules_result
+  enable_binary_authorization          = var.enable_binary_authorization
+  enable_cost_allocation               = var.enable_cost_allocation
+  monitoring_enable_managed_prometheus = var.monitoring_enable_managed_prometheus
+  monitoring_enabled_components        = var.monitoring_enabled_components
 
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled
