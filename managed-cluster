@@ -490,16 +490,9 @@ function select_cluster()
 
     candidate_clusters=( ${candidate_clusters[*]%/} )
 
-    if [ ${#candidate_clusters[*]} -eq 1 ]; then
-        export CLUSTER_DIR=$candidate_clusters
-        export CLUSTER_CONF=$CLUSTER_DIR/cluster.conf
-        if ! has_valid_config $CLUSTER_CONF; then
-            warn Config not found: $CLUSTER_CONF
-            return 1
-        fi
-
-        update_globals
-        return
+    if [ ${#candidate_clusters[*]} -eq 0 ]; then
+        warn "No cluster found. Please run '$0 create' first."
+        exit 1
     fi
 
     cluster_names=( ${candidate_clusters[*]#*/} )
