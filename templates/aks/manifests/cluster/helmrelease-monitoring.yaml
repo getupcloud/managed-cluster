@@ -7,27 +7,7 @@ spec:
   values:
     prometheus:
       prometheusSpec:
-        replicas: 2
-        resources:
-          limits:
-            cpu: 1
-            memory: 4Gi
-          requests:
-            cpu: 1
-            memory: 2Gi
         storageSpec:
           volumeClaimTemplate:
             spec:
               storageClassName: managed-csi-premium
-              resources:
-                requests:
-                  storage: 200Gi
-
-    grafana:
-      resources:
-        limits:
-          cpu: 1
-          memory: 512Mi
-        requests:
-          cpu: 100m
-          memory: 128Mi

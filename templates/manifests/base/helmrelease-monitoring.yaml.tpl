@@ -99,10 +99,10 @@ spec:
         resources:
           limits:
             cpu: 1
-            memory: 2Gi
+            memory: 4Gi
           requests:
-            cpu: 100m
-            memory: 1Gi
+            cpu: 1
+            memory: 2Gi
 
         externalLabels:
           cluster: ${customer_name}/${cluster_name}
@@ -153,7 +153,7 @@ spec:
             spec:
               resources:
                 requests:
-                  storage: 100Gi
+                  storage: 200Gi
 
 %{~ if modules.monitoring.tempo.enabled }
         enableRemoteWriteReceiver: true
@@ -510,9 +510,9 @@ spec:
       resources:
         limits:
           cpu: 1
-          memory: 256Mi
+          memory: 512Mi
         requests:
-          cpu: 50m
+          cpu: 100m
           memory: 128Mi
 
       env: {}
