@@ -1,5 +1,5 @@
 module "aks" {
-  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.5"
+  source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.0.6"
 
   # cluster basics
   customer_name  = var.customer_name
@@ -29,7 +29,7 @@ module "aks" {
   client_id            = var.client_id
   client_secret        = var.client_secret
   docker_bridge_cidr   = var.docker_bridge_cidr
-  dns_service_ip       = var.dns_service_ip
+  dns_service_ip       = local.dns_service_ip
   identity_type        = var.identity_type
   identity_ids         = var.identity_ids
   identity_name        = var.identity_name
