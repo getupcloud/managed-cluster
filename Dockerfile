@@ -52,8 +52,8 @@ RUN \
         vim-enhanced sudo docker-ce-cli teleport azure-cli google-cloud-sdk google-cloud-sdk-gke-gcloud-auth-plugin \
         dialog httpie bind-utils httpd-tools iproute iputils tree \
         git net-tools nmap openssl openssl-devel bc \
-        gettext jq rsync strace sshpass pv procps-ng traceroute \
-        python38-pip python38-devel libffi-devel rust cargo" && \
+        gettext jq rsync strace sshpass pv procps-ng time traceroute \
+        python38-devel python38-pip python39-devel python39-pip libffi-devel rust cargo" && \
     dnf install -y $INSTALL_PACKAGES && \
     dnf clean all && \
     rm -rf /var/cache/dnf
