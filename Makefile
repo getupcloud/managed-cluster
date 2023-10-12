@@ -143,12 +143,12 @@ tag-image:
 
 push: push-git push-image
 
-push-git:
+push-git git-push:
 	git push origin main:release-$(RELEASE)
 	git push origin main
 	git push --tags
 
-push-image:
+push-image image-push:
 	docker push $(IMAGE):$(RELEASE)
 	docker push $(IMAGE):latest
 
