@@ -1,13 +1,12 @@
 **/.debug*
+**/.provider.env
 .kube
 .local
 .setup_history
-.terraform.d
-.terraform.lock.hcl
+.terraform*
 ansible.log
 doctl
 gh
 helm
-openshift-install
-openshift-install-linux-*
+openshift-install*
 terraform.log
