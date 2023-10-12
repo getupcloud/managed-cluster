@@ -1389,10 +1389,15 @@ function repo_pull_remote()
 
 function repo_fetch_remote()
 {
+    local _force=${_force:-false}
     local remote=$1
     local remote_url=$(git remote get-url $remote 2>/dev/null || echo '<none>')
     info "--> fetch remote:" $remote: $remote_url
-    ask_execute_command git fetch $remote --tags
+    if $_force; then
+        git fetch $remote --tags
+    else
+        ask_execute_command git fetch $remote --tags
+    fi
 }
 
 function check_update()
@@ -1429,16 +1434,20 @@ function check_update()
 
     if $force || [ "$(fmt_version $latest_remote_version)" -gt "$(fmt_version $latest_local_version)" ]; then
         has_updates=true
-        if _default=n ask "Remote repo has newer version (latest local: v$latest_local_version, latest remote: v$latest_remote_version). Download now? [y/N]"; then
-            repo_fetch_remote upstream
+        if $force || _default=n ask "Remote repo has newer version (latest local: v$latest_local_version, latest remote: v$latest_remote_version). Download now? [y/N]"; then
+            _force=$force repo_fetch_remote upstream
             latest_local_version=$(get_latest_version)
         fi
     fi
 
     if $force || [ "$(fmt_version $latest_local_version)" -gt "$(fmt_version $version)" ]; then
         has_updates=true
-        if _default=n ask "Upgrade to newer version ${latest_local_version}? [y/N]"; then
-            ask_execute_command git merge v${latest_local_version} -Xtheirs
+        if $force || _default=n ask "Upgrade to newer version ${latest_local_version}? [y/N]"; then
+            if $force; then
+                git merge v${latest_local_version} -Xtheirs -m "Merge tag 'v1.6.50' (forced)"
+            else
+                ask_execute_command git merge v${latest_local_version} -Xtheirs
+            fi
             current_version=$(get_current_version)
             set_config version="$latest_local_version" "Installer version" $REPO_CONF
             exit 0
