@@ -29,7 +29,9 @@ cd $CLUSTER_DIR
 
 
 if $force; then
-    execute_command terraform init
+    if $tf_init; then
+        execute_command terraform init
+    fi
     execute_command terraform validate
     execute_command terraform apply -auto-approve
     execute_command terraform fmt
