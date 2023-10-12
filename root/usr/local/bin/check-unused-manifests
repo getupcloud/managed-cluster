@@ -18,7 +18,7 @@ except:
     dir = "/cluster/manifests/cluster/"
 
 unused = []
-print("Detecting unused resources: ", end='', flush=True)
+#print("Detecting unused resources: ", end='', flush=True)
 
 def verify_dir(dir):
     dir = os.path.abspath(dir)
@@ -51,6 +51,5 @@ if os.path.isdir(dir):
     verify_dir(dir)
 
 if unused:
-    print('\n', '\n'.join([ f'- {f}' for f in unused ]), sep='')
-else:
-    print("none")
+    print(' '.join(unused))
+    sys.exit(2)

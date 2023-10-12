@@ -178,8 +178,13 @@ read_config()
 {
     local _name="${1}"
     local prompt="${2}"
-
     local _opt_name="opt_$_name"
+    local _secret=${_secret:-false}
+    local read_opts='-e'
+
+    if $_secret; then
+        read_opts+=' -s'
+    fi
 
     if [ -v "$_opt_name" ]; then
         local _opt_value="${!_opt_name}"
@@ -194,11 +199,13 @@ read_config()
     else
         local _default=""
     fi
-    shift
-
 
     if [ -n "$_default" ]; then
-        prompt+=" [$_default]"
+        if $_secret; then
+            prompt+=" [${_default//[^*]/*}]"
+        else
+            prompt+=" [$_default]"
+        fi
     fi
 
     if [ -n "$_opt_value" ]; then
@@ -209,7 +216,7 @@ read_config()
     fi
 
     line
-    read -e -p "$(prompt "$prompt")" $_name
+    read $read_opts -p "$(prompt "$prompt")" $_name
 
     local _value="${!_name}"
     if [ -z "$_value" ]; then
@@ -217,6 +224,29 @@ read_config()
     else
         export $_name
     fi
+}
+
+function get_tf_config()
+{
+    local sh_var_name=$1
+    local tf_var_name=$2
+
+    if [ -v $sh_var_name ]; then
+        echo ${!sh_var_name}
+        return
+    elif [ -v TF_VAR_$tf_var_name ]; then
+        local v=TV_VAR_$tf_var_name
+        echo ${!v}
+        return
+    fi
+
+    case "$(hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|type")" in
+        string|number|object)
+            hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}"
+        ;;
+        array)
+            hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|join(\"\n\")"
+    esac
 }
 
 ask()
@@ -266,9 +296,41 @@ ask_any()
 #    done
 #}
 
+function fill_line()
+{
+  local cmd="$@"
+  local cmd_len=${#cmd}
+  local line_pre_fmt="------- [%s] "
+  local line_pre=$(printf -- "$line_pre_fmt" '')
+  local line_len=$[$(tput cols) - cmd_len - ${#line_pre}]
+  local line=$(printf -- '%*s' $line_len|tr ' ' -)
+
+  printf -- "${COLOR_GREEN}${COLOR_BOLD}$line_pre_fmt%s${COLOR_RESET}\n" "$cmd" "$line"
+}
+
+function execute_command_with_time_track()
+{
+    local _print_cmd="${_print_cmd:-$@}"
+    local TIMEFORMAT="${COLOR_CYAN}Command [$_print_cmd] took ${COLOR_BOLD}%2lR${COLOR_RESET}"
+    time "$@"
+}
+
+function execute_command()
+{
+    if [ $# -eq 0 ]; then
+      return
+    fi
+
+  local _print_cmd="${_print_cmd:-$@}"
+
+  fill_line "$_print_cmd"
+  _print_cmd="${_print_cmd}" execute_command_with_time_track $@
+}
+
 ask_execute_command()
 {
   local _default="${_default:-y}"
+  local _print_cmd="${_print_cmd:-$@}"
 
   if [ "$_default" == "n" ]; then
     local _sel="[y/N]"
@@ -276,11 +338,7 @@ ask_execute_command()
     local _sel="[Y/n]"
   fi
 
-  if [ $BASH_VERSINFO -lt 5 ]; then
-    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@}${COLOR_RESET}${COLOR_GREEN}] now? $_sel")" res
-  else
-    read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${@@Q}${COLOR_RESET}${COLOR_GREEN}] now? $_sel")" res
-  fi
+  read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${_print_cmd}${COLOR_RESET}${COLOR_GREEN}] now? $_sel")" res
 
   if [ "$_default" == "n" ]; then
     res="${res:-n}"
@@ -289,7 +347,8 @@ ask_execute_command()
   fi
 
   case "${res,,}" in
-    y|yes|s|sim) "$@"
+    y|yes|s|sim)
+        _print_cmd="${_print_cmd}" execute_command "$@"
   esac
 }
 

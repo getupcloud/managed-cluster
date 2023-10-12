@@ -4,7 +4,8 @@ kind: Kustomization
 resources:
 - ../base/
 
-#patches:
+patches:
+- excludes.yaml
 #- path: helmrelease-cert-manager.yaml
 #- path: helmrelease-ingress-nginx.yaml
 #- path: helmrelease-monitoring.yaml

@@ -9,6 +9,17 @@ else
 fi
 source repo-git-config-setup
 
+opt_force=
+force=false
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -f|--force)
+            force=true
+            opt_force=$1
+    esac
+    shift
+done
+
 info Switching to $REPO_DIR
 cd $REPO_DIR
 
@@ -24,11 +35,15 @@ if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
 fi
 
 if ! is_local_git_repo && ! repo-exists; then
-    ask_execute_command repo-setup
+    if $force; then
+        repo-setup $opt_force
+    else
+        ask_execute_command repo-setup
+    fi
 fi
 
 if ${INSIDE_CONTAINER:-false}; then
-    repo-validate
+    repo-validate $opt_force
     REPO_FILES="repo.conf clusters/$cluster_name/$cluster_type"
     COMMIT_MESSAGE="Automatic commit: clusters/$cluster_name/$cluster_type"
 else
@@ -36,15 +51,18 @@ else
     COMMIT_MESSAGE="Automatic commit: repo/$customer_name"
 fi
 
-FZF_PREVIEW="
-    if [ {1} == '??' ]; then
-        [ -d {2} ] && tree {2} || cat {2}
-    else
-        git diff --color {2}
-    fi
-"
+if $force; then
+    git add ${REPO_FILES}
+    git commit -m "$COMMIT_MESSAGE"
+elif ask "Select files to commit now? [Y/n]"; then
+    FZF_PREVIEW="
+        if [ {1} == '??' ]; then
+            [ -d {2} ] && tree {2} || cat {2}
+        else
+            git diff --color {2}
+        fi
+    "
 
-if ask "Select files to commit now? [Y/n]"; then
     FILES_TO_COMMIT=(
         $(git status --short $REPO_FILES | fzf -0 --ansi --reverse --multi --disabled \
             --header='---[ Select files to commit (ctrl+a to select all) ]---' \
@@ -67,4 +85,8 @@ if ask "Select files to commit now? [Y/n]"; then
     fi
 fi
 
-ask_execute_command git push origin main
+if $force; then
+    git push origin main
+else
+    ask_execute_command git push origin main
+fi

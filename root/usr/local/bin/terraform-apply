@@ -1,19 +1,53 @@
 #!/usr/bin/env bash
 
 set -eu
-
 source /etc/profile.d/getup.sh
+
+tf_init=false
+opt_force=
+force=false
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -f|--force)
+            force=true
+            opt_force=$1
+        ;;
+        -i|--init)
+            tf_init=true
+        ;;
+    esac
+    shift
+done
+
+if ! $force; then
+    tf_init=true
+fi
 
 info Switching to $CLUSTER_DIR
 cd $CLUSTER_DIR
 
-ask_execute_command terraform init
-ask_execute_command terraform validate
-ask_execute_command terraform plan -out=$TF_PLAN_FILE
-_default=n \
-    ask_execute_command terraform apply $TF_PLAN_FILE
-ask_execute_command terraform fmt
-ask_execute_command repo-push
 
-[ -e "$KUBECONFIG" ] && _default=n; \
-    ask_execute_command kubeconfig-get
+if $force; then
+    execute_command terraform init
+    execute_command terraform validate
+    execute_command terraform apply -auto-approve
+    execute_command terraform fmt
+    execute_command repo-push $opt_force
+    execute_command kubeconfig-get $opt_force
+    execute_command flux reconcile source git cluster
+else
+    ask_execute_command terraform init
+    ask_execute_command terraform validate
+    ask_execute_command terraform plan -out=$TF_PLAN_FILE
+    _default=n \
+        ask_execute_command terraform apply $TF_PLAN_FILE
+    ask_execute_command terraform fmt
+    ask_execute_command repo-push
+
+    [ -e "$KUBECONFIG" ] && _default=n; \
+        ask_execute_command kubeconfig-get
+fi
+
+t=$(date -d@$SECONDS -u +%Hh%Mm%Ss)
+echo -e "${COLOR_CYAN}Total execution time: ${COLOR_BOLD}${t}${COLOR_RESET}"

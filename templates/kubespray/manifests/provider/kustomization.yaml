@@ -6,4 +6,5 @@ resources:
 - helmrelease-csr-auto-approver.yaml
 - helmrelease-metallb.yaml
 
-patches: []
+patches:
+- excludes.yaml

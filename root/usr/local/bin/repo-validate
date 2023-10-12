@@ -4,10 +4,34 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-KUSTOMIZE_BUILD=/tmp/.kustomize_build.yaml
+force=false
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -f|--force)
+            force=true
+    esac
+    shift
+done
 
-if ask_execute_command kustomize build /cluster/manifests/cluster/ -o $KUSTOMIZE_BUILD; then
-    echo Passed
+KUSTOMIZE_BUILD=/tmp/.kustomize_build.yaml
+KUSTOMIZE_BUILD_CMD="kustomize build /cluster/manifests/cluster/ -o $KUSTOMIZE_BUILD"
+
+if $force; then
+    info Checking kustomize build: /cluster/manifests/cluster/
+    $KUSTOMIZE_BUILD_CMD
+else
+    ask_execute_command $KUSTOMIZE_BUILD_CMD
 fi
 
-check-unused-manifests || true
+if [ $? -eq 0 ]; then
+    info Passed
+else
+    warn Failed
+    exit 1
+fi
+
+info Checking if there are unused manifests: /cluster/manifests/cluster/
+if ! UNUSED_MANIFESTS=$(check-unused-manifests); then
+    warn Manifests below are never referenced by /cluster/manifests/cluster/kustomization.yaml
+    printf '+ %s\n' $UNUSED_MANIFESTS
+fi
