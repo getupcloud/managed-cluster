@@ -106,7 +106,6 @@ spec:
 
         externalLabels:
           cluster: ${customer_name}/${cluster_name}
-        prometheusExternalLabelName: cluster
 
         ruleSelectorNilUsesHelmValues: false
         ruleSelector: {}
