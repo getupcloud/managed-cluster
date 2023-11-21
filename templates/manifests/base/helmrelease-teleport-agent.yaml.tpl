@@ -33,6 +33,7 @@ supplementalGroups:
   type: RunAsAny
 users:
 - system:serviceaccount:getup:teleport-agent
+- system:serviceaccount:getup:teleport-agent-updater
 volumes:
 - configMap
 - downwardAPI
