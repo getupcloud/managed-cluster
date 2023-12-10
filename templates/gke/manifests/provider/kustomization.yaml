@@ -5,7 +5,7 @@ resources:
 - ../base/
 
 patches:
-- excludes.yaml
+- path: excludes.yaml
 #- path: helmrelease-cert-manager.yaml
 #- path: helmrelease-ingress-nginx.yaml
 #- path: helmrelease-monitoring.yaml

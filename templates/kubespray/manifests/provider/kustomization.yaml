@@ -7,4 +7,4 @@ resources:
 - helmrelease-metallb.yaml
 
 patches:
-- excludes.yaml
+- path: excludes.yaml
