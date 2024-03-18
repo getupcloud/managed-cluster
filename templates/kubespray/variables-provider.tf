@@ -10,7 +10,7 @@ variable "api_endpoint" {
 variable "kubernetes_version" {
   description = "Kubernetes rersion"
   type        = string
-  default     = "1.24"
+  default     = "v1.25.6"
 }
 
 variable "region" {
@@ -28,7 +28,7 @@ variable "deploy_components" {
 variable "kubespray_git_ref" {
   description = "Kubespray ref name"
   type        = string
-  default     = "remotes/origin/release-2.17"
+  default     = "remotes/origin/release-2.22"
 }
 
 variable "kubespray_dir" {

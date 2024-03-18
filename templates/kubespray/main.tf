@@ -1,16 +1,17 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v3.4.0"
+  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v4.0.0-beta1"
 
   # cluster basics
-  customer_name    = var.customer_name
-  cluster_name     = var.cluster_name
-  cluster_sla      = var.cluster_sla
-  cluster_provider = var.cluster_provider
-  use_kubeconfig   = var.use_kubeconfig
-  pre_create       = var.pre_create
-  post_create      = var.post_create
-  modules          = local.modules_result
-  dump_debug       = var.dump_debug
+  customer_name      = var.customer_name
+  cluster_name       = var.cluster_name
+  cluster_sla        = var.cluster_sla
+  cluster_provider   = var.cluster_provider
+  kubernetes_version = var.kubernetes_version
+  use_kubeconfig     = var.use_kubeconfig
+  pre_create         = var.pre_create
+  post_create        = var.post_create
+  modules            = local.modules_result
+  dump_debug         = var.dump_debug
 
   # monitoring and operations
   cronitor_enabled            = var.cronitor_enabled

@@ -4,14 +4,20 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-user=$(get_tf_config SSH_USER ssh_user)
-
-if [ -z "$user" ]; then
-    user=centos
-fi
+user=$(get_tf_config SSH_USER ssh_user centos)
 
 hosts=all
 remote_src=false
+
+if [ $# -lt 2 ] || [[ "$1" =~ (-h|--help) ]]; then
+    echo "Usage:"
+    echo
+    echo "  Upload:   $0 local-file hosts:remote-file [copy module extra parameters...]"
+    echo "  Download: $0 host:remote-file local-file [copy module extra parameters...]"
+    echo
+    echo "See available flags in https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html"
+    exit 1
+fi
 
 src=$1
 dest=$2
@@ -22,13 +28,6 @@ dest_host=${dest%%:*}
 src=${src#*:}
 dest=${dest#*:}
 
-if [ -n "$src_host" -a -n "$dest_host" ] || [ -z "$src_host$dest_host" ]; then
-    echo "Usage:"
-    echo "  Upload:   $0 local-file hosts:remote-file"
-    echo "  Download: $0 host:remote-file local-file"
-    exit 1
-fi
-
 if [ -n "$src_host" ]; then
     # downloading
     hosts=$src_host
@@ -37,7 +36,5 @@ elif [ -n "$dest_host" ]; then
     # uploading
     hosts=$dest_host
 fi
-
-echo "See available flags in https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html" >&2
 
 execute_command ansible $hosts -i $INVENTORY_FILE --become --user $user -m copy -a "src=$src dest=$dest remote_src=$remote_src $*"

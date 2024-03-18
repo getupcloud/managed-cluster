@@ -18,7 +18,6 @@ ENV TERM="xterm-256color" \
     KREW_REPOS="kvaps@https://github.com/kvaps/krew-index" \
     KREW_VERSION="v0.4.2" \
     KUBECONFIG="${CLUSTER_DIR}/.kube/config" \
-    KUBECTL_VERSIONS="v1.21.14 v1.22.17 v1.23.17 v1.24.14 v1.25.10 v1.26.9 v1.27.6" \
     KUBELOGIN_VERSION="v0.0.32" \
     OC_VERSION="4.11.0-0.okd-2022-12-02-145640" \
     OSH="/etc/oh-my-bash" \
@@ -101,6 +100,13 @@ RUN cd /usr/local/bin && \
     curl -skL https://run.linkerd.io/install | INSTALLROOT=/usr/local bash && \
     curl -skL https://github.com/openshift/okd/releases/download/${OC_VERSION}/openshift-client-linux-${OC_VERSION}.tar.gz \
         | tar xzvf - oc && \
+    KUBECTL_VERSIONS=$( \
+        curl -s https://api.github.com/repos/kubernetes/kubernetes/releases?per_page=100 \
+        | jq -r '.[] | .tag_name' \
+        | grep '^v[0-9]\.[0-9][0-9]\?\.[0-9][0-9]\?$' \
+        | sort -Vr \
+        | awk -F . '!a[$1 FS $2]++' \
+        | sort -V) && \
     for KUBECTL_VERSION in $KUBECTL_VERSIONS; do \
       curl -skL https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl > \
         kubectl_${KUBECTL_VERSION}; \

@@ -4,10 +4,12 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-user=$(grep 'ssh_user\s*=\s*.*' $CLUSTER_DIR/terraform.tfvars | awk '{print $NF}' | tr -d '"')
-if [ -z "$user" ]; then
-    user=centos
+if [[ "$1" =~ (-h|--help|^$) ]] ; then
+    echo "Usage: $0 command [parameters...]"
+    exit 1
 fi
+
+user=$(get_tf_config SSH_USER ssh_user centos)
 
 set -x
 

@@ -6,11 +6,14 @@ export ROOT_DIR=$(readlink -nf $(dirname $0))
 
 source /etc/profile.d/getup.sh
 
-if [ $# -gt 0 ]; then
-  user="$1"
-else
-  user=$(awk '/\s*#?\s*ssh_user\s*=\s".*".*/ { patsplit($3, a, /[^"]+/); print a[1] }' $TF_VARS_FILE | tail -n1) 2>/dev/null
+if [[ "$1" =~ (-h|--help) ]] ; then
+    echo "Usage: $0 [ansible-playbook parameters...]"
+    exit 1
 fi
+
+user=$(get_tf_config SSH_USER ssh_user centos)
+
+kube_version=$(ansible-inventory -i $INVENTORY_FILE --list |  jq -r '._meta.hostvars[._meta.hostvars|keys[0]].kube_version')
 
 out=/tmp/.dialog
 exec 3>$out
@@ -27,4 +30,5 @@ if [ -z "$tags" ]; then
     exit 0
 fi
 
-ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $KUBESPRAY_DIR/cluster.yml --tags $tags
+echo Kubernetes Version: $kube_version
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user --tags $tags $@ $KUBESPRAY_DIR/cluster.yml

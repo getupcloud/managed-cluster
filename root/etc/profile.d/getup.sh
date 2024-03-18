@@ -230,6 +230,7 @@ function get_tf_config()
 {
     local sh_var_name=$1
     local tf_var_name=$2
+    local default=$3
 
     if [ -v $sh_var_name ]; then
         echo ${!sh_var_name}
@@ -247,6 +248,8 @@ function get_tf_config()
         array)
             hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|join(\"\n\")"
     esac
+
+    echo $default
 }
 
 ask()
