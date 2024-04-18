@@ -57,7 +57,7 @@ RUN \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-RUN alternatives --set python3 /usr/bin/python3.8 && \
+RUN alternatives --set python3 /usr/bin/python3.9 && \
     pip3 install giturlparse.py pyyaml ruamel-yaml python-hcl2==3.0.5 && \
     curl -Lv https://github.com/junegunn/fzf/releases/download/0.29.0/fzf-0.29.0-linux_amd64.tar.gz \
         | sudo tar xzvf - -C /usr/local/bin && \
