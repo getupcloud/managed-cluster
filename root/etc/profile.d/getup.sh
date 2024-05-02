@@ -430,7 +430,11 @@ fmt_version()
 {
     local v="$1"
     v=( ${v//[.-]/ } )
-    printf "%03d" ${v[0]} ${v[1]} ${v[2]}
+    if [[ "${v[-1]}" =~ [a-z] ]]; then
+      v[-1]=${v[-1]/alpha/1}
+      v[-1]=${v[-1]/beta/2}
+    fi
+    printf "%03d" ${v[@]}
 }
 
 update_ca_certificates()
