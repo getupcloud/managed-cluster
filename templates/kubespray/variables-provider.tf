@@ -10,7 +10,10 @@ variable "api_endpoint" {
 variable "kubernetes_version" {
   description = "Kubernetes rersion"
   type        = string
-  default     = "v1.25.6"
+  validation {
+    condition     = can(regex("^v[0-9]\\.[0-9]+\\.[0-9]+", var.kubernetes_version))
+    error_message = "Kubernetes version must match format `v{MAJOR}.{MINOR}.{PATCH}`."
+  }
 }
 
 variable "region" {
@@ -28,7 +31,7 @@ variable "deploy_components" {
 variable "kubespray_git_ref" {
   description = "Kubespray ref name"
   type        = string
-  default     = "remotes/origin/release-2.22"
+  default     = "remotes/origin/release-2.17"
 }
 
 variable "kubespray_dir" {
