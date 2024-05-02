@@ -87,9 +87,9 @@ variable "manifests_template_vars" {
 }
 
 variable "cronitor_id" {
- description = "Cronitor Monitor ID (6 chars key)."
- type        = string
- default     = ""
+  description = "Cronitor Monitor ID (6 chars key)."
+  type        = string
+  default     = ""
 }
 
 variable "opsgenie_integration_api_key" {
