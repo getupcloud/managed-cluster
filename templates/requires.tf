@@ -14,16 +14,6 @@ terraform {
       version = "< 1"
     }
 
-    cronitor = {
-      source  = "nauxliu/cronitor"
-      version = "~> 1"
-    }
-
-    opsgenie = {
-      source  = "opsgenie/opsgenie"
-      version = "~> 0.6"
-    }
-
     random = {
       version = "~> 2"
     }
