@@ -258,7 +258,7 @@ spec:
 %{~ if alertmanager_cronitor_id != "" }
         - name: cronitor
           webhook_configs:
-          - url: https://cronitor.link/${alertmanager_cronitor_id}/run
+          - url: https://cronitor.link/${alertmanager_cronitor_id}/complete
             send_resolved: false
 %{~ else }
         # Set manifests_template_vars.alertmanager_cronitor_id to configure Cronitor
