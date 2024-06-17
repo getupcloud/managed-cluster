@@ -37,7 +37,8 @@ COPY root/etc/yum.repos.d/ /etc/yum.repos.d/
 
 WORKDIR $CLUSTER_DIR
 
-RUN dnf install -y 'dnf-command(config-manager)' && \
+RUN sed -i -e 's/mirrorlist/#mirrorlist/g' -e 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* && \
+    dnf install -y 'dnf-command(config-manager)' && \
     dnf config-manager --set-enabled powertools && \
     dnf install -y epel-release epel-next-release && \
     dnf config-manager --add-repo https://rpm.releases.teleport.dev/teleport.repo && \
@@ -52,12 +53,12 @@ RUN \
         dialog httpie bind-utils httpd-tools iproute iputils tree \
         git net-tools nmap openssl openssl-devel bc \
         gettext jq rsync strace sshpass pv procps-ng time traceroute \
-        python38-devel python38-pip python39-devel python39-pip libffi-devel rust cargo" && \
+        python3.11-devel python3.11-pip python39-devel python39-pip libffi-devel rust cargo" && \
     dnf install -y $INSTALL_PACKAGES && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-RUN alternatives --set python3 /usr/bin/python3.9 && \
+RUN alternatives --set python3 /usr/bin/python3.11 && \
     pip3 install giturlparse.py pyyaml ruamel-yaml python-hcl2==3.0.5 && \
     curl -Lv https://github.com/junegunn/fzf/releases/download/0.29.0/fzf-0.29.0-linux_amd64.tar.gz \
         | sudo tar xzvf - -C /usr/local/bin && \
