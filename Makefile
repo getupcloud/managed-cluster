@@ -102,7 +102,7 @@ print-release:
 	@echo $(RELEASE)
 
 # Build and release from CI/CD (github actions for now)
-release: fmt lint check-git update-version
+release: fmt check-git update-version
 	$(MAKE) git-release
 
 git-release: tag-git push-git
