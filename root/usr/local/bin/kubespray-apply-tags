@@ -6,7 +6,7 @@ export ROOT_DIR=$(readlink -nf $(dirname $0))
 
 source /etc/profile.d/getup.sh
 
-if [[ "$1" =~ (-h|--help) ]] ; then
+if [ $# -gt 0 ] && [[ "$1" =~ (-h|--help) ]] ; then
     echo "Usage: $0 [ansible-playbook parameters...]"
     exit 1
 fi
