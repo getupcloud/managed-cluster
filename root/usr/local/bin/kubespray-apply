@@ -4,7 +4,7 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-if [[ "$1" =~ (-h|--help) ]] ; then
+if [ $# -gt 0 ] && [[ "$1" =~ (-h|--help) ]] ; then
     echo "Usage: $0 [ansible-playbook parameters...]"
     exit 1
 fi

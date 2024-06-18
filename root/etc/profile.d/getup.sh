@@ -244,9 +244,11 @@ function get_tf_config()
     case "$(hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|type")" in
         string|number|object)
             hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}"
+            return
         ;;
         array)
             hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|join(\"\n\")"
+            return
     esac
 
     echo $default
