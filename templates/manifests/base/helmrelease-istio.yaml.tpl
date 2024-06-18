@@ -125,15 +125,44 @@ spec:
       effect: NoSchedule
 
 ---
-apiVersion: telemetry.istio.io/v1alpha1
-kind: Telemetry
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
-  name: mesh-default
-  namespace: istio-system
+  name: telemetry-config
+  namespace: flux-system
 spec:
-  accessLogging:
-    - providers:
-      - name: envoy
+  chart:
+    spec:
+      chart: templater
+      sourceRef:
+        kind: HelmRepository
+        name: getupcloud
+      version: "~> 1"
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: telemetry-config
+  storageNamespace: istio-system
+  targetNamespace: istio-system
+  dependsOn:
+  - name: istio-base
+  values:
+    template-telemetry:
+      apiVersion: telemetry.istio.io/v1alpha1
+      kind: Telemetry
+      metadata:
+        name: mesh-default
+        namespace: istio-system
+      spec:
+        accessLogging:
+          - providers:
+            - name: envoy
 
 %{ if modules.istio.kiali.enabled ~}
 
