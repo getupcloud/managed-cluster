@@ -1,4 +1,5 @@
 VERSION_TXT          := version.txt
+DISTRO               ?= ubuntu
 FILE_VERSION         := $(shell cat $(VERSION_TXT))
 VERSION              := $(FILE_VERSION)
 RELEASE              := v$(VERSION)
@@ -9,7 +10,7 @@ IMAGE_NAME           ?= getupcloud/managed-cluster
 IMAGE                 = $(addsuffix /,$(IMAGE_HOST))$(IMAGE_NAME)
 
 GIT_COMMIT           ?= $(shell git log --pretty=format:"%h" -n 1)
-DOCKERFILE           := Dockerfile
+DOCKERFILE           := Dockerfile.$(DISTRO)
 DOCKER_BUILD_OPTIONS  = --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg VERSION=$(VERSION) --build-arg RELEASE=$(RELEASE)
 
 SEMVER_REGEX := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
