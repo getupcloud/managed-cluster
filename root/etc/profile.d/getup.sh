@@ -431,12 +431,23 @@ get_latest_version()
 fmt_version()
 {
     local v="$1"
+    local n="${2:-0}"
     v=( ${v//[.-]/ } )
+
+    if [ ${#v[*]} -eq 3 ]; then
+      v[3]=999
+    fi
+
     if [[ "${v[-1]}" =~ [a-z] ]]; then
       v[-1]=${v[-1]/alpha/1}
       v[-1]=${v[-1]/beta/2}
     fi
-    printf "%03d" ${v[@]}
+
+    if [ "$n" -gt 0 ]; then
+        printf "%03d" ${v[@]:0:$n}
+    else
+        printf "%03d" ${v[@]}
+    fi
 }
 
 update_ca_certificates()
