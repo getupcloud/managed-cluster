@@ -488,7 +488,11 @@ run_as_user()
     if ! CONTAINER_USER=$(id -nu $CONTAINER_USER_ID 2>/dev/null); then
         CONTAINER_USER=getup
         #info "Creating user $CONTAINER_USER ($CONTAINER_USER_ID)"
-        useradd $CONTAINER_USER -u $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -G wheel${DOCKER_SOCK_GROUP:+,$DOCKER_SOCK_GROUP} -m -k /etc/skel
+        local sudo_group=sudo
+        if grep -q ^wheel: /etc/group; then
+          sudo_group=wheel
+        fi
+        useradd $CONTAINER_USER -u $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -G ${sudo_group}${DOCKER_SOCK_GROUP:+,$DOCKER_SOCK_GROUP} -m -k /etc/skel
     fi
 
     export CONTAINER_USER
@@ -501,7 +505,7 @@ run_as_user()
 
     for src in .gitconfig .ssh .tsh; do
         if [ -d "/home/_host/$src" ]; then
-            cp -an /home/_host/$src $HOME/
+            cp -a --update=none /home/_host/$src $HOME/
         elif [ -e "/home/_host/$src" ]; then
             install -o $CONTAINER_USER_ID -g $CONTAINER_GROUP_ID -m 700 "/home/_host/$src" $HOME/
         fi
@@ -519,7 +523,7 @@ run_as_user()
         esac
 
         if ! [ -e "$private_key_path" ]; then
-            cp $CLUSTER_DIR/identity $private_key_path
+            cp -f $CLUSTER_DIR/identity $private_key_path
             ssh-keygen -yf $CLUSTER_DIR/identity > ${private_key_path}.pub
             chmod 400 $private_key_path
         fi
