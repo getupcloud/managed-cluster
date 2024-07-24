@@ -681,7 +681,7 @@ if $INSIDE_CONTAINER; then
     export DOT_CLUSTER_ENV="$CLUSTER_DIR/.cluster.env"
     source_env "$DOT_CLUSTER_ENV"
 
-  if [ -v KUBECTL_VERSION ] && [ -x "/usr/local/bin/kubectl_$KUBECTL_VERSION" ]; then
+  if [ "$UID" == 0 ] && [ -v KUBECTL_VERSION ] && [ -x "/usr/local/bin/kubectl_$KUBECTL_VERSION" ]; then
     ln -fs /usr/local/bin/kubectl_$KUBECTL_VERSION /usr/local/bin/kubectl
   fi
 else
