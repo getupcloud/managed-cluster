@@ -420,6 +420,12 @@ get_current_version()
 
 list_versions()
 {
+    if ! git show v1.0.1 -q -- . &>/dev/null; then
+        warn 'Missing git repo tags.'
+        warn 'Please run "git pull --tags" or use flag "-U|--no-check-update" and try again'
+        exit 2
+    fi
+
     GIT_DIR=${REPO_DIR:-.}/.git git tag | grep '^v[0-9]' | cut -c 2- | sort  -V -r
 }
 
@@ -438,9 +444,10 @@ fmt_version()
       v[3]=999
     fi
 
-    if [[ "${v[-1]}" =~ [a-z] ]]; then
-      v[-1]=${v[-1]/alpha/1}
-      v[-1]=${v[-1]/beta/2}
+    local last=$[ ${#v[*]} - 1 ]
+    if [[ "${v[$last]}" =~ [a-z] ]]; then
+      v[$last]=${v[$last]/alpha/1}
+      v[$last]=${v[$last]/beta/2}
     fi
 
     if [ "$n" -gt 0 ]; then
