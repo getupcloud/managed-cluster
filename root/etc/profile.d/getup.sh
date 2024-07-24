@@ -422,7 +422,7 @@ list_versions()
 {
     if ! git show v1.0.1 -q -- . &>/dev/null; then
         warn 'Missing git repo tags.'
-        warn 'Please run "git pull --tags" or use flag "-U|--no-check-update" and try again'
+        warn 'Please run "git fetch --tags upstream main" or use flag "-U|--no-check-update" and try again'
         exit 2
     fi
 
