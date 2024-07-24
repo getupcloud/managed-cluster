@@ -3,6 +3,8 @@ kind: Kustomization
 
 resources:
 - ../base/
+- helmrelease-cert-manager.yaml
+- helmrelease-cert-manager-config.yaml
 - helmrelease-cert-utils-operator.yaml
 - helmrepository.yaml
 - helmrelease-kyverno.yaml
@@ -11,8 +13,6 @@ resources:
 - cri-o-garbage-collector.yaml
 
 patchesStrategicMerge:
-- helmrelease-cert-manager.yaml
-- helmrelease-cert-manager-config.yaml
 - helmrelease-linkerd.yaml
 
 patches: []
