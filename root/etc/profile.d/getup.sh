@@ -668,12 +668,22 @@ fi
 
 if $INSIDE_CONTAINER; then
     pathmunge $REPO_DIR after
+
     export PROVIDER_ENV="$CLUSTER_DIR/provider.env"
     source_env "$PROVIDER_ENV"
     source_env_tf "$PROVIDER_ENV"
     export DOT_PROVIDER_ENV="$CLUSTER_DIR/.provider.env"
     source_env "$DOT_PROVIDER_ENV"
+
     source_env $ROOT_DIR/.dockerenv
+    export CLUSTER_ENV="$CLUSTER_DIR/cluster.env"
+    source_env "$CLUSTER_ENV"
+    export DOT_CLUSTER_ENV="$CLUSTER_DIR/.cluster.env"
+    source_env "$DOT_CLUSTER_ENV"
+
+  if [ -v KUBECTL_VERSION ] && [ -x "/usr/local/bin/kubectl_$KUBECTL_VERSION" ]; then
+    ln -fs /usr/local/bin/kubectl_$KUBECTL_VERSION /usr/local/bin/kubectl
+  fi
 else
     export REPO_DIR=$ROOT_DIR
 fi
