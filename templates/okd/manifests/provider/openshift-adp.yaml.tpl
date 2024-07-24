@@ -1,3 +1,4 @@
+%{ if modules.velero.enabled ~}
 ---
 apiVersion: v1
 kind: Namespace
@@ -93,3 +94,4 @@ spec:
     - '*'
     ttl: 336h0m0s
   useOwnerReferencesInBackup: false
+%{~ endif }

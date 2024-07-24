@@ -1,3 +1,4 @@
+%{ if modules.monitoring.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -840,3 +841,4 @@ spec:
 
     kubeDns:
       enabled: false
+%{~ endif }

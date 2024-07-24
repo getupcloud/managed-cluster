@@ -1,3 +1,4 @@
+%{ if modules.monitoring.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -36,3 +37,4 @@ spec:
 
     rabbitmq:
       enabled: true
+%{~ endif }

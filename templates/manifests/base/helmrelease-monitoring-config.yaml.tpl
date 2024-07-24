@@ -1,3 +1,4 @@
+%{ if modules.monitoring.enabled ~}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -60,4 +61,4 @@ spec:
           secretNamespace: monitoring
           #username: "monitoring"
           #password: "monitoring"
-
+%{~ endif }
