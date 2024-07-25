@@ -26,17 +26,15 @@ spec:
   targetNamespace: x509-exporter
   releaseName: x509-exporter
   values:
-%{ if cluster_type == "okd" ~}
-    secretsExporter:
-      securityContext:
-        runAsGroup: null
-        runAsUser: null
-%{~ endif }
-
     # Monitors certificates from secrets
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-tls-secrets
     secretsExporter:
       enabled: true
+%{ if cluster_type == "okd" ~}
+      securityContext:
+        runAsGroup: null
+        runAsUser: null
+%{~ endif }
 
     # Monitors certificates from node's filesystem
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-node-certificates-hostpath
