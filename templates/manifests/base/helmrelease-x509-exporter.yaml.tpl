@@ -40,7 +40,7 @@ spec:
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-node-certificates-hostpath
     hostPathsExporter:
       daemonSets:
-        controlPlane:
+        controlplane:
           nodeSelector:
             node-role.kubernetes.io/master: ""
           tolerations:
