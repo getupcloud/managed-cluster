@@ -31,7 +31,7 @@ spec:
       securityContext:
         runAsGroup: null
         runAsUser: null
-{% endif }
+%{~ endif }
 
     # Monitors certificates from secrets
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-tls-secrets
