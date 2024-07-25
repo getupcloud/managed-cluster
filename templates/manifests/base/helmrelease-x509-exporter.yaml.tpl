@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: x509-exporter
-  namespace: x509-exporter
+  namespace: flux-system
 spec:
   chart:
     spec:
