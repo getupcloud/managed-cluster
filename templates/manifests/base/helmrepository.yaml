@@ -269,3 +269,12 @@ metadata:
 spec:
   interval: 1h
   url: https://metallb.github.io/metallb
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: enix
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.enix.io

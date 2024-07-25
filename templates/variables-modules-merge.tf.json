@@ -143,6 +143,9 @@
         "enabled": "${try(var.modules.weave-gitops.enabled, var.modules_defaults.weave-gitops.enabled)}",
         "admin-username": "${try(var.modules.weave-gitops.admin-username, var.modules_defaults.weave-gitops.admin-username)}",
         "admin-password": "${try(var.modules.weave-gitops.admin-password, var.modules_defaults.weave-gitops.admin-password)}"
+      },
+      "x509-exporter": {
+        "enabled": "${try(var.modules.x509-exporter.enabled, var.modules_defaults.x509-exporter.enabled)}"
       }
     }
   }

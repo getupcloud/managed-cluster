@@ -120,6 +120,9 @@ variable "modules_defaults" {
       admin-username = string
       admin-password = string
     })
+    x509-exporter = object({
+      enabled = bool
+    })
   })
 
   default = {
@@ -261,6 +264,9 @@ variable "modules_defaults" {
       enabled        = false
       admin-username = "admin"
       admin-password = "admin"
+    }
+    x509-exporter = {
+      enabled = false
     }
   }
 }

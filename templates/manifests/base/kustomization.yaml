@@ -25,4 +25,5 @@ resources:
 - helmrelease-trivy-operator.yaml
 - helmrelease-velero.yaml
 - helmrelease-weave-gitops.yaml
+- helmrelease-x509-exporter.yaml
 - helmrepository.yaml
