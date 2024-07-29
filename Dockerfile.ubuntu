@@ -57,6 +57,7 @@ RUN apt update && \
       jq \
       libffi-dev \
       libssl-dev \
+      make \
       net-tools \
       nmap \
       pv \
@@ -181,7 +182,13 @@ RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/
     chmod -R 777 $KREW_ROOT && \
     for plugin in ${HELM_PLUGINS}; do \
         helm plugin install $plugin; \
-    done
+    done && \
+    wget https://github.com/caruccio/autokube/archive/refs/heads/main.zip && \
+    unzip main.zip && \
+    cd autokube-main && \
+    sudo make install install-user && \
+    cd ../ && \
+    rm -rf main.zip autokube-main
 
 RUN cd /etc/profile.d && \
     curl -skL https://raw.githubusercontent.com/jonmosco/kube-ps1/master/kube-ps1.sh > bash_ps1_kubernetes.sh && \
