@@ -67,22 +67,22 @@ spec:
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-node-certificates-hostpath
     # !! auto-generated from script x509-exporter-config-builder.sh !!
     hostPathsExporter:
-      daemonSets:
-        securityContext:
-          allowPrivilegeEscalation: true
-          privileged: true
-          readOnlyRootFilesystem: true
-          runAsGroup: 0
-          runAsUser: 0
-          capabilities:
-            drop:
-            - ALL
+      securityContext:
+        allowPrivilegeEscalation: true
+        privileged: true
+        readOnlyRootFilesystem: true
+        runAsGroup: 0
+        runAsUser: 0
+        capabilities:
+          drop:
+          - ALL
 %{~ if cluster_type == "okd" }
-          seLinuxOptions:
-            level: s0
-            user: system_u
+        seLinuxOptions:
+          level: s0
+          user: system_u
 %{~ endif }
 
+      daemonSets:
         controlplane:
           nodeSelector:
             node-role.kubernetes.io/master: ""
