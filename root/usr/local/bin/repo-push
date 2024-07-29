@@ -56,7 +56,7 @@ if $force; then
     git commit -m "$COMMIT_MESSAGE"
 elif ask "Select files to commit now? [Y/n]"; then
     FZF_PREVIEW="
-        if [ {1} == '??' ]; then
+        if [ '{1}' = '??' ]; then
             [ -d {2} ] && tree {2} || cat {2}
         else
             git diff --color {2}
