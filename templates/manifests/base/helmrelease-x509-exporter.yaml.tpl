@@ -34,6 +34,9 @@ subjects:
 - kind: ServiceAccount
   name: x509-exporter-hostpaths
   namespace: x509-exporter
+- kind: ServiceAccount
+  name: x509-exporter-secrets
+  namespace: x509-exporter
 ---
 %{~ endif }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
@@ -99,7 +102,7 @@ spec:
           - /etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-certs
           - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/aggregator-client-ca
           - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/client-ca
-          - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/trusted-ca-bundle
+          # - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/trusted-ca-bundle
           - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/aggregator-client
           - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/check-endpoints-client-cert-key
           - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/control-plane-node-admin-client-cert-key
@@ -110,7 +113,7 @@ spec:
           - /etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/service-network-serving-certkey
           - /etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/aggregator-client-ca
           - /etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/client-ca
-          - /etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/trusted-ca-bundle
+          # - /etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/trusted-ca-bundle
           - /etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer
           - /etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/kube-controller-manager-client-cert-key
           - /etc/kubernetes/static-pod-resources/kube-scheduler-certs/secrets/kube-scheduler-client-cert-key
