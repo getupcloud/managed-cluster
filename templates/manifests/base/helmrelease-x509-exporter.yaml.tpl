@@ -1,6 +1,12 @@
 %{ if modules.x509-exporter.enabled ~}
-%{~ if cluster_type == "okd" }
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: x509-exporter
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
+%{~ if cluster_type == "okd" }
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:

@@ -22,7 +22,7 @@ COLOR_RESET  := $(shell tput sgr0)
 .ONESHELL:
 .EXPORT_ALL_VARIABLES:
 
-default: build
+default: image
 
 define print_targets =
 Targets:$(shell $(MAKE) -p null | grep '^$(1):' | tail -n1 | cut -d: -f2-)
@@ -32,7 +32,7 @@ null:
 
 help:
 	@echo Target:
-	@echo '  build:              Create docker image (default). $(call print_targets,build)'
+	@echo '  image:              Build docker image (default). $(call print_targets,build)'
 	@echo '  fmt:                Run terraform fmt. $(call print_targets,fmt)'
 	@echo '  import:             Download terraform variables from cluster repositories. $(call print_targets,import)'
 	@echo '  modules:            Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
@@ -94,7 +94,7 @@ templates/variables-modules-merge.tf.json: templates/variables-modules.tf
 show-modules-vars:
 	grep 'modules\.[^[:space:],)}]\+' -r templates/*/manifests  templates/manifests/ -oh | sort -u
 
-build: modules
+image: modules
 	docker build -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
 	docker tag $(IMAGE):$(RELEASE) $(IMAGE):latest
 	#buildah bud -f $(DOCKERFILE) $(DOCKER_BUILD_OPTIONS) -t $(IMAGE):$(RELEASE) .
