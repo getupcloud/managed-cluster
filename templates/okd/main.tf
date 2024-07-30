@@ -7,7 +7,7 @@ module "cluster" {
   cluster_sla      = var.cluster_sla
   cluster_type     = local.cluster_type
   cluster_provider = var.cluster_provider
-  use_kubeconfig   = var.use_kubeconfig
+  use_kubeconfig   = true
   pre_create       = var.pre_create
   post_create      = var.post_create
   modules          = local.modules_result

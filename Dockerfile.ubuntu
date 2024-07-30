@@ -49,6 +49,7 @@ RUN apt update && \
       curl \
       dialog \
       dnsutils \
+      gawk \
       gettext \
       git \
       iproute2 \

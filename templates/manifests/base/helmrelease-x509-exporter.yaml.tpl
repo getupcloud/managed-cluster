@@ -3,8 +3,11 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: x509-exporter
+%{~ if cluster_type == "okd" }
   labels:
-    openshift.io/cluster-monitoring: "true"
+    openshift.io/cluster-monitoring: "false"
+    openshift.io/user-monitoring: "true"
+%{~ endif }
 ---
 %{~ if cluster_type == "okd" }
 apiVersion: rbac.authorization.k8s.io/v1
@@ -136,17 +139,21 @@ spec:
             operator: Exists
 
 %{~ if cluster_type == "okd" }
-          watchDirectories:
-          - /var/lib/kubelet/pki
+          watchFiles:
+          - /var/lib/kubelet/pki/kubelet-server-current.pem
+          - /var/lib/kubelet/pki/kubelet-client-current.pem
 
           watchKubeconfFiles:
           - /etc/kubernetes/kubeconfig
           - /etc/kubernetes/kubelet.conf
 %{~ endif }
 %{~ if cluster_type == "kubespray" }
+          watchFiles:
+          - /var/lib/kubelet/pki/kubelet-server-current.pem
+          - /var/lib/kubelet/pki/kubelet-client-current.pem
+
           watchDirectories:
           - /etc/kubernetes/ssl
-          - /var/lib/kubelet/pki
 
           watchKubeconfFiles:
           - /etc/kubernetes/kubelet.conf
@@ -168,6 +175,14 @@ spec:
     #  create: false
     #prometheusRules:
     #  create: false
+
+    prometheusServiceMonitor:
+      create: true
+      scrapeInterval: 600s
+    prometheusRules:
+      create: true
+      warningDaysLeft: 14
+      criticalDaysLeft: 7
 
     rbac:
       secretsExporter:
