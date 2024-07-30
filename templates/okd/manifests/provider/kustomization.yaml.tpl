@@ -3,9 +3,9 @@ kind: Kustomization
 
 resources:
 # Do not include all from ../base in order to use openshift native monitoring system
-- ../base/helmrepository.yaml
-- ../base/helmrelease-teleport-agent.yaml
-- ../base/helmrelease-x509-exporter.yaml
+- base-helmrepository.yaml
+- base-helmrelease-teleport-agent.yaml
+- base-helmrelease-x509-exporter.yaml
 - helmrelease-cert-manager.yaml
 - helmrelease-cert-manager-config.yaml
 - helmrelease-cert-utils-operator.yaml
@@ -16,7 +16,9 @@ resources:
 - cri-o-garbage-collector.yaml
 
 patchesStrategicMerge:
+%{~ if modules.linkerd.enabled && modules.linkerd.linkerd-viz.enabled}
 - helmrelease-linkerd.yaml
+%{~ endif }
 
 patches: []
 #- target:
