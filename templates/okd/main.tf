@@ -28,5 +28,5 @@ module "cluster" {
   api_endpoint        = var.api_endpoint
   generic_post_create = var.generic_post_create
   install_on_okd      = true
-  kubeconfig_filename = var.kubeconfig_filename
+  kubeconfig_filename = local.kubeconfig_filename
 }
