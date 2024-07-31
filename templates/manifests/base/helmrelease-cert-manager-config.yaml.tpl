@@ -29,7 +29,7 @@ spec:
   targetNamespace: cert-manager
   values:
     acme_email: ${ modules.cert-manager-config.acme_email }
-    ingress_class: ${ modules.cert-manager-config.ingress_class }
+    ingress_class: ${ cluster_type == "okd" ? "openshift-default" : modules.cert-manager-config.ingress_class }
 
     cluster_issuer_selfsigned:
       enabled: true

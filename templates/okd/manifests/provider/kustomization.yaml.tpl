@@ -5,14 +5,13 @@ resources:
 # Do not include all from ../base in order to use openshift native monitoring system
 - base-helmrepository.yaml
 - base-helmrelease-teleport-agent.yaml
-- base-helmrelease-x509-exporter.yaml
-- helmrelease-cert-manager.yaml
-- helmrelease-cert-manager-config.yaml
+- subscription-cert-manager.yaml
 - helmrelease-cert-utils-operator.yaml
+- base-helmrelease-x509-exporter.yaml
 - helmrepository.yaml
 - helmrelease-kyverno.yaml
 - helmrelease-trivy-operator-polr-adapter.yaml
-- openshift-adp.yaml
+- subscription-adp.yaml
 - cri-o-garbage-collector.yaml
 
 patchesStrategicMerge:
