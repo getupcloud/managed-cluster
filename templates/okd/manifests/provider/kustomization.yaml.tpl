@@ -14,10 +14,7 @@ resources:
 - subscription-adp.yaml
 - cri-o-garbage-collector.yaml
 
-patchesStrategicMerge:
-%{~ if modules.linkerd.enabled && modules.linkerd.linkerd-viz.enabled}
-- helmrelease-linkerd.yaml
-%{~ endif }
+patchesStrategicMerge: []
 
 patches: []
 #- target:

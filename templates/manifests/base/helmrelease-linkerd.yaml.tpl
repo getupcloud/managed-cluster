@@ -249,7 +249,7 @@ metadata:
   name: linkerd-viz
   namespace: linkerd-viz
 spec:
-  ingressClassName: nginx
+  ingressClassName: ${ cluster_type == "okd" ? "openshift-default" : "nginx" }
   rules:
   - host: ${modules.linkerd.linkerd-viz.hostname}
     http:
