@@ -70,10 +70,10 @@ spec:
   releaseName: x509-exporter
   valuesFrom:
   - kind: ConfigMap
-    name: host-paths-exporter-values-controlplane
+    name: host-paths-exporter-controlplane-values
     optional: true
   - kind: ConfigMap
-    name: host-paths-exporter-values-node
+    name: host-paths-exporter-node-values
     optional: true
   values:
     # Monitors certificates from node's filesystem
