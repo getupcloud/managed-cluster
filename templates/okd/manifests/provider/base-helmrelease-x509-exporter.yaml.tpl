@@ -3,13 +3,9 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: x509-exporter
-%{~ if cluster_type == "okd" }
   labels:
-    openshift.io/cluster-monitoring: "false"
-    openshift.io/user-monitoring: "true"
-%{~ endif }
+    openshift.io/cluster-monitoring: "true"
 ---
-%{~ if cluster_type == "okd" }
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -41,7 +37,6 @@ subjects:
   name: x509-exporter-secrets
   namespace: x509-exporter
 ---
-%{~ endif }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -91,11 +86,9 @@ spec:
         capabilities:
           drop:
           - ALL
-%{~ if cluster_type == "okd" }
         seLinuxOptions:
           level: s0
           user: system_u
-%{~ endif }
 
     # Monitors certificates from secrets
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-tls-secrets
