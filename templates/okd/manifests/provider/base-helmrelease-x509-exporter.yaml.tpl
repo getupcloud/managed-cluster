@@ -68,6 +68,8 @@ spec:
   storageNamespace: x509-exporter
   targetNamespace: x509-exporter
   releaseName: x509-exporter
+  dependsOn:
+  - name: x509-exporter-discovery
   valuesFrom:
   - kind: ConfigMap
     name: host-paths-exporter-controlplane-values
@@ -125,4 +127,35 @@ spec:
         serviceAccountName: x509-exporter-secrets
       hostPathsExporter:
         serviceAccountName: x509-exporter-hostpaths # must match RoleBinding for OKD clusters
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: x509-exporter-discovery
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: x509-exporter-discovery
+      sourceRef:
+        kind: HelmRepository
+        name: getupcloud
+      # version: "~> 3"
+  install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 5m
+  storageNamespace: x509-exporter
+  targetNamespace: x509-exporter
+  releaseName: x509-exporter-discovery
+  values:
+    okd: ${ cluster_type == "okd" }
+    configMap:
+        namespace: flux-system
 %{~ endif }
