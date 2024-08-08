@@ -1,3 +1,4 @@
+tmp/*
 **/.debug*
 **/.provider.env
 .kube
