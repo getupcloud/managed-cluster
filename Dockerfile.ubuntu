@@ -185,6 +185,10 @@ RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/
         helm plugin install $plugin; \
     done
 
+COPY root/ /
+COPY root/etc/skel/ /root/
+COPY Dockerfile.ubuntu /
+
 RUN cd /etc/profile.d && \
     curl -skL https://raw.githubusercontent.com/jonmosco/kube-ps1/master/kube-ps1.sh > bash_ps1_kubernetes.sh && \
     chmod +x bash_ps1_kubernetes.sh && \
@@ -195,13 +199,8 @@ RUN cd /etc/profile.d && \
     wget https://github.com/caruccio/autokube/archive/refs/heads/main.zip && \
     unzip main.zip && \
     cd autokube-main && \
-    sudo make install install-user && \
-    cd ../  && \
+    sudo make install && \
     rm -rf main.zip autokube-main
-
-COPY root/ /
-COPY root/etc/skel/ /root/
-COPY Dockerfile /
 
 ARG GIT_COMMIT
 ARG VERSION
