@@ -1,8 +1,5 @@
 #!/bin/bash
 
-declare -A CERTS=()
-declare -A CONFS=()
-
 OKD_ROOT_DIR=/etc/kubernetes/static-pod-resources
 CERTS_DIRS=(
   /etc/kubernetes
@@ -22,13 +19,11 @@ if [ -d "$OKD_ROOT_DIR" ]; then
     $OKD_ROOT_DIR/kube-scheduler-certs
   )
   for name in etcd kube-apiserver kube-controller-manager kube-scheduler; do
-    current_no=$(printf "%s\n" $OKD_ROOT_DIR/${name}-pod-*/ | awk -F- '{print $NF}' | sort -n | tail -n 1)
-    pod_dir="$OKD_ROOT_DIR/${name}-pod-$current_no"
-
-    if ! [ -d "$pod_dir" ]; then
-      continue
+    revision=$(printf "%s\n" $OKD_ROOT_DIR/${name}-pod-*/ | awk -F- '{print $NF}' | sort -n | tail -n 1)
+    pod_dir="$OKD_ROOT_DIR/${name}-pod-$revision"
+    if [ -d "$pod_dir" ]; then
+      PODS_DIRS+=( "$pod_dir" )
     fi
-    PODS_DIRS+=( "$pod_dir" )
   done
 fi
 
