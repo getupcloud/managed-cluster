@@ -183,13 +183,7 @@ RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/
     chmod -R 777 $KREW_ROOT && \
     for plugin in ${HELM_PLUGINS}; do \
         helm plugin install $plugin; \
-    done && \
-    wget https://github.com/caruccio/autokube/archive/refs/heads/main.zip && \
-    unzip main.zip && \
-    cd autokube-main && \
-    sudo make install install-user && \
-    cd ../ && \
-    rm -rf main.zip autokube-main
+    done
 
 RUN cd /etc/profile.d && \
     curl -skL https://raw.githubusercontent.com/jonmosco/kube-ps1/master/kube-ps1.sh > bash_ps1_kubernetes.sh && \
@@ -197,7 +191,13 @@ RUN cd /etc/profile.d && \
     curl -skL https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh > bash_ps1_git.sh && \
     chmod +x bash_ps1_git.sh && \
     kubectl completion bash > kubectl_completion.sh && \
-    chmod +x kubectl_completion.sh
+    chmod +x kubectl_completion.sh && \
+    wget https://github.com/caruccio/autokube/archive/refs/heads/main.zip && \
+    unzip main.zip && \
+    cd autokube-main && \
+    sudo make install install-user && \
+    cd ../  && \
+    rm -rf main.zip autokube-main
 
 COPY root/ /
 COPY root/etc/skel/ /root/
