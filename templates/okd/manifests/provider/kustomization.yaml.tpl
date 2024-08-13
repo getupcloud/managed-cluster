@@ -5,6 +5,7 @@ resources:
 # Do not include all from ../base in order to use openshift native monitoring system
 - base-helmrepository.yaml
 - base-helmrelease-monitoring.yaml
+- base-helmrelease-monitoring-config.yaml
 - base-helmrelease-teleport-agent.yaml
 - subscription-cert-manager.yaml
 - helmrelease-cert-utils-operator.yaml
