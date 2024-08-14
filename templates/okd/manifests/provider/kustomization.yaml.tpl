@@ -7,9 +7,9 @@ resources:
 - base-helmrelease-monitoring.yaml
 - base-helmrelease-monitoring-config.yaml
 - base-helmrelease-teleport-agent.yaml
+- base-helmrelease-x509-exporter.yaml
 - subscription-cert-manager.yaml
 - helmrelease-cert-utils-operator.yaml
-- base-helmrelease-x509-exporter.yaml
 - helmrepository.yaml
 - helmrelease-kyverno.yaml
 - helmrelease-trivy-operator-polr-adapter.yaml
