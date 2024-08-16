@@ -123,6 +123,9 @@ variable "modules_defaults" {
     x509-exporter = object({
       enabled = bool
     })
+    tiny-controllers = object({
+      enabled = bool
+    })
   })
 
   default = {
@@ -266,6 +269,9 @@ variable "modules_defaults" {
       admin-password = "admin"
     }
     x509-exporter = {
+      enabled = false
+    }
+    tiny-controllers = {
       enabled = false
     }
   }

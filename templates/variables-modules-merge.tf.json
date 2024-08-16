@@ -146,6 +146,9 @@
       },
       "x509-exporter": {
         "enabled": "${try(var.modules.x509-exporter.enabled, var.modules_defaults.x509-exporter.enabled)}"
+      },
+      "tiny-controllers": {
+        "enabled": "${try(var.modules.tiny-controllers.enabled, var.modules_defaults.tiny-controllers.enabled)}"
       }
     }
   }
