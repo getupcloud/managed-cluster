@@ -1,47 +1,4 @@
 %{ if modules.x509-exporter.enabled ~}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: x509-exporter
-%{~ if cluster_type == "okd" }
-  labels:
-    openshift.io/cluster-monitoring: "false"
-    openshift.io/user-monitoring: "true"
-%{~ endif }
----
-%{~ if cluster_type == "okd" }
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: system:openshift:scc:anyuid
-  namespace: x509-exporter
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:openshift:scc:anyuid
-subjects:
-- kind: ServiceAccount
-  name: x509-exporter-hostpaths
-  namespace: x509-exporter
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: system:openshift:scc:privileged
-  namespace: x509-exporter
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:openshift:scc:privileged
-subjects:
-- kind: ServiceAccount
-  name: x509-exporter-hostpaths
-  namespace: x509-exporter
-- kind: ServiceAccount
-  name: x509-exporter-secrets
-  namespace: x509-exporter
----
-%{~ endif }
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -68,6 +25,8 @@ spec:
   storageNamespace: x509-exporter
   targetNamespace: x509-exporter
   releaseName: x509-exporter
+  dependsOn:
+  - name: x509-exporter-discovery
   valuesFrom:
   - kind: ConfigMap
     name: host-paths-exporter-controlplane-values
@@ -89,11 +48,6 @@ spec:
         capabilities:
           drop:
           - ALL
-%{~ if cluster_type == "okd" }
-        seLinuxOptions:
-          level: s0
-          user: system_u
-%{~ endif }
 
     # Monitors certificates from secrets
     # https://github.com/enix/x509-certificate-exporter/tree/main/deploy/charts/x509-certificate-exporter#metrics-for-tls-secrets
@@ -125,4 +79,35 @@ spec:
         serviceAccountName: x509-exporter-secrets
       hostPathsExporter:
         serviceAccountName: x509-exporter-hostpaths # must match RoleBinding for OKD clusters
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: x509-exporter-discovery
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: x509-exporter-discovery
+      sourceRef:
+        kind: HelmRepository
+        name: getupcloud
+      # version: "~> 3"
+  install:
+    createNamespace: true
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    disableWait: false
+    remediation:
+      retries: -1
+  interval: 5m
+  storageNamespace: x509-exporter
+  targetNamespace: x509-exporter
+  releaseName: x509-exporter-discovery
+  values:
+    okd: false
+    configMap:
+        namespace: flux-system
 %{~ endif }

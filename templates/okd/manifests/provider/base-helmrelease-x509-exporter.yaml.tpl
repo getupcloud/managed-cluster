@@ -1,3 +1,4 @@
+# from base/helmrelease-x509-exporter.yaml.tpl
 %{ if modules.x509-exporter.enabled ~}
 apiVersion: v1
 kind: Namespace
@@ -148,7 +149,7 @@ spec:
   targetNamespace: x509-exporter
   releaseName: x509-exporter-discovery
   values:
-    okd: ${ cluster_type == "okd" }
+    okd: true
     configMap:
         namespace: flux-system
 %{~ endif }

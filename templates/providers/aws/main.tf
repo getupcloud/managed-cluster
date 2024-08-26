@@ -33,3 +33,15 @@ module "ebs-csi" {
   cluster_name            = var.cluster_name
   cluster_oidc_issuer_url = var.modules.ebs-csi.cluster_oidc_issuer_url
 }
+
+module "logging" {
+  count  = local.modules.logging.enabled ? 1 : 0
+  source = "github.com/getupcloud/terraform-module-aws-loki?ref=v1.3"
+
+  cluster_name            = var.cluster_name
+  customer_name           = var.customer_name
+  cluster_oidc_issuer_url = var.modules.logging.cluster_oidc_issuer_url
+  tags                    = var.modules.logging.tags
+  region                  = var.modules.logging.region
+  account_id              = var.account_id
+}

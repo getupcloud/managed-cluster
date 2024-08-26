@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - ../provider/
+#- project-template.yaml
 ### To install logging you must remove it from excludes.yaml
 #- helmrelease-logging-grafana.yaml
 #- dns.operator.default.yaml

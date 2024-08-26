@@ -3,17 +3,19 @@ kind: Kustomization
 
 resources:
 # Do not include all from ../base in order to use openshift native monitoring system
-- base-helmrepository.yaml
-- base-helmrelease-monitoring.yaml
-- base-helmrelease-monitoring-config.yaml
-- base-helmrelease-teleport-agent.yaml
-- base-helmrelease-x509-exporter.yaml
-- subscription-cert-manager.yaml
-- helmrelease-cert-utils-operator.yaml
 - helmrepository.yaml
+- helmrelease-monitoring-config.yaml
+- helmrelease-teleport-agent.yaml
+- helmrelease-x509-exporter.yaml
+- openshift-helmrepository.yaml
+- openshift-operators-namespace.yaml
+- openshift-cert-manager.yaml
+- openshift-adp.yaml
+- openshift-logging.yaml
+- openshift-monitoring.yaml
+- helmrelease-cert-utils-operator.yaml
 - helmrelease-kyverno.yaml
 - helmrelease-trivy-operator-polr-adapter.yaml
-- subscription-adp.yaml
 - cri-o-garbage-collector.yaml
 
 patchesStrategicMerge: []
