@@ -14,11 +14,9 @@ module "eks" {
   dump_debug          = var.dump_debug
 
   # monitoring and operations
-  cronitor_enabled            = var.cronitor_enabled
-  cronitor_pagerduty_key      = var.cronitor_pagerduty_key
-  cronitor_notification_lists = var.cronitor_notification_lists
-  opsgenie_enabled            = var.opsgenie_enabled
-  teleport_auth_token         = var.teleport_auth_token
+  cronitor_id                  = var.cronitor_id
+  opsgenie_integration_api_key = opsgenie_integration_api_key
+  teleport_auth_token          = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo
