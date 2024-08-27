@@ -42,7 +42,7 @@ variable "flux_git_repo" {
 variable "flux_version" {
   description = "Flux version to install"
   type        = string
-  default     = "v0.41.2"
+  default     = "v2.3.0"
 }
 
 variable "flux_install_file" {
