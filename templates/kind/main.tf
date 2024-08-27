@@ -1,5 +1,5 @@
 module "kind" {
-  source = "github.com/getupcloud/terraform-cluster-kind?ref=v2.5.1"
+  source = "github.com/getupcloud/terraform-cluster-kind?ref=v3.0.0"
 
   # cluster basics
   customer_name  = var.customer_name
@@ -12,10 +12,8 @@ module "kind" {
   #dump_debug          = var.dump_debug
 
   # monitoring and operations
-  cronitor_enabled           = var.cronitor_enabled
-  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
-  cronitor_notification_list = var.cronitor_notification_lists
-  opsgenie_enabled           = var.opsgenie_enabled
+  cronitor_id                  = var.cronitor_id
+  opsgenie_integration_api_key = var.opsgenie_integration_api_key
   teleport_auth_token        = var.teleport_auth_token
 
   # flux
@@ -23,6 +21,4 @@ module "kind" {
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
   manifests_template_vars = local.manifests_template_vars
-
-  # provider specific
 }
