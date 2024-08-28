@@ -13,3 +13,9 @@ variable "modules" {
   type        = any
   default     = {}
 }
+
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+  default     = ""
+}

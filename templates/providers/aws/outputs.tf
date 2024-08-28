@@ -9,3 +9,7 @@ output "velero" {
 output "ebs-csi" {
   value = try(var.modules.ebs-csi.enabled, false) ? module.ebs-csi[0] : {}
 }
+
+output "logging" {
+  value = try(var.modules.logging.enabled, false) ? module.logging[0] : {}
+}

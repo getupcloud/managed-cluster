@@ -35,7 +35,7 @@ module "ebs-csi" {
 }
 
 module "logging" {
-  count  = local.modules.logging.enabled ? 1 : 0
+  count  = var.modules.logging.enabled ? 1 : 0
   source = "github.com/getupcloud/terraform-module-aws-loki?ref=v1.3"
 
   cluster_name            = var.cluster_name

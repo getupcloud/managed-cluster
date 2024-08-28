@@ -1,9 +1,21 @@
 ## Provider specific variables
 
+variable "region" {
+  description = "Cluster Region"
+  type        = string
+  default     = "unknown"
+}
+
+variable "get_kubeconfig_command" {
+  description = "Command to create/update kubeconfig"
+  type        = string
+  default     = "kind export kubeconfig --name $CLUSTER_NAME"
+}
+
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.20"
+  default     = "1.29"
 }
 
 variable "kubeadm_config_patches" {

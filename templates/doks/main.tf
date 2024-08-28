@@ -1,5 +1,5 @@
 module "doks" {
-  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.8.1"
+  source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.10.0"
 
   # cluster basics
   customer_name  = var.customer_name
@@ -11,11 +11,9 @@ module "doks" {
   doks_modules   = var.doks_modules
 
   # monitoring and operations
-  cronitor_enabled           = var.cronitor_enabled
-  cronitor_pagerduty_key     = var.cronitor_pagerduty_key
-  cronitor_notification_list = local.cronitor_notification_list
-  opsgenie_enabled           = var.opsgenie_enabled
-  teleport_auth_token        = var.teleport_auth_token
+  cronitor_id                  = var.cronitor_id
+  opsgenie_integration_api_key = var.opsgenie_integration_api_key
+  teleport_auth_token          = var.teleport_auth_token
 
   # flux
   flux_git_repo           = var.flux_git_repo

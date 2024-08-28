@@ -43,7 +43,7 @@ variable "kubespray_dir" {
 variable "inventory_file" {
   description = "Kubespray inventory file"
   type        = string
-  default     = "/cluster/hosts.yaml"
+  default     = "hosts.yaml"
 }
 
 variable "master_nodes" {
@@ -236,7 +236,7 @@ variable "ssh_password" {
 variable "ssh_private_key" {
   description = "Path for SSH private key"
   type        = string
-  default     = "/cluster/identity"
+  default     = "identity"
 }
 
 variable "ssh_bastion_host" {
