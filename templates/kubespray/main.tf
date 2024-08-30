@@ -1,5 +1,5 @@
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v5.1.1"
+  source = "github.com/getupcloud/terraform-cluster-kubespray?ref=v5.1.2"
 
   # cluster basics
   customer_name      = var.customer_name
