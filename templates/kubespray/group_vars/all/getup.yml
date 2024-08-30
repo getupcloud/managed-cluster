@@ -2,9 +2,36 @@ kubeconfig_localhost: true
 
 kubelet_rotate_server_certificates: true
 
+## Automatically renew K8S control plane certificates on first Monday of each month
+
+### NOTICE ###
+### The option below must be disable in group_vars/k8s_cluster/k8s-cluster.yml
+auto_renew_certificates: true
+### NOTICE ###
+
+# First Monday of each month
+# Timer Format: DayOfWeek Year-Month-Day Hour:Minute:Second
+auto_renew_certificates_systemd_calendar: "Mon *-2,7-1,2,3,4,5,6,7 03:{{ groups['kube_control_plane'].index(inventory_hostname) }}0:00"
+
 # https://github.com/postfinance/kubelet-csr-approver/blob/main/charts/kubelet-csr-approver/values.yaml
 kubelet_csr_approver_values:
   # optional, permits to bypass dns resolution checks. default: false
   bypassDnsResolution: true
   # number of DNS SAN names allowed in a certificate request. defaults to 1
   allowedDnsNames: 3
+
+additional_sysctl:
+- name: fs.aio-max-nr
+  value: 1048576
+- name: fs.file-max
+  value: 104857600
+- name: fs.nr_open
+  value: 10485760
+- name: fs.inotify.max_user_instances
+  value: 1048576
+- name: fs.inotify.max_user_watches
+  value: 1048576
+- name: kernel.pid_max
+  value: 128000
+- name: kernel.threads-max
+  value: 128000
