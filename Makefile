@@ -104,7 +104,7 @@ print-release:
 
 # Build and release from CI/CD (github actions for now)
 release: fmt check-git update-version
-	$(MAKE) git-release
+	$(MAKE) git-release image image-push
 
 git-release: tag-git push-git
 	@echo Finished $(RELEASE) release
