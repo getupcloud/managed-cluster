@@ -92,7 +92,7 @@ RUN (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y
 
 RUN python3 -m venv /pyenv && \
     chmod o+w -R /pyenv && \
-    source /pyenv/bin/activate &&
+    source /pyenv/bin/activate && \
     pip3 install giturlparse.py pyyaml ruamel-yaml python-hcl2==3.0.5 && \
     curl -Lv https://github.com/junegunn/fzf/releases/download/0.29.0/fzf-0.29.0-linux_amd64.tar.gz \
         | sudo tar xzvf - -C /usr/local/bin && \
