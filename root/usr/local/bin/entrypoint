@@ -2,6 +2,7 @@
 
 export ENTRYPOINT=$0
 source /etc/profile.d/getup.sh
+source /pyenv/bin/activate
 
 update_ca_certificates
 run_as_user "$@"
