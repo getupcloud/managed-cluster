@@ -23,7 +23,7 @@ data:
   identity.pub: ${ base64encode(identity_pub) }
   known_hosts: ${ base64encode(known_hosts) }
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: ${ git_repository_name }
