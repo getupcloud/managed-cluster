@@ -73,7 +73,7 @@ volumes:
 ##
 
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: linkerd-crds
@@ -103,7 +103,7 @@ spec:
     cniEnabled: ${ modules.linkerd.linkerd-cni.enabled }
 
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: linkerd-control-plane
@@ -184,7 +184,7 @@ spec:
 ##
 
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: linkerd-cni
@@ -275,7 +275,7 @@ type: Opaque
 data:
   auth: ${base64encode(modules.linkerd.output.linkerd-viz-htpasswd)}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: linkerd-viz
@@ -324,7 +324,7 @@ spec:
 
 %{~ if modules.linkerd.linkerd-jaeger.enabled }
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: linkerd-jaeger

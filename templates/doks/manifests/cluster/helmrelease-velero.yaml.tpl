@@ -1,7 +1,7 @@
 %{ if modules.velero.enabled ~}
 ## See https://github.com/digitalocean/velero-plugin for instructions
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: velero

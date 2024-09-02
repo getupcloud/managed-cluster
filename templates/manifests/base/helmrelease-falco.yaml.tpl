@@ -1,5 +1,5 @@
 %{ if modules.falco.enabled ~}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: falco
@@ -47,7 +47,7 @@ spec:
       effect: NoSchedule
 %{ if modules.falco.falco-exporter.enabled ~}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: falco-exporter
@@ -92,7 +92,7 @@ spec:
 %{~ endif }
 %{ if modules.falco.event-generator.enabled ~}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: event-generator

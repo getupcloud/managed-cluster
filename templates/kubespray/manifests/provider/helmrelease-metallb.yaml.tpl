@@ -1,6 +1,6 @@
 %{ if modules.metallb.enabled ~}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: metallb
@@ -63,7 +63,7 @@ spec:
         - effect: NoSchedule
           operator: Exists
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: metallb-config

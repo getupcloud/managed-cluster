@@ -1,5 +1,5 @@
 %{ if modules.cert-manager.enabled ~}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: cert-manager

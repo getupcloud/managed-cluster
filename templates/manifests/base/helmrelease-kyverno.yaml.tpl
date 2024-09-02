@@ -1,6 +1,6 @@
 %{ if modules.kyverno.enabled ~}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kyverno
@@ -33,7 +33,7 @@ spec:
         memory: 2Gi
 %{~ if modules.kyverno.kyverno-policies.enabled }
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kyverno-policies

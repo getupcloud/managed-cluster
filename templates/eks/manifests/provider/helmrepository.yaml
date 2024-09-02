@@ -1,5 +1,5 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: eks
@@ -8,7 +8,7 @@ spec:
   interval: 1h
   url: https://aws.github.io/eks-charts
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: aws-ebs-csi-driver
@@ -17,7 +17,7 @@ spec:
   interval: 1h
   url: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: aws-efs-csi-driver

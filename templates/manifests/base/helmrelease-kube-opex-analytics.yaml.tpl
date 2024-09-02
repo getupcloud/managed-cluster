@@ -54,7 +54,7 @@ metadata:
   name: kube-opex-analytics-secrets
   namespace: kube-opex-analytics
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kube-opex-analytics
