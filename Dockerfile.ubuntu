@@ -198,11 +198,12 @@ RUN cd /etc/profile.d && \
     chmod +x bash_ps1_git.sh && \
     kubectl completion bash > kubectl_completion.sh && \
     chmod +x kubectl_completion.sh && \
+    cd /opt && \
     wget https://github.com/caruccio/autokube/archive/refs/heads/main.zip && \
     unzip main.zip && \
+    rm -f main.zip && \
     cd autokube-main && \
-    sudo make install && \
-    rm -rf main.zip autokube-main
+    make install
 
 ARG GIT_COMMIT
 ARG VERSION
