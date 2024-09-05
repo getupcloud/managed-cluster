@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo '## All Nodes ##'
+cat <<EOF
+kubespray-exec all -- yum install -y firewalld
+kubespray-exec all -- systemctl start firewalld
+kubespray-exec all -- firewall-cmd --permanent --add-port=10250/tcp         # Kubelet API
+kubespray-exec all -- firewall-cmd --permanent --add-port=8285/udp          # Flannel
+kubespray-exec all -- firewall-cmd --permanent --add-port=8472/udp          # Flannel
+kubespray-exec all -- firewall-cmd --permanent --add-port=30000-32767/tcp   # NodePorts
+kubespray-exec all -- firewall-cmd --permanent --add-masquerade
+kubespray-exec all -- firewall-cmd --reload
+kubespray-exec all -- systemctl restart firewalld
+EOF
+
+echo
+echo '## Control Plane ##'
+cat <<EOF
+kubespray-exec masters -- firewall-cmd --permanent --add-port=6443/tcp          # Kubernetes API server
+kubespray-exec masters -- firewall-cmd --permanent --add-port=2379-2380/tcp     # etcd server client API
+kubespray-exec masters -- firewall-cmd --permanent --add-port=10251/tcp         # kube-scheduler
+kubespray-exec masters -- firewall-cmd --permanent --add-port=10252/tcp         # kube-controller-manager
+kubespray-exec masters -- firewall-cmd --permanent --add-masquerade
+kubespray-exec masters -- firewall-cmd --reload
+kubespray-exec masters -- systemctl restart firewalld
+EOF
