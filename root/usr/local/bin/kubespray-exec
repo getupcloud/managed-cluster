@@ -4,13 +4,57 @@ set -eu
 
 source /etc/profile.d/getup.sh
 
-if [ $# -gt 0 ] && [[ "$1" =~ (-h|--help) ]] ; then
-    echo "Usage: $0 command [parameters...]"
-    exit 1
-fi
+hosts=()
+cmd=()
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      echo "Usage: $0 command [parameters...]"
+      exit
+    ;;
+
+    --)
+      shift
+      break
+    ;;
+
+    *)
+      # some sugar
+      case "$1" in
+        masters|controlplane|control-plane|cp)
+          if grep -q kube_control_plane $INVENTORY_FILE; then
+            hosts+=("kube_control_plane")
+          elif grep -q kube-control-plane $INVENTORY_FILE; then
+            hosts+=("kube-control-plane")
+          else
+            hosts+=("$1")
+          fi
+        ;;
+        nodes|workers|apps)
+          if grep -q kube_node $INVENTORY_FILE; then
+            hosts+=("kube_node")
+          elif grep -q kube-node $INVENTORY_FILE; then
+            hosts+=("kube-node")
+          else
+            hosts+=("$1")
+          fi
+        ;;
+        *)
+          hosts+=("$1")
+      esac
+      shift
+  esac
+done
 
 user=$(get_tf_config SSH_USER ssh_user centos)
 
-set -x
+if [ ${#hosts[*]} -eq 0 ]; then
+  hosts=(all)
+fi
 
-ansible all -i $INVENTORY_FILE --become --user $user -m shell -a "$*"
+hosts="${hosts[*]}"
+hosts="${hosts// /,}," # make it a string list for ansible to accept hosts also
+
+set -x
+ansible $hosts -i $INVENTORY_FILE --become --user $user -m shell -a "$*"
