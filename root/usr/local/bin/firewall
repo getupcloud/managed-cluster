@@ -20,7 +20,6 @@ kubespray-exec masters -- firewall-cmd --permanent --add-port=6443/tcp          
 kubespray-exec masters -- firewall-cmd --permanent --add-port=2379-2380/tcp     # etcd server client API
 kubespray-exec masters -- firewall-cmd --permanent --add-port=10251/tcp         # kube-scheduler
 kubespray-exec masters -- firewall-cmd --permanent --add-port=10252/tcp         # kube-controller-manager
-kubespray-exec masters -- firewall-cmd --permanent --add-masquerade
 kubespray-exec masters -- firewall-cmd --reload
 kubespray-exec masters -- systemctl restart firewalld
 EOF
