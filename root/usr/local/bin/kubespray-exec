@@ -7,10 +7,15 @@ source /etc/profile.d/getup.sh
 hosts=()
 cmd=()
 
+if ! grep -q ' -- ' <<<"$*"; then
+  # do not have -- so we force one
+  set -- -- "$@"
+fi
+
 while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help)
-      echo "Usage: $0 command [parameters...]"
+      echo "Usage: $0 [hosts...] [--] [command, [parameters...]]"
       exit
     ;;
 
@@ -54,7 +59,7 @@ if [ ${#hosts[*]} -eq 0 ]; then
 fi
 
 hosts="${hosts[*]}"
-hosts="${hosts// /,}," # make it a string list for ansible to accept hosts also
+hosts="${hosts// /,}," # make it a string list for ansible to accept hostnames
 
 set -x
 ansible $hosts -i $INVENTORY_FILE --become --user $user -m shell -a "$*"
