@@ -214,6 +214,7 @@ RUN echo $VERSION > /.version && \
     echo $GIT_COMMIT > /.gitcommit && \
     rsync /etc/skel/ /root/ && \
     chmod -R +x /etc/profile.d/ && \
-    chmod 777 /usr/share
+    chmod 777 /usr/share && \
+    chmod -R 777 /usr/local/bin
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
