@@ -4,7 +4,7 @@
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: grafana
@@ -12,7 +12,7 @@ metadata:
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: loki
@@ -20,7 +20,7 @@ metadata:
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: velero
@@ -28,14 +28,14 @@ metadata:
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: monitoring
   namespace: flux-system
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: monitoring-config
@@ -43,7 +43,7 @@ metadata:
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: cluster-autoscaler
@@ -51,7 +51,7 @@ metadata:
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: grafana-extra-dashboards
@@ -59,7 +59,7 @@ metadata:
 
 ---
 $patch: delete
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: ingress-nginx

@@ -38,7 +38,7 @@ subjects:
   name: x509-exporter-secrets
   namespace: x509-exporter
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: x509-exporter
@@ -122,7 +122,7 @@ spec:
       hostPathsExporter:
         serviceAccountName: x509-exporter-hostpaths # must match RoleBinding for OKD clusters
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: x509-exporter-discovery
