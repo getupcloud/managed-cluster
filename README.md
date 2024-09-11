@@ -6,22 +6,31 @@
 
 ## Bootstrap from base repository
 
-Clone this repo and give it a meaningful name:
+### Clone this repo and give it a meaningful name:
 
 ```sh
 $ git clone git@github.com:getupcloud/managed-cluster.git managed-cluster-evilcorp
-                                                          ^^^^^^^^^^^^^^^^^^^^^^^^
-
 $ cd managed-cluster-evilcorp
 ```
 
-Bootstrap an initial config for a new cluster named `production`:
+### Install required tools as root:
+
+```sh
+$ sudo make install
+```
+
+### Install docker or compatible
+
+This depends on your distro. Fedora/Centos based distros can install either podman or moby-engine.
+
+
+### Bootstrap an initial config for a new cluster named `production`:
 
 ```sh
 $ ./managed-cluster create
 ```
 
-All cluster configs will be stored inside the directory structure `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}`.
+The cluster configs will be stored inside the directory `./clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}`.
 
 ## Start installer container
 
@@ -55,6 +64,24 @@ After terraform finishes, you will be asked to create a github repo and push thi
 
 Flux will be installed and configured to sync from `${GITHUB_REPO}/clusters/${CLUSTER_NAME}/${CLUSTER_TYPE}/manifests/cluster/kustomization.yaml`.
 
+### Kubespary/OnpPremises only
+
+The first time you run terraform-apply, it will provision the hosts (install basic packages, configure swap, format disks, etc).
+After that, you must manually start kubespray using the command:
+
+```sh
+$ kubespray-apply
+```
+
+If kubespray finishes with success, run `terraform-apply` again.
+
+From now, it will not `provision` hosts anymore, and will only commit and push flux manifests to git (`install` mode).
+In case you need to re-provision the hosts (maybe to add new hosts or update the OS), go back to `provision` mode with:
+
+```sh
+$ kubespray-mode terraform-provision
+```
+
 ## Updating the cluster
 
 In order to update any config, simply `terraform-edit` and then `terraform-apply`.
@@ -67,7 +94,6 @@ This is the complete workflow (created in https://asciiflow.com)
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                                                                   │
 │                                                                                                                                   │
 │          ##################                               ##################                                                      │
 │          # CREATE CLUSTER #                               # UPDATE CLUSTER #                                                      │
@@ -105,15 +131,17 @@ This is the complete workflow (created in https://asciiflow.com)
 │   │              │               │         │                      │                         └──┤ git merge $latest-tag │          │
 │   │              ▼               │         │                      │                            └───────────────────────┘          │
 │   │     ┌──────────────────┐     │         │                      │                                                               │
-│   │     │ terraform-apply  │     │         │                      │                                                               │
-│   │     └──────────────────┘     │         │                      │                                                               │
-│   │                              │         │                      │                        ┌──────────────────────────────┐       │
-│   └──────────────────────────────┘         │                      ▼                     ┌──┤ rsync templates/ -> /cluster │       │
-│                                            │       ┌───────────────────────────────┐    │  └──────────────────────────────┘       │
-│                                            └───────┤ managed-cluster sync-template │◄───┤                                         │
-│                                                    └───────────────────────────────┘    │  ┌────────────────────────────────────┐ │
-│                                                                                         └──┤ rsync templates/$type/ -> /cluster │ │
-│                                                                                            └────────────────────────────────────┘ │
-│ * required only once                                                                                                              │
+│   │     │ terraform-apply  │◄─┐  │         │                      │                                                               │
+│   │     └────────┬─────────┘  │  │         │                      │                                                               │
+│   │              │            │  │         │                      │                        ┌──────────────────────────────┐       │
+│   │              │            │  │         │                      ▼                     ┌──┤ rsync templates/ -> /cluster │       │
+│   │              │            │  │         │       ┌───────────────────────────────┐    │  └──────────────────────────────┘       │
+│   │              ▼            │  │         └───────┤ managed-cluster sync-template │◄───┤                                         │
+│   │     ┌─────────────────┐** │  │                 └───────────────────────────────┘    │  ┌────────────────────────────────────┐ │
+│   │     │ kubespray-apply │───┘  │                                                      └──┤ rsync templates/$type/ -> /cluster │ │
+│   │     └─────────────────┘      │                                                         └────────────────────────────────────┘ │
+│   └──────────────────────────────┘                                                                                                │
+│                                                                                                                                   │
+│ * required only once         ** kubespray only                                                                                    │
 └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```

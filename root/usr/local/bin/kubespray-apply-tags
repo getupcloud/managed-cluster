@@ -32,3 +32,5 @@ fi
 
 echo Kubernetes Version: $kube_version
 ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user --tags $tags $@ $KUBESPRAY_DIR/cluster.yml
+
+kubespray-mode terraform-install
