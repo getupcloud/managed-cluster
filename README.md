@@ -9,7 +9,7 @@
 ### Clone this repo and give it a meaningful name:
 
 ```sh
-$ git clone git@github.com:getupcloud/managed-cluster.git managed-cluster-evilcorp
+$ git clone https://github.com/getupcloud/managed-cluster.git managed-cluster-evilcorp
 $ cd managed-cluster-evilcorp
 ```
 
