@@ -25,7 +25,6 @@ while [ $# -gt 0 ]; do
       ansible_args+=("$1")
     ;;
 
-
     --)
       shift
       break
@@ -55,8 +54,8 @@ while [ $# -gt 0 ]; do
         *)
           hosts+=("$1")
       esac
-      shift
   esac
+  shift
 done
 
 user=$(get_tf_config SSH_USER ssh_user centos)
