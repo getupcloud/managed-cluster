@@ -24,9 +24,10 @@ if ! $force; then
     tf_init=true
 fi
 
+deploy_components=$(get_tf_config DEPLOY_COMPONENTS deploy_components false)
+
 info Switching to $CLUSTER_DIR
 cd $CLUSTER_DIR
-
 
 if $force; then
     if $tf_init; then
@@ -35,9 +36,12 @@ if $force; then
     execute_command terraform validate
     execute_command terraform apply -auto-approve
     execute_command terraform fmt
-    execute_command repo-push $opt_force
-    execute_command kubeconfig-get $opt_force
-    execute_command flux reconcile source git cluster
+
+    if [ "$cluster_type" != "kubespray" ] || [ "$deploy_components" == "true" ]; then
+      execute_command repo-push $opt_force
+      execute_command kubeconfig-get $opt_force
+      execute_command flux reconcile source git cluster
+    fi
 else
     ask_execute_command terraform init
     ask_execute_command terraform validate
@@ -45,10 +49,13 @@ else
     _default=n \
         ask_execute_command terraform apply $TF_PLAN_FILE
     ask_execute_command terraform fmt
-    ask_execute_command repo-push
 
-    [ -e "$KUBECONFIG" ] && _default=n; \
-        ask_execute_command kubeconfig-get
+    if [ "$cluster_type" != "kubespray" ] || [ "$deploy_components" == "true" ]; then
+      ask_execute_command repo-push
+
+      [ -e "$KUBECONFIG" ] && _default=n; \
+          ask_execute_command kubeconfig-get
+    fi
 fi
 
 t=$(date -d@$SECONDS -u +%Hh%Mm%Ss)
