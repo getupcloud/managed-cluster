@@ -236,13 +236,13 @@ function get_tf_config()
         echo ${!sh_var_name}
         return
     elif [ -v TF_VAR_$tf_var_name ]; then
-        local v=TV_VAR_$tf_var_name
+        local v=TF_VAR_$tf_var_name
         echo ${!v}
         return
     fi
 
     case "$(hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|type")" in
-        string|number|object)
+        string|number|object|boolean)
             hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}"
             return
         ;;
