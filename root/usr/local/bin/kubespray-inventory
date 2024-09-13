@@ -10,5 +10,9 @@ if [ $# -gt 0 ] && [[ "$1" =~ (-h|--help) ]] ; then
 fi
 
 set -x
-terraform plan -out=/cluster/terraform.tfplan -target=module.cluster.shell_script.kubespray-inventory
+
+terraform plan -out=/cluster/terraform.tfplan \
+  -target=module.cluster.shell_script.kubespray-inventory \
+  -replace=module.cluster.shell_script.kubespray-inventory
+
 terraform apply /cluster/terraform.tfplan
