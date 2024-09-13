@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+if [ $# -gt 0 ] && [[ "$1" =~ (-h|--help) ]] ; then
+    echo "Usage: $0"
+    exit 1
+fi
+
+set -x
+terraform plan -out=/cluster/terraform.tfplan -target=module.cluster.shell_script.kubespray-inventory
+terraform apply /cluster/terraform.tfplan
