@@ -33,7 +33,7 @@ module "cluster" {
   default_infra_node_taints  = var.default_infra_node_taints
   default_master_node_labels = var.default_master_node_labels
   default_master_node_taints = var.default_master_node_taints
-  deploy_components          = var.deploy_components
+  terraform_mode             = var.terraform_mode
   etc_hosts                  = var.etc_hosts
   infra_nodes                = var.infra_nodes
   install_packages           = var.install_packages
