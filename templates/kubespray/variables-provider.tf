@@ -22,10 +22,14 @@ variable "region" {
   default     = "unknown"
 }
 
-variable "deploy_components" {
-  description = "Either to deploy or not kubernetes components. Set to true after kubernetes is up and running."
-  type        = bool
-  default     = false
+variable "terraform_mode" {
+  description = "Select terraform \"mode\" to run: \"terraform-provision\" must be used before kubespray; \"terraform-install\" must be used after kubespary is finished and the basic of the cluster is already up."
+  type        = string
+  default     = "terraform-provision"
+  validation {
+    condition     = contains(["terraform-provision", "terraform-install"], var.terraform_mode)
+    error_message = "terraform_mode: invalid value. One of terraform-provision or terraform-install."
+  }
 }
 
 variable "kubespray_git_ref" {
