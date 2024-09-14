@@ -493,42 +493,44 @@ function select_cluster()
     if [ ${#candidate_clusters[*]} -eq 0 ]; then
         warn "No cluster found. Please run '$0 create' first."
         exit 1
-    fi
-
-    cluster_names=( ${candidate_clusters[*]#*/} )
-    cluster_names=( ${cluster_names[*]%/*} )
-    cluster_types=( ${candidate_clusters[*]##*/} )
-
-    if type fzf &>/dev/null; then
-        cluster_dir=$(printf '%s\n' ${candidate_clusters[*]} | awk '{print FNR, $0}' |
-            fzf -1 --ansi --no-preview --cycle --reverse --header='---[ Select Cluster ]---' | awk '{print $2}')
-    elif type dialog &>/dev/null; then
-        exec 3>.tmp
-        eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
-            "$(for i in $(seq 0 $(( ${#candidate_clusters[*]} - 1 )) ); do echo -n " $((i + 1)) '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
-            '---' '---' \
-            b "'Bootstrap cluster'"  >&2
-            #s 'Sync from template' >&2
-        idx=$(<.tmp)
-        rm -f .tmp
-        let idx--
-        case "$idx" in
-            [0-9]*)
-                cluster_dir=${candidate_clusters[$idx]}
-            ;;
-            *) cluster_dir=$idx
-        esac
+    elif [ ${#candidate_clusters[*]} -eq 1 ]; then
+        cluster_dir="$candidate_clusters"
     else
-        local PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
+      cluster_names=( ${candidate_clusters[*]#*/} )
+      cluster_names=( ${cluster_names[*]%/*} )
+      cluster_types=( ${candidate_clusters[*]##*/} )
 
-        select cluster_dir in ${candidate_clusters[*]}; do
-            export CLUSTER_CONF=$cluster_dir/cluster.conf
-            if has_valid_config $cluster_dir; then
-                break
-            else
-                warn Config not found: $CLUSTER_CONF
-            fi
-        done
+      if type fzf &>/dev/null; then
+          cluster_dir=$(printf '%s\n' ${candidate_clusters[*]} | awk '{print FNR, $0}' |
+              fzf -1 --ansi --no-preview --cycle --reverse --header='---[ Select Cluster ]---' | awk '{print $2}')
+      elif type dialog &>/dev/null; then
+          exec 3>.tmp
+          eval dialog --output-fd 3 --menu "'Select cluster'" 0 0 0 \
+              "$(for i in $(seq 0 $(( ${#candidate_clusters[*]} - 1 )) ); do echo -n " $((i + 1)) '[${cluster_types[$i]}] ${cluster_names[$i]}'"; done)" \
+              '---' '---' \
+              b "'Bootstrap cluster'"  >&2
+              #s 'Sync from template' >&2
+          idx=$(<.tmp)
+          rm -f .tmp
+          let idx--
+          case "$idx" in
+              [0-9]*)
+                  cluster_dir=${candidate_clusters[$idx]}
+              ;;
+              *) cluster_dir=$idx
+          esac
+      else
+          local PS3="${COLOR_GREEN}${COLOR_BOLD}Select cluster to start: ${COLOR_RESET} "
+
+          select cluster_dir in ${candidate_clusters[*]}; do
+              export CLUSTER_CONF=$cluster_dir/cluster.conf
+              if has_valid_config $cluster_dir; then
+                  break
+              else
+                  warn Config not found: $CLUSTER_CONF
+              fi
+          done
+      fi
     fi
 
     export CLUSTER_DIR=$cluster_dir
