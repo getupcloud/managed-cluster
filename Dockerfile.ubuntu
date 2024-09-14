@@ -201,10 +201,6 @@ RUN cd /etc/profile.d && \
     cd autokube-main && \
     make install
 
-COPY root/ /
-COPY root/etc/skel/ /root/
-COPY Dockerfile.ubuntu /
-
 ARG GIT_COMMIT
 ARG VERSION
 ARG RELEASE
@@ -213,8 +209,10 @@ RUN echo $VERSION > /.version && \
     echo $RELEASE > /.release && \
     echo $GIT_COMMIT > /.gitcommit && \
     rsync /etc/skel/ /root/ && \
-    chmod -R +x /etc/profile.d/ && \
-    chmod 777 /usr/share && \
-    chmod -R 777 /usr/local/bin
+    chmod 777 /usr/share
+
+COPY root/ /
+COPY root/etc/skel/ /root/
+COPY Dockerfile.ubuntu /
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
