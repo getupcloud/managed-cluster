@@ -32,29 +32,27 @@ null:
 
 help:
 	@echo Target:
-	@echo '  image:              Build docker image (default). $(call print_targets,build)'
-	@echo '  fmt:                Run terraform fmt. $(call print_targets,fmt)'
-	@echo '  import:             Download terraform variables from cluster repositories. $(call print_targets,import)'
-	@echo '  modules:            Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
-	@echo '  release:            Release a new version (source only). $(call print_targets,release)'
-	@echo '  local-release:      Build locally and release a new version. $(call print_targets,local-release)'
-	@echo '  test:               Run all tests from ./tests. $(call print_targets,test)'
-	@echo '  test-iter:          Iterable tests. $(call print_targets,test-iter)'
-	@echo '  test-help:          Show test options. $(call print_targets,test-help)'
-	@echo '  push-git:           Push code to github'
-	@echo '  push-image:         Push image to $(IMAGE_HOST)'
-	@echo '  show-modules-vars:  Print modules.* from all manifests'
+	@echo '  image:                    Build docker image (default). $(call print_targets,build)'
+	@echo '  fmt:                      Run terraform fmt. $(call print_targets,fmt)'
+	@echo '  update-cluster-versions   Download terraform variables from cluster repositories.'
+	@echo '  import-cluster-variables  Download terraform variables from cluster repositories.'
+	@echo '  modules:                  Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
+	@echo '  release:                  Release a new version (source only). $(call print_targets,release)'
+	@echo '  local-release:            Build locally and release a new version. $(call print_targets,local-release)'
+	@echo '  test:                     Run all tests from ./tests. $(call print_targets,test)'
+	@echo '  test-iter:                Iterable tests. $(call print_targets,test-iter)'
+	@echo '  test-help:                Show test options. $(call print_targets,test-help)'
+	@echo '  push-git:                 Push code to github'
+	@echo '  push-image:               Push image to $(IMAGE_HOST)'
+	@echo '  show-modules-vars:        Print modules.* from all manifests'
 
 CLUSTER_TYPES := $(shell ls -1 templates/*/main.tf | awk -F/ '{print $$2}')
 
-define CLUSTER_REPO_template =
+define IMPORT_CLUSTER_VARIABLES_template =
 	modules=$$(hcl2json < templates/$(1)/main.tf  | jq '.module|keys|.[]' -r 2>/dev/null) || true
 	if [ -n "$$modules" ]; then
 		for module in $$modules; do
 			source=$$(hcl2json < templates/$(1)/main.tf  | jq ".module.$$module[0].source" -r)
-			#echo ./root/usr/local/bin/urlparse "$$source" "{query[ref]}"
-			#echo ./root/usr/local/bin/urlparse "$$source" "https://{netloc}{path}/raw"
-
 			base_url=$$(./root/usr/local/bin/urlparse "$$source" "https://{netloc}{path}/raw")
 			ref=$$(./root/usr/local/bin/urlparse "$$source" "{query[ref]}")
 			for i in provider cluster; do
@@ -63,7 +61,7 @@ define CLUSTER_REPO_template =
 				md5_old=$$(md5sum $$file 2>/dev/null || true)
 				echo -n ">Downloading: $(1) $$url"
 				if ! curl --fail -sL $$url -o $$file; then
-					printf "\r[ Not Found ]"
+					printf "\r[ Not Found ] $$url"
 				else
 					md5_new=$$(md5sum $$file)
 					if [ "$$md5_old" != "$$md5_new" ]; then
@@ -78,8 +76,33 @@ define CLUSTER_REPO_template =
 	fi;
 endef
 
-import:
-	@$(foreach i,$(CLUSTER_TYPES),$(call CLUSTER_REPO_template,$(i)))
+import-cluster-variables:
+	@$(foreach i,$(CLUSTER_TYPES),$(call IMPORT_CLUSTER_VARIABLES_template,$(i)))
+
+define UPDATE_CLUSTER_VERSION_template =
+	modules=$$(hcl2json < templates/$(1)/main.tf  | jq '.module|keys|.[]' -r 2>/dev/null) || true
+	if [ -n "$$modules" ]; then
+		for module in $$modules; do
+			source=$$(hcl2json < templates/$(1)/main.tf  | jq ".module.$$module[0].source" -r)
+			url=$$(./root/usr/local/bin/urlparse "$$source" "https://{netloc}{path}/raw/refs/heads/main/version.txt")
+			ref=$$(./root/usr/local/bin/urlparse "$$source" "{query[ref]}")
+			if ! new_ver=$$(curl --fail -sL "$$url"); then
+				printf "\r[ Not Found ] $$url\n"
+				exit 1
+			fi
+			[ "$${ref:0:1}" == v ] && cur_ver="$${ref:1}" || cur_ver="$$ver"
+			if [ "$$cur_ver" != "$$new_ver" ]; then
+				printf "\r[  $(COLOR_GREEN)Changed$(COLOR_RESET)  ] $(1): $$cur_ver -> $$new_ver\n"
+				sed -i -e "/.*source\s\?=/s|?ref=v\?[a-zA-Z0-9\.\-]\+|?ref=v$$new_ver|" templates/$(1)/main.tf
+			else
+				printf "\r[ Unchanged ] $(1): $$cur_ver\n"
+			fi
+		done
+	fi;
+endef
+
+update-cluster-versions:
+	@$(foreach i,$(CLUSTER_TYPES),$(call UPDATE_CLUSTER_VERSION_template,$(i)))
 
 check-version:
 	@if ! [[ "$(VERSION)" =~ $(SEMVER_REGEX) ]]; then \
