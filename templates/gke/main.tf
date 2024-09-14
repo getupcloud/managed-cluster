@@ -1,5 +1,5 @@
 module "gke" {
-  source = "github.com/getupcloud/terraform-cluster-gke?ref=v2.2.1"
+  source = "github.com/getupcloud/terraform-cluster-gke?ref=v2.2.2"
 
   # cluster basics
   customer_name                        = var.customer_name
