@@ -461,7 +461,7 @@ function generate_ssh_key()
         local static_known_hosts=(
             "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGCqvxcZO6VUWq+mz3ybMgsVDJbVGeYF02hCCsnrdoLD/pZyijfjp3UCVlMj2lMhJz6iFwhnSi8w+3EkYGPn3ws="
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/sYED/XeGeSv5PFFA9XE7DLdIkUpjDYD4XD3a7n0Gc"
-            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDinq0LyTjv49feM9fAzTkE5QFCXQWdFBN95QpVrqEPANzgZKuvlwYg/KwjoxYiz0+CTEkedVKNdvwxCvi15B9Ucfnvz0uGS2+CU0M85dSAspGn92EBCFl/gMfXWcxV8PmTokRozQBHsIbzeDeynTBkPHN2rmsywDTptiaa7gZiTTWpiA0xwmJpVPflQllWvboxHh2RYBSHFsVLzteX+FSvSh0b2cRSA0GZovC6KeYUywHft+6/dia7/erbBa5MRgFWXEkUM6R0SDPU/6kKasC8DZiLvGJjCfUP1ycMmLV6rsgAtK/OlIsjz/WuKqlrf1D0KTL9ucsca6RSRJuu7eaNE7/rAN1ZBCO9HScWyTky165biq60hdkK4o5LvfgAs5C7/xzsnks/3pvzfC9Oe++o9BKUI2UT/TQhLc72jqgHy+K5X+bYRAIiHPoB/ASgXr1tmDIGVxhVeIe4oKLe5zJQTGU1Uw45fvsU7A/7OFLplkVdxmoPWQhcVMF3pdUHBXU="
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk="
         )
 
         for i in "${static_known_hosts[@]}"; do
