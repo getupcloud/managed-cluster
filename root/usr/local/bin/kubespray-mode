@@ -11,8 +11,8 @@ if [ $# -eq 0 ]; then
   exit
 fi
 
-case $1 in
-  terraform-provision|terraform-install) : ;;
+case "$1" in
+  terraform-provision|terraform-install) mode="$1" ;;
   *)
     echo "Usage: $0 [terraform-provision|terraform-install]"
     exit
