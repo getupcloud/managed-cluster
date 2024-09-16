@@ -19,11 +19,11 @@ case $1 in
 esac
 
 if grep -q '^terraform_mode.*' $TF_VARS_FILE; then
-    sed -i -e "s/^terraform_mode.*/terraform_mode = \"$value\"/" $TF_VARS_FILE
+    sed -i -e "s/^terraform_mode.*/terraform_mode = \"$mode\"/" $TF_VARS_FILE
 elif grep -q '^#terraform_mode.*' $TF_VARS_FILE; then
-    sed -i -e "s/^#terraform_mode.*/terraform_mode = \"$value\"/" $TF_VARS_FILE
+    sed -i -e "s/^#terraform_mode.*/terraform_mode = \"$mode\"/" $TF_VARS_FILE
 else
-  echo "terraform_mode = \"$value\"" >> $TF_VARS_FILE
+  echo "terraform_mode = \"$mode\"" >> $TF_VARS_FILE
 fi
 
-echo "Updated $TF_VARS_FILE: terraform_mode=$value"
+echo "Updated $TF_VARS_FILE: terraform_mode=$mode"
