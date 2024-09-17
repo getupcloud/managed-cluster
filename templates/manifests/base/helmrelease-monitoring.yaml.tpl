@@ -151,6 +151,8 @@ spec:
               labels:
                 velero.io/exclude-from-backup: "true"
             spec:
+              accessModes:
+              - ReadWriteOnce
               resources:
                 requests:
                   storage: 200Gi
@@ -504,7 +506,8 @@ spec:
 
       persistence:
         enabled: true
-        accessModes: ["ReadWriteOnce"]
+        accessModes:
+        - ReadWriteOnce
         size: 10Gi
 
       resources:
