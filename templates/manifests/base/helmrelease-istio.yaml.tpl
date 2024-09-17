@@ -17,7 +17,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: istio
-      version: "~> 1.16"
+      version: "~> 1.23"
   install:
     createNamespace: true
     disableWait: false
@@ -45,7 +45,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: istio
-      version: "~> 1.16"
+      version: "~> 1.23"
   install:
     createNamespace: false
     disableWait: false
@@ -100,7 +100,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: istio
-      version: "~> 1.16"
+      version: "~> 1.23"
   install:
     createNamespace: false
     disableWait: false
