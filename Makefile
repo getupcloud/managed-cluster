@@ -34,7 +34,7 @@ help:
 	@echo Target:
 	@echo '  image:                    Build docker image (default). $(call print_targets,build)'
 	@echo '  fmt:                      Run terraform fmt. $(call print_targets,fmt)'
-	@echo '  update-cluster-versions   Download terraform variables from cluster repositories.'
+	@echo '  update-cluster-versions   Update templates/*/main.tf versionsfrom terraform-cluster-* repositories.'
 	@echo '  import-cluster-variables  Download terraform variables from cluster repositories.'
 	@echo '  modules:                  Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
 	@echo '  release:                  Release a new version (source only). $(call print_targets,release)'
