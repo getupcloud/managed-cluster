@@ -31,7 +31,7 @@ spec:
 
     driver:
       enabled: true
-      kind: modernEbpf
+      kind: modern_ebpf
 
     falco:
       grpc:
