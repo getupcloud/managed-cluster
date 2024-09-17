@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      version: "~> 2.3"
+      version: "~> 4.8"
   install:
     createNamespace: true
     disableWait: true
@@ -31,7 +31,7 @@ spec:
 
     driver:
       enabled: true
-      kind: ebpf
+      kind: modernEbpf
 
     falco:
       grpc:
@@ -59,7 +59,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      version: "~> 0.9"
+      version: "~> 0.12"
   install:
     createNamespace: true
     disableWait: true
@@ -104,7 +104,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      version: "~> 0.2"
+      version: "~> 0.3"
   install:
     createNamespace: true
     disableWait: true
