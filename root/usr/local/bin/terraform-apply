@@ -24,7 +24,7 @@ if ! $force; then
     tf_init=true
 fi
 
-deploy_components=$(get_tf_config DEPLOY_COMPONENTS deploy_components false)
+mode=$(get_tf_config TERRAFORM_MODE terraform_mode '')
 
 info Switching to $CLUSTER_DIR
 cd $CLUSTER_DIR
@@ -37,7 +37,7 @@ if $force; then
     execute_command terraform apply -auto-approve
     execute_command terraform fmt
 
-    if [ "$cluster_type" != "kubespray" ] || [ "$deploy_components" == "true" ]; then
+    if [ "$cluster_type" != "kubespray" ] || [ "$mode" == "terraform-install" ]; then
       execute_command repo-push $opt_force
       execute_command kubeconfig-get $opt_force
       execute_command flux reconcile source git cluster
@@ -50,7 +50,7 @@ else
         ask_execute_command terraform apply $TF_PLAN_FILE
     ask_execute_command terraform fmt
 
-    if [ "$cluster_type" != "kubespray" ] || [ "$deploy_components" == "true" ]; then
+    if [ "$cluster_type" != "kubespray" ] || [ "$mode" == "terraform-install" ]; then
       ask_execute_command repo-push
 
       [ -e "$KUBECONFIG" ] && _default=n; \
