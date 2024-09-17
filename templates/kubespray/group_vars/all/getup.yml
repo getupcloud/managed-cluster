@@ -35,3 +35,9 @@ additional_sysctl:
   value: 128000
 - name: kernel.threads-max
   value: 128000
+
+audit_policy_custom_rules: |
+  - level: None
+    users: []
+    verbs: []
+    resources: []
