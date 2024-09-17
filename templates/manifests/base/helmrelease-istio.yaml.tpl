@@ -128,6 +128,43 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
+  name: istio-ingressclass
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: templater
+      sourceRef:
+        kind: HelmRepository
+        name: getupcloud
+      version: "~> 1"
+  install:
+    createNamespace: false
+    disableWait: false
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  interval: 5m
+  releaseName: istio-ingressclass
+  storageNamespace: istio-system
+  targetNamespace: istio-system
+  dependsOn:
+  - name: istio-ingressgateway
+  values:
+    istio-ingressclass:
+      apiVersion: networking.k8s.io/v1
+      kind: IngressClass
+      metadata:
+        name: istio
+      spec:
+        controller: istio.io/ingress-controller
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
   name: telemetry-config
   namespace: flux-system
 spec:
