@@ -41,4 +41,13 @@ spec:
     - key: dedicated
       value: infra
       effect: NoSchedule
+    prometheus:
+      metricServer:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+      operator:
+        enabled: true
+        serviceMonitor:
+          enabled: true
 %{~ endif }
