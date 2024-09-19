@@ -49,6 +49,9 @@
           }
         }
       },
+      "keda": {
+        "enabled": "${try(var.modules.keda.enabled, var.modules_defaults.keda.enabled)}"
+      },
       "kong": {
         "enabled": "${try(var.modules.kong.enabled, var.modules_defaults.kong.enabled)}"
       },

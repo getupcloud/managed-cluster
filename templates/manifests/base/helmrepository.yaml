@@ -278,3 +278,12 @@ metadata:
 spec:
   interval: 1h
   url: https://charts.enix.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kedacore
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://kedacore.github.io/charts

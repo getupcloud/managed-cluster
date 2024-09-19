@@ -39,6 +39,7 @@ variable "modules_defaults" {
         })
       })
     })
+    keda = object({ enabled = bool })
     kube-opex-analytics = object({ enabled = bool })
     kong                = object({ enabled = bool })
     kyverno = object({
@@ -172,6 +173,9 @@ variable "modules_defaults" {
           host = "kiali.example.com"
         }
       }
+    }
+    keda = {
+      enabled = false
     }
     kong = {
       enabled = false

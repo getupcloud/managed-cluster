@@ -11,6 +11,7 @@ resources:
 - helmrelease-grafana-extra-dashboards.yaml
 - helmrelease-ingress-nginx.yaml
 - helmrelease-istio.yaml
+- helmrelease-keda.yaml
 - helmrelease-kong-dbless.yaml
 - helmrelease-kube-opex-analytics.yaml
 - helmrelease-kyverno.yaml
