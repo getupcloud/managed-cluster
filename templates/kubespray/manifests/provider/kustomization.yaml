@@ -5,6 +5,7 @@ resources:
 - ../base/
 - helmrelease-csr-auto-approver.yaml
 - helmrelease-metallb.yaml
+- helmrelease-metrics-server.yaml
 
 patches:
 - path: excludes.yaml
