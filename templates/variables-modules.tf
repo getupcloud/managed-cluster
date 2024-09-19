@@ -39,7 +39,7 @@ variable "modules_defaults" {
         })
       })
     })
-    keda = object({ enabled = bool })
+    keda                = object({ enabled = bool })
     kube-opex-analytics = object({ enabled = bool })
     kong                = object({ enabled = bool })
     kyverno = object({
