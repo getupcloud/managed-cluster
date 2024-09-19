@@ -37,4 +37,8 @@ spec:
           - matchExpressions:
             - key: node-role.kubernetes.io/infra
               operator: Exists
+    tolerations:
+    - key: dedicated
+      value: infra
+      effect: NoSchedule
 %{~ endif }
