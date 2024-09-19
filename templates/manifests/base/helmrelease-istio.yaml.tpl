@@ -153,7 +153,7 @@ spec:
   dependsOn:
   - name: istio-ingressgateway
   values:
-    istio-ingressclass:
+    template-istio-ingressclass:
       apiVersion: networking.k8s.io/v1
       kind: IngressClass
       metadata:
