@@ -24,24 +24,20 @@ COLOR_RESET  := $(shell tput sgr0)
 
 default: image
 
-define print_targets =
-Targets:$(shell $(MAKE) -p null | grep '^$(1):' | tail -n1 | cut -d: -f2-)
-endef
-
 null:
 
 help:
 	@echo Target:
-	@echo '  image:                    Build docker image (default). $(call print_targets,build)'
-	@echo '  fmt:                      Run terraform fmt. $(call print_targets,fmt)'
+	@echo '  image:                    Build docker image (default).'
+	@echo '  fmt:                      Run terraform fmt.'
 	@echo '  update-cluster-versions   Update templates/*/main.tf versionsfrom terraform-cluster-* repositories.'
 	@echo '  import-cluster-variables  Download terraform variables from cluster repositories.'
-	@echo '  modules:                  Create templates/variables-modules-merge.tf.json. $(call print_targets,modules)'
-	@echo '  release:                  Release a new version (source only). $(call print_targets,release)'
-	@echo '  local-release:            Build locally and release a new version. $(call print_targets,local-release)'
-	@echo '  test:                     Run all tests from ./tests. $(call print_targets,test)'
-	@echo '  test-iter:                Iterable tests. $(call print_targets,test-iter)'
-	@echo '  test-help:                Show test options. $(call print_targets,test-help)'
+	@echo '  modules:                  Create templates/variables-modules-merge.tf.json.'
+	@echo '  release:                  Release a new version (source only).'
+	@echo '  local-release:            Build locally and release a new version.'
+	@echo '  test:                     Run all tests from ./tests.'
+	@echo '  test-iter:                Iterable tests.'
+	@echo '  test-help:                Show test options.'
 	@echo '  push-git:                 Push code to github'
 	@echo '  push-image:               Push image to $(IMAGE_HOST)'
 	@echo '  show-modules-vars:        Print modules.* from all manifests'
