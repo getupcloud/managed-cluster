@@ -51,6 +51,18 @@ variable "flux_install_file" {
   default     = ""
 }
 
+variable "flux_identity_file" {
+  description = "SSH deploy private key"
+  type        = string
+  default     = "identity"
+}
+
+variable "flux_identity_pub_file" {
+  description = "SSH deploy public key"
+  type        = string
+  default     = "identity.pub"
+}
+
 variable "flux_wait" {
   description = "Wait for all manifests to apply"
   type        = bool

@@ -19,6 +19,9 @@ module "doks" {
   flux_git_repo           = var.flux_git_repo
   flux_wait               = var.flux_wait
   flux_version            = var.flux_version
+  flux_install_file       = var.flux_install_file
+  flux_identity_file      = var.flux_identity_file
+  flux_identity_pub_file  = var.flux_identity_pub_file
   manifests_template_vars = local.manifests_template_vars
 
   # provider specific
