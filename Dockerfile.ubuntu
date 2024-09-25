@@ -143,7 +143,7 @@ RUN cd /usr/local/bin && \
         | awk -F . '!a[$1 FS $2]++' \
         | sort -V) && \
     for KUBECTL_VERSION in $KUBECTL_VERSIONS; do \
-      curl -skL https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl > \
+      curl -skL https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl > \
         kubectl_${KUBECTL_VERSION}; \
     done && \
     ln -s kubectl_$KUBECTL_VERSION kubectl && \
