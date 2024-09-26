@@ -6,7 +6,6 @@ if [ -d "$1" ]; then
 fi
 
 host=$(git-url "$1" host)
-echo $host
 
 case "$host" in
   github.com) echo github ;;
