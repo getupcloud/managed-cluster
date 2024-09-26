@@ -10,5 +10,13 @@ if os.path.exists(sys.argv[1]) or sys.argv[1].startswith(".") or sys.argv[1].sta
     print(sys.argv[1])
     sys.exit(0)
 
-p = parse(sys.argv[1], check_domain=False)
-print(getattr(p, sys.argv[2]))
+url, attr = sys.argv[1:3]
+
+p = parse(url, check_domain=False)
+value = getattr(p, attr)
+
+if attr in ['host', 'domain']:
+    if '/' in value:
+        value = value[:value.index('/')]
+
+print(value)

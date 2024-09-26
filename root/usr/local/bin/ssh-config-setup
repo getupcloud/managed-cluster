@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+if ${INSIDE_CONTAINER:-false}; then
+    source /etc/profile.d/getup.sh
+else
+    source $REPO_DIR/root/etc/profile.d/getup.sh
+fi
+
+cd $REPO_DIR
+
+origin=$(git remote get-url origin)
+git_provider=$(git-provider $origin)
+host=$(git-url $origin host)
+ssh_hostname="$host"
+ssh_port=22
+ssh_identity_file=$(get_tf_config SSH_PRIVATE_KEY ssh_private_key '/cluster/identity')
+
+if [ "$git_provider" == local ]; then
+  ssh_port=2222
+  ssh_hostname=${HOST_IP:-$(get_host_ip 2>/dev/null)}
+fi
+
+if [ "${ssh_identity_file:0:1}" != '/' ]; then
+  ssh_identity_file="/cluster/$ssh_identity_file"
+fi
+
+sed -i -e "/^Host $host\$/,/^\s*\$/d" ~/.ssh/config
+
+cat >>~/.ssh/config <<-EOF
+	
+	Host ${host}
+	  Hostname ${ssh_hostname}
+	  Port ${ssh_port}
+	  IdentityFile ${ssh_identity_file}
+	  UserKnownHostsFile /dev/null
+	  CheckHostIP no
+	  StrictHostKeyChecking no
+EOF
