@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -eu
+
+source /etc/profile.d/getup.sh
+
+git_provider=$(git-provider $origin)
+
+case "$git_provider" in
+  github)
+    if [ -n "$GH_TOKEN" ]; then
+      gh auth login --with-token <<<$GH_TOKEN
+    else
+      gh auth login
+    fi
+  *) :
+esac

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -d "$1" ]; then
+  echo local
+  exit
+fi
+
+host=$(git-url "$1" host)
+echo $host
+
+case "$host" in
+  github.com) echo github ;;
+  gitlab.com) echo gitlab ;;
+  vs-ssh.visualstudio.com*|ssh.dev.azure.com*) echo azure ;;
+  git.flux-system.svc*) echo local ;;
+  *) exit 1
+esac

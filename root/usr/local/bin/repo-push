@@ -24,6 +24,7 @@ info Switching to $REPO_DIR
 cd $REPO_DIR
 
 origin=$(git remote get-url origin)
+
 if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
    || [ "$origin" == git@github.com:getupcloud/managed-cluster.git ]; then
 
@@ -34,12 +35,16 @@ if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
   exit 1
 fi
 
-if ! is_local_git_repo && ! repo-exists; then
-    if $force; then
-        repo-setup $opt_force
-    else
-        ask_execute_command repo-setup
-    fi
+git_provider=$(git-provider $origin)
+
+if [ "$git_provider" == github ]; then
+  if ! repo-exists-github; then
+      if $force; then
+          repo-setup-github $opt_force
+      else
+          ask_execute_command repo-setup-github
+      fi
+  fi
 fi
 
 if ${INSIDE_CONTAINER:-false}; then

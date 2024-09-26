@@ -8,6 +8,8 @@ else
     source $REPO_DIR/root/etc/profile.d/getup.sh
 fi
 
+repo_host=$(git-provider $origin)
+
 cd $REPO_DIR
 
 if ! gh auth status >/dev/null 2>&1; then

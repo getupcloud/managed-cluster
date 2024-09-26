@@ -11,9 +11,7 @@ if ! [ -d "${KUBECONFIG%/*}" ]; then
     mkdir -p "${KUBECONFIG%/*}"
 fi
 
-if [ -n "$GH_TOKEN" ]; then
-    gh auth login --with-token <<<$GH_TOKEN
-fi
+repo-auth
 
 if [ "$cluster_type" == standalone ] || [ -z "$cluster_type" ]; then
     info Entering standalone mode
