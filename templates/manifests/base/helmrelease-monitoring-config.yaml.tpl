@@ -40,7 +40,7 @@ spec:
 
     loki:
       prometheusRules:
-        enabled: true
+        enabled: ${ modules.logging.enabled }
         canary:
           enabled: false
       ingress:

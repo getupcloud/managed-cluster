@@ -352,11 +352,16 @@ spec:
 
         inhibit_rules:
         # Inhibit same alert with lower severity of an already firing alert
-        - equal: ['alertname']
-          source_match:
-            severity: critical
-          target_match:
-            severity: warning
+        - equal:
+          - alertname
+          source_matchers:
+          - severity = critical
+          target_matchers:
+          - severity = warning
+        - source_matchers:
+          - alertname =~ "KubeNodeUnreachable|KubeletDown"
+          target_matchers:
+          - alertname =~ "KubeDaemonSetRolloutStuck|KubeStatefulSetReplicasMismatch|KubeDeploymentReplicasMismatch"
 
         #################################################################
         ## Routes
@@ -555,6 +560,7 @@ spec:
             jsonData:
               timeout: 60
               httpMethod: GET
+              %{~ if modules.logging.enabled }
               tracesToLogs:
                 datasourceUid: loki
                 mapTagNamesEnabled: true
@@ -565,6 +571,7 @@ spec:
                 spanEndTimeShift: '15m'
                 filterByTraceID: true
                 filterBySpanID: false
+              %{~ endif }
               tracesToMetrics:
                 datasourceUid: prometheus
                 tags:
@@ -583,8 +590,10 @@ spec:
                 hide: false
               nodeGraph:
                 enabled: true
+              %{~ if modules.logging.enabled }
               lokiSearch:
                 datasourceUid: loki
+              %{~ endif }
           %{~ endif }
 
       dashboardProviders:
