@@ -1426,9 +1426,13 @@ function check_update()
 
     # check if upstream has a newer version than our local latest version and asks to download it.
     # TODO: parse upstream url from git remote
-    local latest_remote_version=$(timeout 3 curl -s -H 'cache-control: no-cache' \
-        'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
-        | jq '.[0].name' -r | cut -c 2-)
+    local latest_remote_version=''
+    if ! latest_remote_version=$(timeout -v 10 curl -s -H 'cache-control: no-cache' \
+          'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
+          | jq '.[0].name' -r | cut -c 2-)
+        echo Unable to retrieve latest version from upstream
+        return 1
+    fi
 
     if $force; then
         warn "Forcing update"
