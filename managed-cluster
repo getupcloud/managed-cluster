@@ -1429,7 +1429,7 @@ function check_update()
     local latest_remote_version=''
     if ! latest_remote_version=$(timeout -v 10 curl -s -H 'cache-control: no-cache' \
           'https://api.github.com/repos/getupcloud/managed-cluster/tags?sort=created&order=asc' \
-          | jq '.[0].name' -r | cut -c 2-)
+          | jq '.[0].name' -r | cut -c 2-); then
         echo Unable to retrieve latest version from upstream
         return 1
     fi
