@@ -13,5 +13,6 @@ case "$git_provider" in
     else
       gh auth login
     fi
+  ;;
   *) :
 esac

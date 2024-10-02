@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 shopt -s checkwinsize
 shopt -s nullglob
 
