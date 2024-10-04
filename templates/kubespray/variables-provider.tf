@@ -35,7 +35,7 @@ variable "terraform_mode" {
 variable "kubespray_git_ref" {
   description = "Kubespray ref name"
   type        = string
-  default     = "remotes/origin/release-2.25"
+  default     = "refs/tags/v2.26.0"
 }
 
 variable "kubespray_dir" {
