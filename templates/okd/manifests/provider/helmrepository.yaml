@@ -3,6 +3,15 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
+  name: cert-utils-operator
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://redhat-cop.github.io/cert-utils-operator
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
   name: metrics-server
   namespace: flux-system
 spec:

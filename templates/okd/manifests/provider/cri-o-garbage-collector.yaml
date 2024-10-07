@@ -225,11 +225,31 @@ data:
       done
     }
 
+    journal()
+    {
+      corrupted_files=( $(journalctl --verify 2>&1 | grep "uses an unsupported feature") )
+
+      if [ ${#corrupted_files[@]} -eq 0 ]; then
+        return
+      fi
+
+      echo "Journald is corrupted. Cleaning..."
+      journalctl --rotate
+      journalctl --vacuum-time=1s
+
+      new_corrupted_files=($(journalctl --verify 2>&1 | grep "uses an unsupported feature"))
+
+      if [ ${#new_corrupted_files[@]} -eq 0 ]; then
+        echo "Cleanup has failed. Please check."
+      fi
+    }
+
     # sleep for 1m to allow garbage collector to setup properly and avoid pod start race-condition
     sleep 60
 
     while true; do
       logger "Starting k8s garbage collector run..."
+      journal
       gc_pods
       gc_cgroups
       logger "Sleeping for ${SLEEP_INTERVAL} seconds..."
