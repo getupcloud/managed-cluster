@@ -7,7 +7,7 @@ fi
 
 host=$(git-url "$1" host)
 
-case "$host" in
+case "${host%:*}" in
   github.com) echo github ;;
   gitlab.com) echo gitlab ;;
   vs-ssh.visualstudio.com*|ssh.dev.azure.com*) echo azure ;;

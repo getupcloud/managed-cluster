@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+if ${INSIDE_CONTAINER:-false}; then
+    source /etc/profile.d/getup.sh
+else
+    source $REPO_DIR/root/etc/profile.d/getup.sh
+fi
+
+cd $REPO_DIR
+
+if [ $# -eq 0 ]; then
+  git_origin=$(git remote get-url origin)
+  git_host=$(git-url $git_origin host)
+  flux_git_repo=$(get_tf_config FLUX_GIT_REPO flux_git_repo "$git_origin")
+  flux_git_host=$(git-url $flux_git_repo host)
+  hosts=( $(printf '%s\n' $git_host $flux_git_host | sort -u) )
+else
+  hosts=($@)
+fi
+
+info "Scaning hostkey from: ${hosts[@]}"
+
+printf "%s\n" ${hosts[@]} | ssh-keyscan -f - >$CLUSTER_DIR/known_hosts 2>/dev/null

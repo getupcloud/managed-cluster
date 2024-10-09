@@ -435,15 +435,9 @@ function set_local_git_repo()
 
 function generate_ssh_key()
 {
-    if [ "$1" == repo ]; then
-        local key_priv=$REPO_DIR/identity
-        local key_pub=$REPO_DIR/identity.pub
-        local kh=$REPO_DIR/known_hosts
-    else
-        local key_priv=$CLUSTER_DIR/identity
-        local key_pub=$CLUSTER_DIR/identity.pub
-        local kh=$CLUSTER_DIR/known_hosts
-    fi
+    local key_priv=$CLUSTER_DIR/identity
+    local key_pub=$CLUSTER_DIR/identity.pub
+    #local kh=$CLUSTER_DIR/known_hosts
 
     if ! [ -e $key_priv ]; then
         info "Generating $key_priv ($ssh_key_length bits)"
@@ -457,20 +451,14 @@ function generate_ssh_key()
     fi
 
     if $opt_local_git_repo; then
-        info "Generating static $kh for $ssh_host"
-        local static_known_hosts=(
-            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGCqvxcZO6VUWq+mz3ybMgsVDJbVGeYF02hCCsnrdoLD/pZyijfjp3UCVlMj2lMhJz6iFwhnSi8w+3EkYGPn3ws="
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/sYED/XeGeSv5PFFA9XE7DLdIkUpjDYD4XD3a7n0Gc"
-            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk="
-        )
-
-        for i in "${static_known_hosts[@]}"; do
-            echo "$ssh_host $i"
-        done >$kh
+      host_to_scan="127.0.0.1,$ssh_host"
     else
-        info "Generating $kh for $ssh_host: ssh-keyscan $ssh_host"
-        ssh-keyscan $ssh_host &>$kh
+      host_to_scan="$ssh_host"
     fi
+
+    #info "Generating $kh for $ssh_host"
+    #echo "$host_to_scan" | ssh-keyscan -f - >$kh 2>/dev/null
+    ssh-keyscan-setup $ssh_host
 }
 
 function select_cluster()
@@ -955,7 +943,7 @@ function command_create_repo()
         git remote -v
     fi
 
-    generate_ssh_key repo
+    #generate_ssh_key repo
     repo-setup
     repo-push
 }
@@ -1527,7 +1515,7 @@ function command_update_ssh_key()
     fi
 
     generate_ssh_key
-    generate_ssh_key repo
+    #generate_ssh_key repo
 }
 
 ##########
