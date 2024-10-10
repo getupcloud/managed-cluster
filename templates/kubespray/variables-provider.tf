@@ -207,8 +207,7 @@ variable "default_master_node_taints" {
   description = "Default taints for master nodes"
   type        = list(string)
   default = [
-    "node-role.kubernetes.io/control-plane:NoSchedule",
-    "node-role.kubernetes.io/master:NoSchedule"
+    "node-role.kubernetes.io/control-plane:NoSchedule"
   ]
 }
 
