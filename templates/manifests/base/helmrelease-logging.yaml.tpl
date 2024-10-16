@@ -174,15 +174,14 @@ spec:
     - name: containers
       hostPath:
         path: /var/lib/containers
-    - name: docker
-      hostPath:
-        path: /var/lib/docker/containers
     - name: pods
       hostPath:
         path: /var/log/pods
-    #
-    # OCI OKE
-    #
+    ## Docker (deprecated)
+    #- name: docker
+    #  hostPath:
+    #    path: /var/lib/docker/containers
+    ## OCI OKE
     #- hostPath:
     #    path: /u01
     #  name: u01
@@ -191,10 +190,11 @@ spec:
     - name: containers
       mountPath: /var/lib/containers
       readOnly: true
-    - name: docker
-      mountPath: /var/lib/docker/containers
-      readOnly: true
     - name: pods
       mountPath: /var/log/pods
       readOnly: true
+    ## Docker (deprecated)
+    #- name: docker
+    #  mountPath: /var/lib/docker/containers
+    #  readOnly: true
 %{~ endif }
