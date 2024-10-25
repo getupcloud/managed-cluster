@@ -369,7 +369,7 @@ spec:
 
         route:
           receiver: ${ alertmanager_default_receiver }
-          group_by: ['alertname', 'cluster_name']
+          group_by: ['alertname', 'cluster']
           group_wait: 15s
           group_interval: 5m
           repeat_interval: 3h
