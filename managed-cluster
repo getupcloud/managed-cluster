@@ -287,6 +287,14 @@ function sync_from_template()
 
     copy_from_template_common $rsync_params
     copy_from_template_provider $rsync_params
+
+    if ! [ -e $CLUSTER_VERSION_FILE ]; then
+        info Creating $CLUSTER_VERSION_FILE: $(get_cluster_version)
+    else
+        info Updating $CLUSTER_VERSION_FILE: $(get_cluster_version)
+    fi
+
+    cp -f $VERSION_FILE $CLUSTER_VERSION_FILE
 }
 
 function merge_requires()
@@ -521,8 +529,7 @@ function select_cluster()
       fi
     fi
 
-    export CLUSTER_DIR=$cluster_dir
-    update_globals
+    update_globals CLUSTER_DIR="$cluster_dir"
 }
 
 function assert_cluster_dir()
@@ -834,12 +841,10 @@ function create_cluster()
     read_config cluster_name "Cluster name"
     select_cluster_sla
 
-    export CLUSTER_DIR=$ROOT_DIR/clusters/$cluster_name/$cluster_type
-    export CLUSTER_CONF=$CLUSTER_DIR/cluster.conf
-
+    update_globals CLUSTER_DIR="$ROOT_DIR/clusters/$cluster_name/$cluster_type"
     mkdir -p ${CLUSTER_DIR}
+
     save_cluster_config
-    update_globals
     copy_from_template_common
     copy_from_template_provider
     merge_requires
@@ -853,6 +858,9 @@ function save_cluster_config()
     set_config cluster_provider="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
     set_config cluster_name="$cluster_name" "Cluster Name" $CLUSTER_CONF
     set_config cluster_sla="$cluster_sla" "Cluster SLA" $CLUSTER_CONF
+
+    info Copying $CLUSTER_VERSION_FILE
+    cp $VERSION_FILE $CLUSTER_VERSION_FILE
 }
 
 ##########################

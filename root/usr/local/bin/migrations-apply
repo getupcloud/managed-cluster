@@ -1,0 +1,32 @@
+#!/bin/bash
+
+source /etc/profile.d/getup.sh
+
+set -eu
+
+if ! CURRENT_MIGRATION_VERSION=$(get_current_migration_version); then
+  # was never migrated. start now
+  CURRENT_MIGRATION_VERSION=0.0.0
+  set_current_migration_version $CURRENT_MIGRATION_VERSION
+fi
+
+current_version=$(fmt_version $CURRENT_MIGRATION_VERSION)
+
+MIGRATION_SCRIPTS=( $(printf "%s\n" $REPO_DIR/migrations/migration-*.sh | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+-?(alpha[0-9]+|beta[0-9]|)' | sort -V) )
+
+for script_version in ${MIGRATION_SCRIPTS[@]}; do
+  version=$(fmt_version $script_version)
+
+  if [ $current_version -ge $version ]; then
+      #echo ignoring $script_version
+      continue
+  fi
+
+  script=$REPO_DIR/migrations/migration-${script_version}.sh
+
+  if ! confirm_execute_command $script; then
+    continue
+  fi
+  set_current_migration_version $script_version
+  current_version=$(fmt_version $script_version)
+done

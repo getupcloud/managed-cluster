@@ -26,6 +26,7 @@ if [ "$cluster_type" == standalone ] || [ -z "$cluster_type" ]; then
 fi
 
 ssh-config-setup
+migrations-apply
 
 if [ $# -eq 0 ] ; then
     if [ -e $CLUSTER_DIR/main.tf ] && ! [ -r "$TF_VARS_FILE" ]; then

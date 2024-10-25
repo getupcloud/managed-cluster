@@ -316,8 +316,8 @@ function fill_line()
 
 function execute_command_with_time_track()
 {
-    local _print_cmd="${_print_cmd:-$@}"
-    local TIMEFORMAT="${COLOR_CYAN}Command [$_print_cmd] took ${COLOR_BOLD}%2lR${COLOR_RESET}"
+    local cmd="$@"
+    local TIMEFORMAT="${COLOR_CYAN}Command [$cmd] took ${COLOR_BOLD}%2lR${COLOR_RESET}"
     time "$@"
 }
 
@@ -327,26 +327,24 @@ function execute_command()
       return
     fi
 
-  local _print_cmd="${_print_cmd:-$@}"
-
-  fill_line "$_print_cmd"
-  _print_cmd="${_print_cmd}" execute_command_with_time_track $@
+  fill_line "$@"
+  execute_command_with_time_track "$@"
 }
 
 ask_execute_command()
 {
-  local _default="${_default:-y}"
-  local _print_cmd="${_print_cmd:-$@}"
+  local cmd="$@"
+  local default="${default:-y}"
 
-  if [ "$_default" == "n" ]; then
-    local _sel="[y/N]"
+  if [ "$default" == "n" ]; then
+    local sel="[y/N]"
   else
-    local _sel="[Y/n]"
+    local sel="[Y/n]"
   fi
 
-  read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${_print_cmd}${COLOR_RESET}${COLOR_GREEN}] now? $_sel")" res
+  read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${cmd}${COLOR_RESET}${COLOR_GREEN}] now? $sel")" res
 
-  if [ "$_default" == "n" ]; then
+  if [ "$default" == "n" ]; then
     res="${res:-n}"
   else
     res="${res:-y}"
@@ -354,10 +352,36 @@ ask_execute_command()
 
   case "${res,,}" in
     y|yes|s|sim)
-        _print_cmd="${_print_cmd}" execute_command "$@"
+        execute_command "$@"
   esac
 }
 
+confirm_execute_command()
+{
+  local cmd="$@"
+  local default="${default:-y}"
+
+  if [ "$default" == "n" ]; then
+    local sel="[y/N]"
+  else
+    local sel="[Y/n]"
+  fi
+
+  read -e -p "$(prompt COLOR_GREEN "Execute [${COLOR_BOLD}${cmd}${COLOR_RESET}${COLOR_GREEN}] now? $sel")" res
+
+  if [ "$default" == "n" ]; then
+    res="${res:-n}"
+  else
+    res="${res:-y}"
+  fi
+
+  case "${res,,}" in
+    y|yes|s|sim)
+        execute_command "$@"
+    ;;
+    n|no|nao) return 2
+  esac
+}
 has_valid_config()
 {
     if ! [ -r "$1" ]; then
@@ -414,9 +438,24 @@ is_local_git_repo()
     [ -v flux_git_repo ] && grep -q "ssh://git@git.flux-system.svc.cluster.local/git" <<<"$flux_git_repo"
 }
 
+get_current_migration_version()
+{
+    cat $MIGRATION_VERSION_FILE 2>/dev/null
+}
+
+set_current_migration_version()
+{
+    echo $1 > $MIGRATION_VERSION_FILE
+}
+
+get_current_cluster_version()
+{
+    cat $CLUSTER_VERSION_FILE
+}
+
 get_current_version()
 {
-    cat $REPO_DIR/version.txt
+    cat $VERSION_FILE
 }
 
 list_versions()
@@ -651,9 +690,15 @@ fi
 
 function update_globals()
 {
+    for decl; do
+      export "$decl"
+    done
+
     if [ -v CLUSTER_DIR ] && [ -d "$CLUSTER_DIR" ]; then
         export CLUSTER_CONF="$CLUSTER_DIR/cluster.conf"
         source_env_tf "$CLUSTER_CONF"
+        export MIGRATION_VERSION_FILE=$CLUSTER_DIR/migration.txt
+        export CLUSTER_VERSION_FILE=$CLUSTER_DIR/version.txt
     fi
 
     if [ -v cluster_type ]; then
@@ -689,13 +734,14 @@ if $INSIDE_CONTAINER; then
     export DOT_CLUSTER_ENV="$CLUSTER_DIR/.cluster.env"
     source_env "$DOT_CLUSTER_ENV"
 
-  if [ "$UID" == 0 ] && [ -v KUBECTL_VERSION ] && [ -x "/usr/local/bin/kubectl_$KUBECTL_VERSION" ]; then
-    ln -fs /usr/local/bin/kubectl_$KUBECTL_VERSION /usr/local/bin/kubectl
-  fi
+    if [ "$UID" == 0 ] && [ -v KUBECTL_VERSION ] && [ -x "/usr/local/bin/kubectl_$KUBECTL_VERSION" ]; then
+      ln -fs /usr/local/bin/kubectl_$KUBECTL_VERSION /usr/local/bin/kubectl
+    fi
 else
     export REPO_DIR=$ROOT_DIR
 fi
 
+export VERSION_FILE=$REPO_DIR/version.txt
 export TEMPLATES_DIR=$REPO_DIR/templates
 export REPO_CONF=$REPO_DIR/repo.conf
 #export CLUSTER_TYPES="aks doks eks generic gke kind kubespray okd oke"
