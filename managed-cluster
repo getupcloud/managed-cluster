@@ -289,9 +289,9 @@ function sync_from_template()
     copy_from_template_provider $rsync_params
 
     if ! [ -e $CLUSTER_VERSION_FILE ]; then
-        info Creating $CLUSTER_VERSION_FILE: $(get_cluster_version)
+        info Creating $CLUSTER_VERSION_FILE: $(get_current_cluster_version)
     else
-        info Updating $CLUSTER_VERSION_FILE: $(get_cluster_version)
+        info Updating $CLUSTER_VERSION_FILE: $(get_current_cluster_version)
     fi
 
     cp -f $VERSION_FILE $CLUSTER_VERSION_FILE
