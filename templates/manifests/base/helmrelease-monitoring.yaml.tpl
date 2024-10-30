@@ -68,6 +68,8 @@ spec:
         type: ClusterIP
         loadBalancerIP: null
         sessionAffinity: ClientIP
+        labels:
+          teleport.io/app: prometheus
 
       ingress:
         enabled: ${ modules.monitoring.prometheus.ingress.enabled }
@@ -186,6 +188,9 @@ spec:
 %{~ endif }
 
     alertmanager:
+      service:
+        labels:
+          teleport.io/app: alertmanager
       alertmanagerSpec:
         replicas: 2
 
@@ -484,6 +489,8 @@ spec:
       service:
         type: ClusterIP
         sessionAffinity: ClientIP
+        labels:
+          teleport.io/app: grafana
 
       tolerations:
       - key: dedicated

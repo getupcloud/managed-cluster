@@ -2,7 +2,11 @@
 
 source /etc/profile.d/getup.sh
 
-set -eu
+set -u
+
+if ${MIGRATION_EXIT_ON_FAIL:-true}; then
+  set -e
+fi
 
 info "Verifying if it's necessary to migrate flux module..."
 
@@ -25,10 +29,10 @@ function migrate_resource()
   fill_line Migrating resources
 
   info "Importing $to $id"
-  terraform import "$to" "$id"
+  ask_execute_command terraform import "$to" "$id"
 
   info "Removing $from"
-  terraform state rm "$from" || true
+  ask_execute_commandterraform state rm "$from" || true
 }
 
 migrate_resource \
