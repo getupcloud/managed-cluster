@@ -20,7 +20,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-info Switching to $REPO_DIR
+#info Switching to $REPO_DIR
 cd $REPO_DIR
 
 origin=$(git remote get-url origin)
@@ -35,17 +35,25 @@ if [ "$origin" == https://github.com/getupcloud/managed-cluster.git ] \
   exit 1
 fi
 
+info Verifying git repository: $origin
 git_provider=$(git-provider $origin)
 
-if [ "$git_provider" == github ]; then
-  if ! repo-exists-github; then
+case "$git_provider" in
+  local) : ;;
+  github)
+    if ! repo-exists-github; then
       if $force; then
           repo-setup-github $opt_force
       else
           ask_execute_command repo-setup-github
       fi
-  fi
-fi
+    fi
+  ;;
+  *)
+    if ! repo-exists-git; then
+      warn "Repositoy is inaccessible: $origin"
+    fi
+esac
 
 if ${INSIDE_CONTAINER:-false}; then
     repo-validate $opt_force

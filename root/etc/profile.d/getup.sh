@@ -382,6 +382,7 @@ confirm_execute_command()
     n|no|nao) return 2
   esac
 }
+
 has_valid_config()
 {
     if ! [ -r "$1" ]; then

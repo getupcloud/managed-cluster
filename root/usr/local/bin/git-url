@@ -13,10 +13,17 @@ if os.path.exists(sys.argv[1]) or sys.argv[1].startswith(".") or sys.argv[1].sta
 try:
     url, attr = sys.argv[1:3]
 except ValueError:
-    attrs = 'user|host|owner|groups|repo|url2ssh' # user|branch|domain|groups_path|owner|path|path_raw|pathname|platform|port|protocol|protocols|repo|url'
+    # user|branch|domain|groups_path|owner|path|path_raw|pathname|platform|port|protocol|protocols|repo|url
+    attrs = 'user|host|owner|groups|repo|path|protocol|branch|url|url2ssh'
     print(f'Usage: {sys.argv[0]} GIT-URL [{attrs}]', file=sys.stderr)
     print('See https://github.com/nephila/giturlparse for detail', file=sys.stderr)
     sys.exit(1)
+
+if attr == 'groups':
+    attr = 'groups_path'
+
+if attr in ['path', 'path_raw']:
+    attr = 'pathname'
 
 p = parse(url)
 value = getattr(p, attr)

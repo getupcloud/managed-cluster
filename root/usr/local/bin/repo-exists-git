@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec timeout 5 git ls-remote --exit-code -q ${1:-$origin} HEAD &>/dev/null

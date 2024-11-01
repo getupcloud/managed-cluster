@@ -24,6 +24,12 @@ if [ "${ssh_identity_file:0:1}" != '/' ]; then
   ssh_identity_file="/cluster/$ssh_identity_file"
 fi
 
+if [ ! -e ~/.ssh/config ]; then
+  mkdir ~/.ssh
+  touch ~/.ssh/config
+  chmod 700 ~/.ssh
+fi
+
 sed -i -e "/^Host $host\$/,/^\s*\$/d" ~/.ssh/config
 
 cat >>~/.ssh/config <<-EOF
@@ -32,7 +38,7 @@ cat >>~/.ssh/config <<-EOF
 	  Hostname ${ssh_hostname}
 	  Port ${ssh_port}
 	  IdentityFile ${ssh_identity_file}
-	  UserKnownHostsFile /dev/null
+	  # UserKnownHostsFile /dev/null
 	  CheckHostIP no
 	  StrictHostKeyChecking no
 EOF
