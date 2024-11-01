@@ -32,8 +32,10 @@ function migrate_resource()
   ask_execute_command terraform import "$to" "$id"
 
   info "Removing $from"
-  ask_execute_commandterraform state rm "$from" || true
+  ask_execute_command terraform state rm "$from" || true
 }
+
+ask_execute_command terraform-upgrade
 
 migrate_resource \
  'module.cluster.module.flux[0].kubectl_manifest.flux-namespace' \
