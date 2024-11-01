@@ -10,10 +10,10 @@ resources:
 - helmrepository.yaml
 - helmrelease-ecr-credentials-sync.yaml
 
-patchesStrategicMerge:
-- helmrelease-cert-manager.yaml
-- helmrelease-cluster-autoscaler.yaml
-- helmrelease-external-dns.yaml
-- helmrelease-ingress-nginx.yaml
-- helmrelease-monitoring.yaml
-- helmrelease-velero.yaml
+patches:
+- path: helmrelease-cert-manager.yaml
+- path: helmrelease-cluster-autoscaler.yaml
+- path: helmrelease-external-dns.yaml
+- path: helmrelease-ingress-nginx.yaml
+- path: helmrelease-monitoring.yaml
+- path: helmrelease-velero.yaml

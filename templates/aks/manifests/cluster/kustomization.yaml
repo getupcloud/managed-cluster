@@ -4,11 +4,8 @@ kind: Kustomization
 resources:
 - ../base/
 
-patchesStrategicMerge:
-- helmrelease-ingress-nginx.yaml
-- helmrelease-logging.yaml
-- helmrelease-monitoring.yaml
-- helmrelease-velero.yaml
-#- excludes.yaml
-
-patchesJson6902: []
+patches:
+- path: helmrelease-ingress-nginx.yaml
+- path: helmrelease-logging.yaml
+- path: helmrelease-monitoring.yaml
+- path: helmrelease-velero.yaml

@@ -5,7 +5,7 @@ resources:
 - ../base/
 - helmrelease-metrics-server.yaml
 
-patchesStrategicMerge:
-- helmrelease-ingress-nginx.yaml
-- helmrelease-monitoring.yaml
-- helmrelease-velero.yaml
+patches:
+- path: helmrelease-ingress-nginx.yaml
+- path: helmrelease-monitoring.yaml
+- path: helmrelease-velero.yaml

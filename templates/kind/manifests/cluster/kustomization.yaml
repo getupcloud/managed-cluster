@@ -3,8 +3,3 @@ kind: Kustomization
 
 resources:
 - ../provider/
-
-patchesStrategicMerge:
-#- excludes.yaml
-
-patchesJson6902: []
