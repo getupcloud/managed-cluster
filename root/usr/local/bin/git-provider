@@ -5,6 +5,13 @@ if [ -d "$1" ]; then
   exit
 fi
 
+platform=$(git-url "$1" platform)
+
+if [ -n "$platform" ]; then
+  echo $platform
+  exit
+fi
+
 host=$(git-url "$1" host)
 
 case "${host%:*}" in

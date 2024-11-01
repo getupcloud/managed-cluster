@@ -400,11 +400,6 @@ git_name()
     git-url "$1" repo
 }
 
-git_owner_name()
-{
-    echo $(git_owner $1)/$(git_name $1)
-}
-
 git_remote()
 {
     local GIT_VERSION=$(git version | awk '{print $3}')
@@ -420,17 +415,6 @@ git_remote()
 has_remote()
 {
     [ -n "$(git_remote $1)" ]
-}
-
-repo_match()
-{
-    local repo1="$1"
-    local repo2="$2"
-
-    repo1_owner_name=$(git_owner_name $repo1)
-    repo2_owner_name=$(git_owner_name $repo2)
-
-    [ "$repo1_owner_name" == "$repo2_owner_name" ]
 }
 
 is_local_git_repo()
