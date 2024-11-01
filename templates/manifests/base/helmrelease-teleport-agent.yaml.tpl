@@ -73,6 +73,14 @@ spec:
     proxyAddr: ${teleport_proxy_addr}
     authToken: ${teleport_auth_token}
     kubeClusterName: ${teleport_kube_cluster_name}
+    roles: kube,app,discovery
+    kubernetesDiscovery:
+    - types:
+      - app
+      namespaces:
+      - monitoring
+      labels:
+        teleport.io/app: grafana
 
     labels:
       ${indent(6, yamlencode(teleport_labels))}
