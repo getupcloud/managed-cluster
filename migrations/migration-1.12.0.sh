@@ -35,6 +35,7 @@ function migrate_resource()
   ask_execute_command terraform state rm "$from" || true
 }
 
+ask_execute_command managed-cluster sync-template
 ask_execute_command terraform-upgrade
 
 migrate_resource \
