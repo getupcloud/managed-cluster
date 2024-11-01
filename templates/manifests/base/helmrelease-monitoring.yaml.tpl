@@ -188,9 +188,6 @@ spec:
 %{~ endif }
 
     alertmanager:
-      service:
-        labels:
-          teleport.io/app: alertmanager
       alertmanagerSpec:
         replicas: 2
 
@@ -228,6 +225,8 @@ spec:
       service:
         type: ClusterIP
         sessionAffinity: ClientIP
+        labels:
+          teleport.io/app: alertmanager
 
       ingress:
         enabled: ${ modules.monitoring.alertmanager.ingress.enabled }
