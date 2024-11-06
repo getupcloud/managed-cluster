@@ -466,7 +466,7 @@ function generate_ssh_key()
 
     #info "Generating $kh for $ssh_host"
     #echo "$host_to_scan" | ssh-keyscan -f - >$kh 2>/dev/null
-    ssh-keyscan-setup $ssh_host
+    ssh-keyscan-setup
 }
 
 function select_cluster()
@@ -841,26 +841,28 @@ function create_cluster()
     read_config cluster_name "Cluster name"
     select_cluster_sla
 
-    update_globals CLUSTER_DIR="$ROOT_DIR/clusters/$cluster_name/$cluster_type"
+    CLUSTER_DIR="$ROOT_DIR/clusters/$cluster_name/$cluster_type"
+    CLUSTER_CONF="$ROOT_DIR/clusters/$cluster_name/$cluster_type/cluster.conf"
     mkdir -p ${CLUSTER_DIR}
 
-    save_cluster_config
-    copy_from_template_common
-    copy_from_template_provider
-    merge_requires
-    generate_ssh_key
-}
+    update_globals CLUSTER_DIR="$CLUSTER_DIR"
 
-function save_cluster_config()
-{
-    info Saving $CLUSTER_CONF
+    info Creating $CLUSTER_CONF
+
     set_config cluster_type="$cluster_type" "Cluster Type" $CLUSTER_CONF
     set_config cluster_provider="$cluster_provider" "Cluster Provider" $CLUSTER_CONF
     set_config cluster_name="$cluster_name" "Cluster Name" $CLUSTER_CONF
     set_config cluster_sla="$cluster_sla" "Cluster SLA" $CLUSTER_CONF
 
-    info Copying $CLUSTER_VERSION_FILE
+    update_globals
+
     cp $VERSION_FILE $CLUSTER_VERSION_FILE
+    set_current_migration_version $(<$CLUSTER_VERSION_FILE)
+
+    copy_from_template_common
+    copy_from_template_provider
+    merge_requires
+    generate_ssh_key
 }
 
 ##########################

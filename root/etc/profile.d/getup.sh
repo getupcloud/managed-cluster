@@ -242,6 +242,10 @@ function get_tf_config()
         return
     fi
 
+    if ! [ -e "$TF_VARS_FILE" ]; then
+      return
+    fi
+
     case "$(hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|type")" in
         string|number|object|boolean)
             hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}"
