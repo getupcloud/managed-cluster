@@ -30,7 +30,7 @@ help:
 	@echo Target:
 	@echo '  image:                    Build docker image (default).'
 	@echo '  fmt:                      Run terraform fmt.'
-	@echo '  update-cluster-versions   Update templates/*/main.tf versionsfrom terraform-cluster-* repositories.'
+	@echo '  update-cluster-versions   Update templates/*/main.tf versions from terraform-cluster-* repositories.'
 	@echo '  import-cluster-variables  Download terraform variables from cluster repositories.'
 	@echo '  modules:                  Create templates/variables-modules-merge.tf.json.'
 	@echo '  release:                  Release a new version (source only).'
