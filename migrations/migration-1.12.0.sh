@@ -29,7 +29,7 @@ function migrate_resource()
   fill_line Migrating resources
 
   info "Importing $to $id"
-  ask_execute_command terraform import "$to" "$id"
+  ask_execute_command terraform import "$to" "$id" || true
 
   info "Removing $from"
   ask_execute_command terraform state rm "$from" || true
