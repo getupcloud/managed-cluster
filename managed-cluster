@@ -1448,7 +1448,7 @@ function check_update()
         has_updates=true
         if $force || _default=n ask "Upgrade to newer version ${latest_local_version}? [y/N]"; then
             if $force; then
-                git merge v${latest_local_version} -Xtheirs -m "Merge tag 'v1.6.50' (forced)"
+                git merge v${latest_local_version} -Xtheirs -m "Merge tag v${latest_local_version} (forced)"
             else
                 ask_execute_command git merge v${latest_local_version} -Xtheirs
             fi
