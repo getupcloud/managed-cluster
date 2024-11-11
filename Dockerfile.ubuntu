@@ -59,6 +59,7 @@ RUN apt update && \
       libffi-dev \
       libssl-dev \
       make \
+      netcat-openbsd \
       net-tools \
       nmap \
       pv \

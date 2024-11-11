@@ -33,9 +33,9 @@ case "$git_provider" in
     ssh_identity_file=$(get_tf_config SSH_PRIVATE_KEY ssh_private_key '/cluster/identity')
     cmd="ssh -i $ssh_identity_file -o connecttimeout=3 $git_user@$git_host"
 
-    if ! $cmd &>/dev/null; then
+    if ! $cmd 2>/dev/null | grep -i 'server accepts key:'; then
       info ': error'
-      warn "Timeout connecting to $origin:"
+      warn "Error connecting to $origin:"
       warn "\$ $cmd"
       warn "Check if repository exists and the public key is registered as read-write."
     else
