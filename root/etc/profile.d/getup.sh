@@ -469,6 +469,11 @@ fmt_version()
     local n="${2:-0}"
     v=( ${v//[.-]/ } )
 
+    if [ ${#v[@]} -eq 0 ]; then
+      warn "Invalid version format: $1"
+      return 1
+    fi
+
     if [ ${#v[*]} -eq 3 ]; then
       v[3]=999
     fi
