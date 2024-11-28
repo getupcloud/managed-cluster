@@ -765,9 +765,12 @@ spec:
           enabled: true
 
         # Admin user/pass comes from a secret
-        #security:
-        #  admin_user: admin
-        #  admin_password: admin
+        security:
+          #admin_user: admin
+          #admin_password: admin
+          %{~ if teleport_auth_token != "" }
+          csrf_trusted_origins: monitoring-grafana-monitoring-${teleport_kube_cluster_name}.${trimsuffix(teleport_proxy_addr, ":443")}
+          %{~ endif }
 
       ingress:
         enabled: ${ modules.monitoring.grafana.ingress.enabled }
