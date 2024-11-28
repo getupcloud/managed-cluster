@@ -731,6 +731,8 @@ if $INSIDE_CONTAINER; then
     if [ "$UID" == 0 ] && [ -v KUBECTL_VERSION ] && [ -x "/usr/local/bin/kubectl_$KUBECTL_VERSION" ]; then
       ln -fs /usr/local/bin/kubectl_$KUBECTL_VERSION /usr/local/bin/kubectl
     fi
+
+    export GIT_WORK_TREE=/repo GIT_DIR=/repo/.git
 else
     export REPO_DIR=$ROOT_DIR
 fi
