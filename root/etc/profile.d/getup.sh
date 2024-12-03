@@ -240,21 +240,17 @@ function get_tf_config()
         local v=TF_VAR_$tf_var_name
         echo ${!v}
         return
+    elif [ -e "$TF_VARS_FILE" ]; then
+      case "$(hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|type")" in
+          string|number|object|boolean)
+              hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}"
+              return
+          ;;
+          array)
+              hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|join(\"\n\")"
+              return
+      esac
     fi
-
-    if ! [ -e "$TF_VARS_FILE" ]; then
-      return
-    fi
-
-    case "$(hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|type")" in
-        string|number|object|boolean)
-            hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}"
-            return
-        ;;
-        array)
-            hcl2json "$TF_VARS_FILE" | jq -Mrc ".${tf_var_name}|join(\"\n\")"
-            return
-    esac
 
     echo $default
 }

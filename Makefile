@@ -177,6 +177,7 @@ fmt:
 
 install: PIP_INSTALL=giturlparse python-hcl2==3.0.5
 install:
+	set -x
 	if [ -e /etc/debian_version ]; then
 		apt install -y jq python3-pip rsync
 	elif [ -e /etc/redhat-release ]; then
@@ -185,7 +186,7 @@ install:
 		brew install jq
 	fi
 	for pkg in $(PIP_INSTALL); do
-		pip3 install $$pkg || pip install $$pkg
+		pip3 install --break-system-packages $$pkg || pip install --break-system-packages $$pkg
 	done
 	curl -skL https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64 > /usr/local/bin/yq
 	chmod +x /usr/local/bin/yq
