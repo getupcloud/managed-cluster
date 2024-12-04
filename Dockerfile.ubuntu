@@ -66,6 +66,7 @@ RUN apt update && \
       python3.12 \
       python3.12-venv \
       python3-full \
+      python3-dev \
       rsync \
       rustc \
       sshpass \

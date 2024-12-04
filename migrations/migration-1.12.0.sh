@@ -11,11 +11,6 @@ fi
 
 info "Verifying if it's necessary to migrate flux module..."
 
-if ! terraform state list | grep -q '^module.cluster.module.flux\[0].kubectl_manifest.flux-namespace$'; then
-  info "It's all good."
-  exit
-fi
-
 if [ "$cluster_type" == kubespray ]; then
   info "Checking if required variable variable is defined: terraform_mode"
 
@@ -25,8 +20,12 @@ if [ "$cluster_type" == kubespray ]; then
   fi
 fi
 
+
 ask_execute_command managed-cluster sync-template
 ask_execute_command terraform-upgrade
+
+info "Upgrading flux to v2.3.0 (forced)"
+set_tf_config flux_version v2.3.0
 
 migrate_resource \
  'module.cluster.module.flux[0].kubectl_manifest.flux-namespace' \

@@ -245,7 +245,7 @@ function unset_tf_config()
 {
     local tf_var_name="$1"
 
-    sed -i -e 's/^[[:space:]]*'$tf_var_name'[[:space:]]=.*/#\0/' "$TF_VARS_FILE"
+    sed -i -e 's|^[[:space:]]*'$tf_var_name'[[:space:]]=.*|#\0|' "$TF_VARS_FILE"
 }
 
 function set_tf_config()
@@ -259,7 +259,7 @@ function set_tf_config_raw()
     local tf_var_value="$2"
 
     if exists_tf_config "$tf_var_name"; then
-        sed -i -e 's/^[[:space:]#]*'$tf_var_name'[[:space:]]*=.*/'$tf_var_name' = '$tf_var_value'/' "$TF_VARS_FILE"
+        sed -i -e 's|^[[:space:]#]*'$tf_var_name'[[:space:]]*=.*|'$tf_var_name' = '$tf_var_value'|' "$TF_VARS_FILE"
     else
         echo "$tf_var_name = $tf_var_value" >> "$TF_VARS_FILE"
     fi
