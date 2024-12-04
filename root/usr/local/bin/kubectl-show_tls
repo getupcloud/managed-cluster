@@ -1,5 +1,0 @@
-#!/bin/bash
-
-BIN_AWK=${0}.awk
-
-command kubectl get secret -o json "$@" | jq 'select(.type="kubernetes.io/tls") | .data|.[]|values|@base64d' | xargs printf "%b" | gawk -f $BIN_AWK

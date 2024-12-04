@@ -201,7 +201,9 @@ RUN cd /etc/profile.d && \
     unzip main.zip && \
     rm -f main.zip && \
     cd autokube-main && \
-    make install
+    make install && \
+    git clone https://github.com/caruccio/kubectl-plugins && \
+    install -m 755 kubectl-plugins/kubectl-* /usr/local/bin/
 
 ARG GIT_COMMIT
 ARG VERSION
