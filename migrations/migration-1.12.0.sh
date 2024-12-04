@@ -15,6 +15,15 @@ if ! terraform state list | grep -q '^module.cluster.module.flux\[0].kubectl_man
   exit
 fi
 
+if [ "$cluster_type" == kubespray ]; then
+  info "Checking if required variable variable is defined: terraform_mode"
+
+  if [ $(get_tf_config TERRAFORM_MODE terraform_mode "") == "" ]; then
+    kubespray-mode terraform-install
+    unset_tf_config deploy_components
+  fi
+fi
+
 function migrate_resource()
 {
   if [ $# -ne 3 ]; then
