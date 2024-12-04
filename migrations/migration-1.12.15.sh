@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source /etc/profile.d/getup.sh
+source $REPO_DIR/migrations/migration-lib.sh
 
 set -u
 
@@ -15,29 +16,10 @@ if terraform state list | grep -q '^module.cluster.module.flux\[0].kubectl_manif
   exit
 fi
 
-function migrate_resource()
-{
-  if [ $# -ne 3 ]; then
-    warn "$0: migrate_resource: Invalid parameters. Expected 3, got $#"
-    return 1
-  fi
-
-  local from="$1"
-  local to="$2"
-  local id="$3"
-
-  fill_line Migrating resources
-
-  info "Importing $to $id"
-  ask_execute_command terraform import "$to" "$id" || true
-
-  info "Removing $from"
-  ask_execute_command terraform state rm "$from" || true
-}
-
 ask_execute_command managed-cluster sync-template
 ask_execute_command terraform-upgrade
 
+# Revert flux-git-repository only
 migrate_resource \
  'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
  'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Secret_flux-system_cluster"]' \

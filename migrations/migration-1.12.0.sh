@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source /etc/profile.d/getup.sh
+source $REPO_DIR/migrations/migration-lib.sh
 
 set -u
 
@@ -24,26 +25,6 @@ if [ "$cluster_type" == kubespray ]; then
   fi
 fi
 
-function migrate_resource()
-{
-  if [ $# -ne 3 ]; then
-    warn "$0: migrate_resource: Invalid parameters. Expected 3, got $#"
-    return 1
-  fi
-
-  local from="$1"
-  local to="$2"
-  local id="$3"
-
-  fill_line Migrating resources
-
-  info "Importing $to $id"
-  ask_execute_command terraform import "$to" "$id" || true
-
-  info "Removing $from"
-  ask_execute_command terraform state rm "$from" || true
-}
-
 ask_execute_command managed-cluster sync-template
 ask_execute_command terraform-upgrade
 
@@ -52,20 +33,24 @@ migrate_resource \
  'module.cluster.module.flux[0].kubernetes_namespace_v1.flux-namespace' \
  flux-system
 
-migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
- 'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
- apiVersion=v1,kind=Secret,namespace=flux-system,name=cluster
+current_repo_version=$(fmt_version $(get_current_version))
 
-migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Kustomization_flux-system_cluster"]' \
- 'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Kustomization_flux-system_cluster"]' \
- apiVersion=kustomize.toolkit.fluxcd.io/v1,kind=Kustomization,namespace=flux-system,name=cluster
+if [ $current_repo_version -lt $(fmt_version 1.12.15) ]; then
+  migrate_resource \
+   'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
+   'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
+   apiVersion=v1,kind=Secret,namespace=flux-system,name=cluster
 
-migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["GitRepository_flux-system_cluster"]' \
- 'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["GitRepository_flux-system_cluster"]' \
- apiVersion=source.toolkit.fluxcd.io/v1,kind=GitRepository,namespace=flux-system,name=cluster
+  migrate_resource \
+   'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Kustomization_flux-system_cluster"]' \
+   'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Kustomization_flux-system_cluster"]' \
+   apiVersion=kustomize.toolkit.fluxcd.io/v1,kind=Kustomization,namespace=flux-system,name=cluster
+
+  migrate_resource \
+   'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["GitRepository_flux-system_cluster"]' \
+   'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["GitRepository_flux-system_cluster"]' \
+   apiVersion=source.toolkit.fluxcd.io/v1,kind=GitRepository,namespace=flux-system,name=cluster
+fi
 
 INDEXES=( $(terraform state list | sed -ne 's/module.cluster.module.flux\[0].kubectl_manifest.flux\["\([^"]\+\)"]$/\1/p') )
 API_RESOURCES=$(kubectl api-resources)
