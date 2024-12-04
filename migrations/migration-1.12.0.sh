@@ -18,7 +18,7 @@ fi
 if [ "$cluster_type" == kubespray ]; then
   info "Checking if required variable variable is defined: terraform_mode"
 
-  if [ $(get_tf_config TERRAFORM_MODE terraform_mode "") == "" ]; then
+  if [ "$(get_tf_config TERRAFORM_MODE terraform_mode x)" == x ]; then
     kubespray-mode terraform-install
     unset_tf_config deploy_components
   fi
