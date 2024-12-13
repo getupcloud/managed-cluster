@@ -27,6 +27,9 @@ spec:
   releaseName: monitoring-config
   values:
     cronitor:
+      %{~ if alertmanager_cronitor_id != "" }
+      url: https://cronitor.link/${alertmanager_cronitor_id}/run
+      %{~ endif }
       prometheusRules:
         enabled: true
 
