@@ -344,12 +344,20 @@ function fill_line()
 {
   local cmd="$@"
   local cmd_len=${#cmd}
-  local line_pre_fmt="------- [%s] "
-  local line_pre=$(printf -- "$line_pre_fmt" '')
-  local line_len=$[$(tput cols) - cmd_len - ${#line_pre}]
-  local line=$(printf -- '%*s' $line_len|tr ' ' -)
+  local line_start_fmt="------- [%s] "
+  local line_start=$(printf -- "$line_pre_fmt" '')
+  local line_len=$[$(tput cols) - cmd_len - ${#line_start}]
 
-  printf -- "${COLOR_GREEN}${COLOR_BOLD}$line_pre_fmt%s${COLOR_RESET}\n" "$cmd" "$line"
+  if [ $line_len -eq 0 ]; then
+    local line_end=''
+  elif $line_len -lt 0 ]; then
+    line_len=$[$(tput cols) + line_len]
+    local line_end=$(printf -- '%*s' $line_len|tr ' ' -)
+  else
+    local line_end=''
+  fi
+
+  printf -- "${COLOR_GREEN}${COLOR_BOLD}$line_start_fmt%s${COLOR_RESET}\n" "$cmd" "$line_end"
 }
 
 function execute_command_with_time_track()
@@ -369,7 +377,7 @@ function execute_command()
   execute_command_with_time_track "$@"
 }
 
-ask_execute_command()
+function ask_execute_command()
 {
   local cmd="$@"
   local default="${default:-y}"
