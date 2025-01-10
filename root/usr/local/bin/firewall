@@ -8,6 +8,21 @@ kubespray-exec all -- firewall-cmd --permanent --add-port=10250/tcp         # Ku
 kubespray-exec all -- firewall-cmd --permanent --add-port=8285/udp          # Flannel
 kubespray-exec all -- firewall-cmd --permanent --add-port=8472/udp          # Flannel
 kubespray-exec all -- firewall-cmd --permanent --add-port=30000-32767/tcp   # NodePorts
+EOF
+
+if [ $# -gt 0 ]; then
+  for port in $1; do
+    echo "kubespray-exec all -- firewall-cmd --permanent --add-port=${port}/tcp"
+  done
+fi
+
+if [ $# -gt 1 ]; then
+  for port in $2; do
+    echo "kubespray-exec all -- firewall-cmd --permanent --add-port=${port}/udp"
+  done
+fi
+
+cat <<EOF
 kubespray-exec all -- firewall-cmd --permanent --add-masquerade
 kubespray-exec all -- firewall-cmd --reload
 kubespray-exec all -- systemctl restart firewalld
