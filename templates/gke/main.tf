@@ -1,6 +1,6 @@
 moved {
   from = module.gke
-  to = module.cluster
+  to   = module.cluster
 }
 
 module "cluster" {

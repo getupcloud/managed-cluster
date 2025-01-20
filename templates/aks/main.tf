@@ -1,6 +1,6 @@
 moved {
   from = module.aks
-  to = module.cluster
+  to   = module.cluster
 }
 
 module "cluster" {

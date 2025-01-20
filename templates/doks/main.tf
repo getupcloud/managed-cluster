@@ -1,6 +1,6 @@
 moved {
   from = module.doks
-  to = module.cluster
+  to   = module.cluster
 }
 
 module "cluster" {

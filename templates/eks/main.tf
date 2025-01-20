@@ -1,6 +1,6 @@
 moved {
   from = module.eks
-  to = module.cluster
+  to   = module.cluster
 }
 
 module "cluster" {
