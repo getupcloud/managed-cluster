@@ -345,7 +345,7 @@ function fill_line()
   local cmd="$@"
   local cmd_len=${#cmd}
   local line_start_fmt="------- [%s] "
-  local line_start=$(printf -- "$line_pre_fmt" '')
+  local line_start=$(printf -- "$line_start_fmt" '')
   local line_len=$[$(tput cols) - cmd_len - ${#line_start}]
 
   if [ $line_len -eq 0 ]; then
