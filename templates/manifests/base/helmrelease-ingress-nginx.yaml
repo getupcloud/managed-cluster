@@ -77,6 +77,9 @@ spec:
         #real-ip-header: proxy_protocol
         #set-real-ip-from: X.X.X.X
 
+        # Use custom error pages - Must set defaultBackend.[image,extraConfigMaps,extraVolumeMounts,extraVolumes]
+        #custom-http-errors: 404,503
+
       kind: Deployment
 
       replicaCount: 2
@@ -114,6 +117,27 @@ spec:
 
     defaultBackend:
       enabled: true
+
+      ## Use custom error pages - Must set config.custom-http-errors
+      #image:
+      #  image: ingress-nginx/custom-error-pages
+      #  registry: registry.k8s.io
+      #  tag: v1.1.1
+      #extraVolumeMounts:
+      #- mountPath: /www
+      #  name: custom-errors
+      #extraVolumes:
+      #- configMap:
+      #    name: custom-errors
+      #  name: custom-errors
+      ## Use inline html below or your custom ConfigMap
+      #extraConfigMaps:
+      #- name: custom-errors
+      #  data:
+      #    404.html: |
+      #      <h1>Error 404 ¯\_(ツ)_/¯</h1>
+      #    503.html: |
+      #      <h1>Error 503 (╯°□°)╯︵ ┻━┻</h1>
 
       tolerations:
       - key: dedicated
