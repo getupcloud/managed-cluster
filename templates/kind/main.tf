@@ -1,4 +1,9 @@
-module "kind" {
+moved {
+  from = module.kind
+  to = module.cluster
+}
+
+module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-kind?ref=v3.1.7"
 
   # cluster basics

@@ -1,4 +1,9 @@
-module "eks" {
+moved {
+  from = module.eks
+  to = module.cluster
+}
+
+module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.3.8"
 
   # cluster basics

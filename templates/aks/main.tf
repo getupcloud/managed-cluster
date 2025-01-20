@@ -1,4 +1,9 @@
-module "aks" {
+moved {
+  from = module.aks
+  to = module.cluster
+}
+
+module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-aks?ref=v2.3.3"
 
   # cluster basics

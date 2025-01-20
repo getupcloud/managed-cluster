@@ -1,4 +1,9 @@
-module "gke" {
+moved {
+  from = module.gke
+  to = module.cluster
+}
+
+module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-gke?ref=v2.2.5"
 
   # cluster basics

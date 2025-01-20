@@ -1,4 +1,9 @@
-module "doks" {
+moved {
+  from = module.doks
+  to = module.cluster
+}
+
+module "cluster" {
   source = "github.com/getupcloud/terraform-cluster-doks?ref=v1.10.4"
 
   # cluster basics
