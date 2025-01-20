@@ -348,13 +348,13 @@ function fill_line()
   local line_start=$(printf -- "$line_start_fmt" '')
   local line_len=$[$(tput cols) - cmd_len - ${#line_start}]
 
-  if [ $line_len -eq 0 ]; then
-    local line_end=''
-  elif $line_len -lt 0 ]; then
+  if [ $line_len -lt 0 ]; then
     line_len=$[$(tput cols) + line_len]
     local line_end=$(printf -- '%*s' $line_len|tr ' ' -)
-  else
+  elif [ $line_len -eq 0 ]; then
     local line_end=''
+  else # >0
+    local line_end=$(printf -- '%*s' $line_len|tr ' ' -)
   fi
 
   printf -- "${COLOR_GREEN}${COLOR_BOLD}$line_start_fmt%s${COLOR_RESET}\n" "$cmd" "$line_end"
