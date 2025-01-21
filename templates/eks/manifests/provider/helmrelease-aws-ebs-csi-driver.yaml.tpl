@@ -73,9 +73,11 @@ spec:
       parameters:
         encrypted: "true"
         type: gp2
+      allowVolumeExpansion: "true"
     - name: gp3-csi
       parameters:
         encrypted: "true"
         type: gp3
       annotations:
         storageclass.kubernetes.io/is-default-class: "true"
+      allowVolumeExpansion: "true"
