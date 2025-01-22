@@ -449,6 +449,10 @@ spec:
             continue: true
           - receiver: opsgenie
             match:
+              alertname: KubeJobFailed
+              namespace: zora-system
+          - receiver: opsgenie
+            match:
               severity: critical
             continue: true
 %{~ endif }
