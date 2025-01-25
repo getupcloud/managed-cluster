@@ -28,28 +28,13 @@ info "Upgrading flux to v2.3.0 (forced)"
 set_tf_config flux_version v2.3.0
 
 migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-namespace' \
- 'module.cluster.module.flux[0].kubernetes_namespace_v1.flux-namespace' \
+ 'module.cluster.module.flux.kubectl_manifest.flux-namespace' \
+ 'module.cluster.module.flux.kubernetes_namespace_v1.flux-namespace' \
  flux-system
 
 current_repo_version=$(fmt_version $(get_current_version))
 
-migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
- 'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Secret_flux-system_cluster"]' \
- apiVersion=v1,kind=Secret,namespace=flux-system,name=cluster
-
-migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["Kustomization_flux-system_cluster"]' \
- 'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["Kustomization_flux-system_cluster"]' \
- apiVersion=kustomize.toolkit.fluxcd.io/v1,kind=Kustomization,namespace=flux-system,name=cluster
-
-migrate_resource \
- 'module.cluster.module.flux[0].kubectl_manifest.flux-git-repository["GitRepository_flux-system_cluster"]' \
- 'module.cluster.module.flux[0].kubernetes_manifest.flux-git-repository["GitRepository_flux-system_cluster"]' \
- apiVersion=source.toolkit.fluxcd.io/v1,kind=GitRepository,namespace=flux-system,name=cluster
-
-INDEXES=( $(terraform state list | sed -ne 's/module.cluster.module.flux\[0].kubectl_manifest.flux\["\([^"]\+\)"]$/\1/p') )
+INDEXES=( $(terraform state list | sed -ne 's/module.cluster.module.flux.kubectl_manifest.flux\["\([^"]\+\)"]$/\1/p') )
 API_RESOURCES=$(kubectl api-resources)
 
 for idx in ${INDEXES[@]}; do
@@ -79,7 +64,7 @@ for idx in ${INDEXES[@]}; do
   fi
 
   migrate_resource \
-    "module.cluster.module.flux[0].kubectl_manifest.flux[\"$idx\"]" \
-    "module.cluster.module.flux[0].kubernetes_manifest.flux[\"$idx\"]" \
+    "module.cluster.module.flux.kubectl_manifest.flux[\"$idx\"]" \
+    "module.cluster.module.flux.kubernetes_manifest.flux[\"$idx\"]" \
     "$id"
 done
