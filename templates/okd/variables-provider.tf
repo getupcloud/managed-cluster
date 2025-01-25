@@ -19,7 +19,7 @@ variable "cluster_monitoring_config" {
     prometheus_k8s_retention_size = optional(string, "100GiB")
     prometheus_k8s_log_level      = optional(string, "info")
   })
-  default={}
+  default = {}
 }
 
 variable "user_workload_monitoring_config" {
@@ -36,5 +36,5 @@ variable "user_workload_monitoring_config" {
     alertmanager_enable_alertmanager_config = optional(bool, false)
     alertmanager_log_level                  = optional(string, "info")
   })
-  default={}
+  default = {}
 }
