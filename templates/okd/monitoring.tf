@@ -1,4 +1,6 @@
 resource "kubernetes_config_map_v1" "cluster-monitoring-config" {
+  count = var.cluster_monitoring_config.enabled ? 1 : 0
+
   metadata {
     name      = "cluster-monitoring-config"
     namespace = "openshift-monitoring"
@@ -6,23 +8,27 @@ resource "kubernetes_config_map_v1" "cluster-monitoring-config" {
 
   data = {
     "config.yaml" = <<-EOT
-      enableUserWorkload: true
+      %{~if var.cluster_monitoring_config.enabled}
+      enableUserWorkload: ${var.cluster_monitoring_config.enable_user_workload}
       prometheusK8s:
         resources:
           requests:
-            memory: 4Gi
-            cpu: 1
+            cpu: ${var.cluster_monitoring_config.prometheus_k8s_requests_cpu}
+            memory: ${var.cluster_monitoring_config.prometheus_k8s_requests_mem}
           limits:
-            memory: 12Gi
-            cpu: 2
-          retention: 30d
-          retentionSize: 50GiB
-        logLevel: info
+            cpu: ${var.cluster_monitoring_config.prometheus_k8s_limits_cpu}
+            memory: ${var.cluster_monitoring_config.prometheus_k8s_limits_mem}
+          retention: ${var.cluster_monitoring_config.prometheus_k8s_retention}
+          retentionSize: ${var.cluster_monitoring_config.prometheus_k8s_retention_size}
+        logLevel: ${var.cluster_monitoring_config.prometheus_k8s_log_level}
+      %{~endif}
     EOT
   }
 }
 
 resource "kubernetes_config_map_v1" "user-workload-monitoring-config" {
+  count = var.user_workload_monitoring_config.enabled ? 1 : 0
+
   metadata {
     name      = "user-workload-monitoring-config"
     namespace = "openshift-user-workload-monitoring"
@@ -30,13 +36,15 @@ resource "kubernetes_config_map_v1" "user-workload-monitoring-config" {
 
   data = {
     "config.yaml" = <<-EOT
+      %{~if var.user_workload_monitoring_config.enabled}
       prometheus:
-        retention: 24h
-        retentionSize: 10GiB
+        retention: ${var.user_workload_monitoring_config.enabled}
+        retentionSize: ${var.user_workload_monitoring_config.prometheus_retention_size}
       alertmanager:
-        enabled: true
-        enableAlertmanagerConfig: true
-        logLevel: info
+        enabled: ${var.user_workload_monitoring_config.alertmanager_enabled}
+        enableAlertmanagerConfig: ${var.user_workload_monitoring_config.alertmanager_enable_alertmanager_config}
+        logLevel: ${var.user_workload_monitoring_config.alertmanager_log_level}
+      %{~endif}
     EOT
   }
 }
