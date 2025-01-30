@@ -182,14 +182,14 @@ install:
 		apt install -y jq python3-pip rsync
 	elif [ -e /etc/redhat-release ]; then
 		yum install -y jq python3-pip rsync
+	elif grep -qi manjaro /etc/lsb-release ]; then
+		pacman -S jq python-pip rsync
 	elif [ -d /Applications ]; then
 		brew install jq
 	fi
 	for pkg in $(PIP_INSTALL); do
 		pip3 install --break-system-packages $$pkg || pip install --break-system-packages $$pkg
 	done
-	curl -skL https://github.com/mikefarah/yq/releases/download/v4.18.1/yq_linux_amd64 > /usr/local/bin/yq
-	chmod +x /usr/local/bin/yq
 	curl -skL https://github.com/tmccombs/hcl2json/releases/download/v0.3.4/hcl2json_linux_amd64 > /usr/local/bin/hcl2json
 	chmod +x /usr/local/bin/hcl2json
 
