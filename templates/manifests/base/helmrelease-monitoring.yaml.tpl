@@ -358,14 +358,26 @@ spec:
         # Inhibit same alert with lower severity of an already firing alert
         - equal:
           - alertname
-          source_matchers:
+          source_matchers: # existing alert
           - severity = critical
-          target_matchers:
+          target_matchers: # new/entering alert
           - severity = warning
-        - source_matchers:
-          - alertname =~ "KubeNodeUnreachable|KubeletDown"
-          target_matchers:
-          - alertname =~ "KubeDaemonSetRolloutStuck|KubeStatefulSetReplicasMismatch|KubeDeploymentReplicasMismatch"
+
+        - equal:
+          - service # monitoring-kube-state-metrics
+          - node    # matches same node
+        - source_matchers: # existing alert
+          - alertname =~ KubeNodeUnreachable|KubeNodeNotReady|KubeletDown
+          target_matchers: # new/entering alert
+          - alertname =~ KubeDaemonSetRolloutStuck|KubeStatefulSetReplicasMismatch|KubeDeploymentReplicasMismatch
+
+        - equal:
+          - service # only from monitoring-kube-state-metrics
+          - node    # matches same nodes
+          source_matchers: # existing alert
+          - alertname = ToBeDeletedByClusterAutoscaler
+          target_matchers: # new/entering alert
+          - alertname =~ KubeNodeUnreachable|KubeNodeNotReady|KubeletDown|KubeDaemonSetRolloutStuck|KubeStatefulSetReplicasMismatch|KubeDeploymentReplicasMismatch
 
         #################################################################
         ## Routes
@@ -373,7 +385,9 @@ spec:
 
         route:
           receiver: ${ alertmanager_default_receiver }
-          group_by: ['alertname', 'cluster']
+          group_by:
+          - alertname
+          - cluster
           group_wait: 15s
           group_interval: 5m
           repeat_interval: 3h
@@ -384,8 +398,8 @@ spec:
 
           routes:
           # watchdog aims to test the alerting pipeline
-          - match:
-              alertname: Watchdog
+          - matchers:
+            - alertname = Watchdog
             continue: false
 
 %{~ if alertmanager_ignore_alerts != [] || alertmanager_ignore_namespaces != [] }
@@ -394,12 +408,18 @@ spec:
             continue: false
             match_re:
 %{~ if alertmanager_ignore_alerts != [] }
-              alertname: "^(${ join("|", alertmanager_ignore_alerts) })$"
+              alertname: "(${ join("|", alertmanager_ignore_alerts) })"
 %{~ endif }
 %{~ if alertmanager_ignore_namespaces != [] }
-              namespace: "^(${ join("|", alertmanager_ignore_namespaces) })$"
+              namespace: "(${ join("|", alertmanager_ignore_namespaces) })"
 %{~ endif }
 %{~ endif }
+
+          - receiver: blackhole
+            match:
+            - alertname = KubeJobFailed
+            - namespace = zora-system
+            continue: false
 
           #########################
           ## External alert systems
@@ -410,10 +430,10 @@ spec:
           #############################
 %{~ if alertmanager_cronitor_id != "" }
           - receiver: cronitor
-            match:
-              alertname: CronitorWatchdog
-            group_wait: 5s
-            group_interval: 1m
+            matchers:
+            - alertname = CronitorWatchdog
+            group_wait: 1s
+            group_interval: 10s
             continue: false
 %{~ endif }
 
@@ -422,8 +442,8 @@ spec:
           # Slack
           #############################
           - receiver: slack
-            match_re:
-              alertname: .*
+            matchers:
+            - alertname != ""
             continue: true
 %{~ endif }
 
@@ -432,28 +452,8 @@ spec:
           # MS Teams
           #############################
           - receiver: msteams
-            match_re:
-             alertname: .*
-            continue: true
-%{~ endif }
-
-%{~ if alertmanager_opsgenie_integration_api_key != "" }
-          #############################
-          # Opsgenie
-          #############################
-          - receiver: opsgenie
-            match_re:
-              alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
-              namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
-              severity: warning
-            continue: true
-          - receiver: opsgenie
-            match:
-              alertname: KubeJobFailed
-              namespace: zora-system
-          - receiver: opsgenie
-            match:
-              severity: critical
+            matchers:
+            - alertname != ""
             continue: true
 %{~ endif }
 
@@ -462,21 +462,55 @@ spec:
           # PageDuty
           #############################
           - receiver: pagerduty
-            match_re:
-              alertname: (KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch|AlertmanagerFailedReload|CertificateAlert|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples|KubeNodeUnreachable|KubeClientCertificateExpiration|KubeNodeNotReady|KubeAPILatencyHigh|HighNumberOfFailedHTTPRequests|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed)
-              namespace: (kube-.*|logging|monitoring|velero|cert-manager|.*-operator|.*-ingress|ingress-.*|.*-provisioner|getup|.*istio.*|.*-controllers)
-              severity: warning
-            continue: true
-          - receiver: pagerduty
-            match:
-              severity: critical
+            matchers:
+            - alertname != ""
+            - severity: critical
             continue: true
 %{~ endif }
 
-          # ignored all alerts (default)
+
+%{~ if alertmanager_opsgenie_integration_api_key != "" }
+          #############################
+          # Opsgenie
+          #############################
+          - receiver: opsgenie
+            matchers:
+            - alertname =~ KubeNodeUnreachable|KubeCronJobRunning|KubeDaemonSetRolloutStuck|KubePodCrashLooping|KubePodNotReady|KubeStatefulSetGenerationMismatch|KubeStatefulSetReplicasMismatch
+            - namespace =~ logging|monitoring|velero|cert-manager|getup|.*-(ingress|controllers?|operators?|provisioners?|system)
+            - severity = warning
+            continue: true
+
+          - receiver: opsgenie
+            matchers:
+            - alertname =~ KubeDeploymentGenerationMismatch|KubeDeploymentReplicasMismatch|KubeNodeNotReady|KubeAPILatencyHigh|KubeStatefulSetUpdateNotRolledOut|KubeJobCompletion|KubeJobFailed
+            - namespace =~ logging|monitoring|velero|cert-manager|getup|.*-(ingress|controllers?|operators?|provisioners?|system)
+            - severity = warning
+            continue: true
+
+          - receiver: opsgenie
+            matchers:
+            - alertname =~ CertificateAlert|KubeClientCertificateExpiration|ClockSkewDetected|EndpointDown|HighNumberOfFailedProposals|HighNumberOfFailedHTTPRequests
+            - namespace =~ logging|monitoring|velero|cert-manager|getup|.*-(ingress|controllers?|operators?|provisioners?|system)
+            - severity = warning
+            continue: true
+
+          - receiver: opsgenie
+            matchers:
+            - alertname =~ AlertmanagerFailedReload|PrometheusOperatorReconcileErrors|PrometheusConfigReloadFailed|PrometheusNotConnectedToAlertmanagers|PrometheusTSDBReloadsFailing|PrometheusTSDBCompactionsFailing|PrometheusTSDBWALCorruptions|PrometheusNotIngestingSamples
+            - namespace = monitoring
+            - severity = warning
+            continue: true
+
+          - receiver: opsgenie
+            matchers:
+            - severity = critical
+            continue: true
+%{~ endif }
+
+          # ignore non-matching alerts. This is mostly for metrics purpose.
           - receiver: blackhole
-            match_re:
-              alertname: .*
+            matchers:
+            - alertname != ""
             continue: false
 
     grafana:
