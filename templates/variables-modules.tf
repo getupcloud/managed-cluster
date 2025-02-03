@@ -127,6 +127,10 @@ variable "modules_defaults" {
     tiny-controllers = object({
       enabled = bool
     })
+    vap = object({
+      enabled = bool
+      enforce = bool
+    })
   })
 
   default = {
@@ -277,6 +281,10 @@ variable "modules_defaults" {
     }
     tiny-controllers = {
       enabled = false
+    }
+    vap = {
+      enabled = true
+      enforce = false
     }
   }
 }

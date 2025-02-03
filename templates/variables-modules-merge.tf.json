@@ -152,6 +152,10 @@
       },
       "tiny-controllers": {
         "enabled": "${try(var.modules.tiny-controllers.enabled, var.modules_defaults.tiny-controllers.enabled)}"
+      },
+      "vap": {
+        "enabled": "${try(var.modules.vap.enabled, var.modules_defaults.vap.enabled)}",
+        "enforce": "${try(var.modules.vap.enforce, var.modules_defaults.vap.enforce)}"
       }
     }
   }
