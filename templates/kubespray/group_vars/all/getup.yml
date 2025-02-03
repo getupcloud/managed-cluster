@@ -1,3 +1,5 @@
+tls_min_version: "VersionTLS13"
+
 kubeconfig_localhost: true
 
 kubelet_rotate_server_certificates: true
@@ -65,7 +67,7 @@ audit_policy_custom_rules: |
 ignored_audit_rules: # remove this to take effect
     ## Default audit config from kubespray
     ## roles/kubernetes/control-plane/templates/apiserver-audit-policy.yaml.j2
-    
+
     # The following requests were manually identified as high-volume and low-risk,
     # so drop them.
     - level: None
