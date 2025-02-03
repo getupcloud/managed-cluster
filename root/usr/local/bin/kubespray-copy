@@ -23,18 +23,18 @@ src=$1
 dest=$2
 shift 2
 
-src_host=${src%%:*}
-dest_host=${dest%%:*}
-src=${src#*:}
-dest=${dest#*:}
+if [[ $src =~ : ]]; then
+    remote_src=true # download
+    hosts=${src%:*}
+    src=${src#*:}
+else
+    remote_src=false # upload
+    hosts=${dest%:*}
+    dest=${dest#*:}
+fi
 
-if [ -n "$src_host" ]; then
-    # downloading
-    hosts=$src_host
-    remote_src=true
-elif [ -n "$dest_host" ]; then
-    # uploading
-    hosts=$dest_host
+if [ -z "$dest" ]; then
+    dest="$src"
 fi
 
 execute_command ansible $hosts -i $INVENTORY_FILE --become --user $user -m copy -a "src=$src dest=$dest remote_src=$remote_src $*"
