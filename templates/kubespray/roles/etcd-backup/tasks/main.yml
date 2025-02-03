@@ -1,0 +1,31 @@
+---
+- name: Create backup dir {{ etcd_backup_dir }}
+  ansible.builtin.file:
+    path: "{{ etcd_backup_dir }}"
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+
+- name: Copy script etc-backup.sh to {{ etcd_backup_dir }}
+  template:
+    src: etcd-backup.sh.j2
+    dest: "{{ etcd_backup_dir }}/etcd-backup.sh"
+    mode: "0777"
+    owner: root
+    group: root
+
+- name: Setup cronjob to execute backups
+  ansible.builtin.cron:
+    name: "etcd-backup"
+    minute: "{{ etcd_backup_cron_minute }}"
+    hour: "{{ etcd_backup_cron_hour }}"
+    job: "{{ etcd_backup_dir }}/etcd-backup.sh"
+
+- name: Install awscli
+  ansible.builtin.package:
+    name: awscli
+    state: present
+  when:
+  - etcd_backup_s3_bucket is defined
+  - etcd_backup_s3_bucket

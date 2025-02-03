@@ -1,0 +1,10 @@
+---
+
+etcd_backup_cron_minute: 0
+etcd_backup_cron_hour: '*/12'
+etcd_backup_retention_days: 7
+etcd_backup_dir: /root/etcd-backup
+
+#etcd_backup_s3_bucket: 'bucket-name'
+#etcd_backup_aws_access_key_id: ''
+#etcd_backup_aws_secret_access_key: ''

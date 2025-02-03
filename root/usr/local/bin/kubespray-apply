@@ -16,9 +16,11 @@ playbook=$KUBESPRAY_DIR/cluster.yml
 
 if [ ${0##*/} == "kubespray-upgrade" ]; then
     playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
+    ask_execute_command kubespray-exec kube_control_plane -- /root/etcd-backup/etcd-backup.sh
 fi
 
 echo Kubernetes Version: $kube_version
 ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ $playbook
-
 terraform-mode terraform-install
+
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ /cluster/playbook-install-backup.yml
