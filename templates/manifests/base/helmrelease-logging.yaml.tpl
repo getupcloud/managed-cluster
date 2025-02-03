@@ -29,6 +29,10 @@ spec:
   values:
     config:
       auth_enabled: false
+      server:
+        grpc_server_max_recv_msg_size: 10485760  # 10 Mb
+        grpc_server_max_send_msg_size: 10485760  # 10 Mb
+
       ingester:
         chunk_encoding: lz4
         chunk_idle_period: 10m
