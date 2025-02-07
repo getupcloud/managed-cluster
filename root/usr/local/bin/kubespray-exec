@@ -6,6 +6,7 @@ source /etc/profile.d/getup.sh
 
 hosts=()
 ansible_args=()
+module=shell
 
 if ! grep -q ' -- ' <<<"$*"; then
   # do not have -- so we force one
@@ -15,13 +16,17 @@ fi
 while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help)
-      echo "Usage: $0 [hosts...] [-a|--ansible-arguments ARGUMENTS] [--] [command, [parameters...]]"
+      echo "Usage: $0 [hosts...] [-a|--ansible-arguments ARGUMENTS] [-m|--module NAME] [--] [command, [parameters...]]"
       exit
     ;;
 
     -a|--ansible-arguments)
       shift
       ansible_args+=("$1")
+    ;;
+    -m|--module)
+        shift
+        module="$1"
     ;;
 
     --)
@@ -67,4 +72,4 @@ hosts="${hosts[*]}"
 hosts="${hosts// /,}," # make it a string list for ansible to accept hostnames
 
 set -x
-ansible $hosts -i $INVENTORY_FILE --become --user $user -m shell -a "${*@K}" "${ansible_args[@]}"
+ansible $hosts -i $INVENTORY_FILE --become --user $user -m "$module" -a "${*@K}" "${ansible_args[@]}"
