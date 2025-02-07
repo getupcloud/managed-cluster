@@ -56,7 +56,7 @@ source_env_tf()
     source_env "$1"
     save_opt a
     set -a
-    eval $(awk -F= '/^[^#]/{printf("TF_VAR_%s=\"$%s\"\n", $1, $1)}' "$1")
+    eval $(awk -F= '/^[[:blank:]]?[[:alpha:]][[:alnum:]_]+=.*/ { printf("TF_VAR_%s=\"$%s\"\n", $1, $1) }' "$1")
     load_opt a
 }
 
