@@ -11,14 +11,14 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      version: "~> 4.8"
+      version: "~> 4.19"
   install:
     createNamespace: true
     disableWait: true
     remediation:
       retries: -1
   upgrade:
-    disableWait: false
+    disableWait: true
     remediation:
       retries: -1
   interval: 5m
@@ -31,7 +31,7 @@ spec:
 
     driver:
       enabled: true
-      kind: modern_ebpf
+      kind: auto
 
     falco:
       grpc:
@@ -41,55 +41,51 @@ spec:
 
       logSyslog: true
 
+    serviceMonitor:
+      create: true
+
     tolerations:
-    - key: dedicated
-      value: infra
+    - operator: Exists
       effect: NoSchedule
-%{ if modules.falco.falco-exporter.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: falco-exporter
+  name: k8s-metacollector
   namespace: flux-system
 spec:
   chart:
     spec:
-      chart: falco-exporter
+      chart: k8s-metacollector
       sourceRef:
         kind: HelmRepository
         name: falcosecurity
-      version: "~> 0.12"
+      version: "~> 0.1"
   install:
     createNamespace: true
     disableWait: true
     remediation:
       retries: -1
   upgrade:
-    disableWait: false
+    disableWait: true
     remediation:
       retries: -1
   interval: 5m
-  releaseName: falco-exporter
+  releaseName: k8s-metacollector
   storageNamespace: falco-system
   targetNamespace: falco-system
   values:
-    serviceMonitor:
-      enabled: true
-      interval: "30s"
-
-    prometheusRules:
-      enabled: true
-
-    grafanaDashboard:
-      enabled: true
-      namespace: monitoring
-
     tolerations:
     - key: dedicated
       value: infra
       effect: NoSchedule
-%{~ endif }
+    serviceMonitor:
+      create: true
+      labels:
+        release: kube-prometheus-stack
+    grafana:
+      dashboards:
+        enabled: true
 %{ if modules.falco.event-generator.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
