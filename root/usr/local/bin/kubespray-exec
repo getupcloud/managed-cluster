@@ -5,7 +5,6 @@ set -eu
 source /etc/profile.d/getup.sh
 
 hosts=()
-cmd=()
 ansible_args=()
 
 if ! grep -q ' -- ' <<<"$*"; then
@@ -68,4 +67,4 @@ hosts="${hosts[*]}"
 hosts="${hosts// /,}," # make it a string list for ansible to accept hostnames
 
 set -x
-ansible $hosts -i $INVENTORY_FILE --become --user $user -m shell -a "$*" "${ansible_args[@]}"
+ansible $hosts -i $INVENTORY_FILE --become --user $user -m shell -a "${*@K}" "${ansible_args[@]}"
