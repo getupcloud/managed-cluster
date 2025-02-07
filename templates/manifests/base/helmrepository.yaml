@@ -287,3 +287,12 @@ metadata:
 spec:
   interval: 1h
   url: https://kedacore.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kube-vip
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://kube-vip.github.io/helm-charts

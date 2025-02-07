@@ -5,6 +5,7 @@ resources:
 - ../base/
 - helmrelease-csr-auto-approver.yaml
 - helmrelease-metallb.yaml
+- helmrelease-kube-vip-cloud-provider.yaml
 - helmrelease-metrics-server.yaml
 
 patches:

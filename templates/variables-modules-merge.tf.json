@@ -156,6 +156,11 @@
       "vap": {
         "enabled": "${try(var.modules.vap.enabled, var.modules_defaults.vap.enabled)}",
         "enforce": "${try(var.modules.vap.enforce, var.modules_defaults.vap.enforce)}"
+      },
+      "kube-vip": {
+        "enabled": "${try(var.modules.kube-vip.enabled, var.modules_defaults.kube-vip.enabled)}",
+        "cidrs": {},
+        "ranges": {}
       }
     }
   }

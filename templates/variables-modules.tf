@@ -131,6 +131,11 @@ variable "modules_defaults" {
       enabled = bool
       enforce = bool
     })
+    kube-vip = object({
+      enabled = bool
+      cidrs = map(string)
+      ranges = map(string)
+    })
   })
 
   default = {
@@ -285,6 +290,11 @@ variable "modules_defaults" {
     vap = {
       enabled = true
       enforce = false
+    }
+    kube-vip = {
+      enabled = false
+      cidrs = {}
+      ranges = {}
     }
   }
 }
