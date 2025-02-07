@@ -1,5 +1,24 @@
 tls_min_version: "VersionTLS13"
 
+#searchdomains:
+#- example.com
+
+#nameservers:
+#- 8.8.8.8
+#- 1.1.1.1
+
+## ETCD-BACKUP
+#etcd_backup_s3_bucket: 'bucket-name'
+#etcd_backup_aws_access_key_id: ''
+#etcd_backup_aws_secret_access_key: ''
+
+### KUBE-VIP
+kube_proxy_strict_arp: true
+# TODO; create configmap kube-system/kubevip
+# https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+#kubevip_service_ip_range: 192.168.0.200-192.168.0.210
+#kubevip_service_ip_cidr: 192.168.0.200/28
+
 kubeconfig_localhost: true
 
 kubelet_rotate_server_certificates: true
