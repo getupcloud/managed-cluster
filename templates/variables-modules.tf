@@ -133,8 +133,8 @@ variable "modules_defaults" {
     })
     kube-vip = object({
       enabled = bool
-      cidrs = map(string)
-      ranges = map(string)
+      cidrs   = map(string)
+      ranges  = map(string)
     })
   })
 
@@ -293,8 +293,8 @@ variable "modules_defaults" {
     }
     kube-vip = {
       enabled = false
-      cidrs = {}
-      ranges = {}
+      cidrs   = {}
+      ranges  = {}
     }
   }
 }
