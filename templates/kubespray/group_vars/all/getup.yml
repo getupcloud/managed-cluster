@@ -37,6 +37,7 @@ auto_renew_certificates: true
 auto_renew_certificates_systemd_calendar: "Mon *-2,7-1,2,3,4,5,6,7 03:{{ groups['kube_control_plane'].index(inventory_hostname) }}0:00"
 
 # https://github.com/postfinance/kubelet-csr-approver/blob/main/charts/kubelet-csr-approver/values.yaml
+kubelet_csr_approver_repository_url: https://charts.getup.io/postfinance/kubelet-csr-approver/
 kubelet_csr_approver_values:
   # optional, permits to bypass dns resolution checks. default: false
   bypassDnsResolution: true
@@ -84,6 +85,28 @@ additional_sysctl:
 - name: net.ipv4.ip_local_port_range
   value: 32768 62768
 
+kube_apiserver_enable_admission_plugins:
+- EventRateLimit
+- LimitRanger
+- ResourceQuota
+
+kube_apiserver_admission_control_config_file: true
+kube_apiserver_admission_event_rate_limits:
+  EventRateLimitNS:
+    type: Namespace
+    qps: 50
+    burst: 100
+    cache_size: 2000
+  EventRateLimitUser:
+    type: User
+    qps: 25
+    burst: 50
+    cache_size: 500
+
+kube_controller_manager_bind_address: 127.0.0.1
+kube_controller_terminated_pod_gc_threshold: 50
+kube_scheduler_bind_address: 127.0.0.1
+kube_controller_terminated_pod_gc_threshold: 100
 
 kubernetes_audit: true
 audit_log_maxage: 3

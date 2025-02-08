@@ -33,6 +33,8 @@ spec:
       enabled: true
       kind: auto
 
+    tty: true
+
     falco:
       grpc:
         enabled: true

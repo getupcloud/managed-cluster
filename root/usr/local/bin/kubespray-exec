@@ -8,7 +8,7 @@ hosts=()
 ansible_args=()
 module=shell
 
-if ! grep -q ' -- ' <<<"$*"; then
+if ! grep -Eq '^-- | -- ' <<<"$*"; then
   # do not have -- so we force one
   set -- -- "$@"
 fi
