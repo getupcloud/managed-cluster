@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# Install:
+# $ echo 'source ~/bin/aws-assume-role' >> ~/.bashrc
+#
+# Usage:
+# $ aws-assume-role [name]
+#
+
+function aws-list-profiles()
+{
+    jc --ini -r -m <~/.aws/config | jq -r 'keys[]'
+}
+
+function aws-get-config()
+{
+    jc --ini -r -m <~/.aws/config | jq -r ".$1.$2"
+}
+
+function aws-assume-role()
+{
+    if ! which jc &>/dev/null; then
+        echo 'Missing ja. Install with:'
+        echo ' $ pip3 install jc'
+        return 1
+    fi
+
+    if ! which jq &>/dev/null; then
+        echo 'Missing jq. Install with one of:'
+        echo ' $ apt install -y jq'
+        echo ' $ yum install -y jq'
+        echo ' $ pacman -S jq'
+        echo ' $ brew install jq'
+    fi
+
+    local ROLE=
+    local AWS_ACCOUNT_ID=""
+
+    local print=""
+    if [ "$1" == "-p" ]; then
+      print=echo
+    fi
+
+    if [[ "$1" =~ [0-9]+ ]]; then
+        echo Using Account ID $1
+        AWS_ACCOUNT_ID=$1
+    else
+        local AWS_TARGET_PROFILE=$(aws-list-profiles | fzf --select-1 --reverse --exact ${1:+--query "$1"})
+        if [ -z "$AWS_TARGET_PROFILE" ]; then
+            echo "Missing or invalid profile name${AWS_TARGET_PROFILE:+: $AWS_TARGET_PROFILE}"
+            return
+        fi
+        echo Using Profile: $AWS_TARGET_PROFILE
+
+        ROLE=$(aws-get-config $AWS_TARGET_PROFILE role_arn)
+        echo Using Role: $ROLE
+    fi
+
+    if [ -z "$ROLE" ]; then
+        ROLE=arn:aws:iam::${AWS_ACCOUNT_ID}:role/getupcloud
+    elif [ -z "$AWS_ACCOUNT_ID" ]; then
+        AWS_ACCOUNT_ID=$(cut -d: -f5 <<<$ROLE)
+    fi
+
+    if ! [[ "$ROLE" =~ arn:aws:iam::[0-9]+:role/[a-z0-9]+ ]]; then
+        echo Invalid role: $ROLE
+        return 1
+    fi
+
+    echo -n "Current identity ($AWS_PROFILE): "
+    aws sts get-caller-identity ${AWS_PROFILE:+--profile=$AWS_PROFILE} | jq -r .Arn
+    local session_name_suffix=${AWS_TARGET_PROFILE// /-}
+    session_name_suffix=${session_name_suffix//:/-}
+
+    local CREDENTIALS=$(
+        AWS_SESSION_TOKEN='' aws sts assume-role ${AWS_PROFILE:+--profile=$AWS_PROFILE} --role-arn "$ROLE" --role-session-name "AWSCLI-Session-${session_name_suffix}" --duration-seconds=$((12*60*60))
+    )
+    local ROLE_ACCESS_KEY_ID="$(jq -r .Credentials.AccessKeyId <<<$CREDENTIALS)"
+    local ROLE_SECRET_KEY="$(jq -r .Credentials.SecretAccessKey <<<$CREDENTIALS)"
+    local ROLE_SESSION_TOKEN="$(jq -r .Credentials.SessionToken <<<$CREDENTIALS)"
+
+    $print export AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
+    $print export AWS_ACCESS_KEY_ID=$ROLE_ACCESS_KEY_ID
+    $print export AWS_SECRET_ACCESS_KEY=$ROLE_SECRET_KEY
+    $print export AWS_SESSION_TOKEN=$ROLE_SESSION_TOKEN
+
+    echo -n 'Assuming role: '
+    aws sts get-caller-identity | jq -r .Arn
+}

@@ -238,7 +238,7 @@ function sync_from_template()
       return 1
     fi
 
-    local rsync_params="--out-format=%n --info=all0,name1 --exclude=manifests/cluster/ --exclude=provider.env --exclude=\*.swp"
+    local rsync_params="--out-format=%n --info=all0,name1 --exclude=manifests/cluster/ --exclude=provider.env --exclude=group_vars/ --exclude=\*.swp"
     local files_to_sync_common=( $(copy_from_template_common $rsync_params --dry-run) )
     local files_to_sync_provider=( $(copy_from_template_provider $rsync_params --dry-run) )
 
