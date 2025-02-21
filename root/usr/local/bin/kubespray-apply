@@ -5,7 +5,7 @@ set -eu
 source /etc/profile.d/getup.sh
 
 if [ $# -gt 0 ] && [[ "$1" =~ (-h|--help) ]] ; then
-    echo "Usage: $0 [ansible-playbook parameters...]"
+    echo "Usage: $0 [--serial=1] [ansible-playbook parameters...]"
     exit 1
 fi
 
@@ -14,13 +14,18 @@ kube_version=$(ansible-inventory -i $INVENTORY_FILE --list |  jq -r '._meta.host
 
 playbook=$KUBESPRAY_DIR/cluster.yml
 
+serial_opt=""
 if [ ${0##*/} == "kubespray-upgrade" ]; then
+    if [[ "$1" =~ --serial=[0-9]+ ]]; then
+        serial_opt="-e serial=${1:#*=}"
+        shift
+    fi
     playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
     ask_execute_command kubespray-exec kube_control_plane -- /root/etcd-backup/etcd-backup.sh
 fi
 
 echo Kubernetes Version: $kube_version
-ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ $playbook
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ $playbook $serial_opt
 terraform-mode terraform-install
 
 ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ /cluster/playbook-install-backup.yml
