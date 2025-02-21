@@ -104,7 +104,6 @@ kube_apiserver_admission_event_rate_limits:
     cache_size: 500
 
 kube_controller_manager_bind_address: 127.0.0.1
-kube_controller_terminated_pod_gc_threshold: 50
 kube_scheduler_bind_address: 127.0.0.1
 kube_controller_terminated_pod_gc_threshold: 100
 
@@ -128,11 +127,10 @@ audit_policy_custom_rules: |
     - watch
     namespaces: []
     resources:
-     - group: ""
+    - group: ""
       resources:
       - pods
-    resources:
-    - pods/exec
+      - pods/exec
 
 ignored_audit_rules: # remove this to take effect
     ## Default audit config from kubespray
