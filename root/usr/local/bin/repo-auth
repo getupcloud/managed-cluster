@@ -6,6 +6,8 @@ set +eu
 
 git_provider=$(git-provider $origin)
 
+repo-check-access || true
+
 infon "Checking credentials to $origin"
 
 case "$git_provider" in
@@ -26,19 +28,5 @@ case "$git_provider" in
     if [ "$git_proto" != ssh ]; then
       info ': not applicable: ssh only'
       exit
-    fi
-
-    git_user=$(git-url $origin user)
-    git_host=$(git-url $origin host)
-    ssh_identity_file=$(get_tf_config SSH_PRIVATE_KEY ssh_private_key '/cluster/identity')
-    cmd="ssh -i $ssh_identity_file -o connecttimeout=3 $git_user@$git_host"
-
-    if ! $cmd 2>/dev/null | grep -i 'server accepts key:'; then
-      info ': error'
-      warn "Error connecting to $origin:"
-      warn "\$ $cmd"
-      warn "Check if repository exists and the public key is registered as read-write."
-    else
-      info ': ok'
     fi
 esac

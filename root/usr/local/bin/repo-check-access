@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+source /etc/profile.d/getup.sh
+
+set +eu
+
+: ${origin:=$1}
+git_user=$(git-url $origin user)
+git_host=$(git-url $origin host)
+git_port=$(git-url $origin port)
+
+infon "Checking if $git_host:$git_port is accessible"
+if ! nc -w 3 -z $git_host $git_port &>/dev/null; then
+  info ": FAILED"
+  exit 1
+fi
+info ': OK'
+
+infon "Checking if credentials for $git_host:$git_port are valid"
+ssh_identity_file=$(get_tf_config SSH_PRIVATE_KEY ssh_private_key '/cluster/identity')
+cmd="ssh -v -i $ssh_identity_file -o connecttimeout=3 $git_user@$git_host"
+
+if ! $cmd 2>&1 | grep -qi 'server accepts key:'; then
+  info ': FAILED'
+  warn "Error connecting to $origin:"
+  warn "\$ $cmd"
+  warn "Please verify if repository exists and the public key is registered as read-write."
+  exit 1
+fi
+info ': OK'
