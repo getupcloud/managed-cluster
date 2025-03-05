@@ -170,6 +170,7 @@ RUN cd /usr/local/bin && \
     curl -OkL https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip && \
         unzip kubelogin-linux-amd64.zip && mv bin/linux_amd64/kubelogin ./ && rm -rf bin kubelogin-linux-amd64.zip && \
     chmod +x /usr/local/bin/kubectl-extract && \
+    curl -sSfL https://raw.githubusercontent.com/busser/tfautomv/main/install.sh | sh && \
     chmod -R +x /usr/local/bin
 
 RUN KERNEL_MACHINE=$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/' -e 's/aarch64/arm64/') && \
