@@ -26,68 +26,103 @@ spec:
   storageNamespace: falco-system
   targetNamespace: falco-system
   values:
-    #auditLog:
-    #  enabled: true
-
+    tty: true
     driver:
       enabled: true
       kind: auto
-
-    tty: true
-
     falco:
       grpc:
         enabled: true
-      grpcOutput:
+      grpc_output:
         enabled: true
-
-      logSyslog: true
-
+      log_syslog: false
+    metrics:
+      enabled: false # prometheus-metrics is broken
+      outputRule: true
     serviceMonitor:
-      create: true
+      create: false # prometheus-metrics is broken
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
 
-    tolerations:
-    - operator: Exists
-      effect: NoSchedule
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: k8s-metacollector
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: k8s-metacollector
-      sourceRef:
-        kind: HelmRepository
-        name: falcosecurity
-      version: "~> 0.1"
-  install:
-    createNamespace: true
-    disableWait: true
-    remediation:
-      retries: -1
-  upgrade:
-    disableWait: true
-    remediation:
-      retries: -1
-  interval: 5m
-  releaseName: k8s-metacollector
-  storageNamespace: falco-system
-  targetNamespace: falco-system
-  values:
-    tolerations:
-    - key: dedicated
-      value: infra
-      effect: NoSchedule
-    serviceMonitor:
-      create: true
-      labels:
-        release: kube-prometheus-stack
-    grafana:
-      dashboards:
+    collectors:
+      kubernetes:
         enabled: true
+        grafana:
+          dashboards:
+            enabled: true
+        serviceMonitor:
+          create: true
+          interval: 30s
+        nodeSelector:
+          node-role.kubernetes.io/infra: ""
+        tolerations:
+        - key: dedicated
+          value: infra
+          effect: NoSchedule
+
+    falcosidekick:
+      enabled: true
+      prometheusRules:
+        enabled: true
+        alerts:
+          warning:
+            # -- enable the high rate rule for the warning events
+            enabled: true
+            # -- rate interval for the high rate rule for the warning events
+            rate_interval: "5m"
+            # -- threshold for the high rate rule for the warning events
+            threshold: 5
+          error:
+            # -- enable the high rate rule for the error events
+            enabled: true
+            # -- rate interval for the high rate rule for the error events
+            rate_interval: "5m"
+            # -- threshold for the high rate rule for the error events
+            threshold: 1
+          critical:
+            # -- enable the high rate rule for the critical events
+            enabled: true
+            # -- rate interval for the high rate rule for the critical events
+            rate_interval: "5m"
+            # -- threshold for the high rate rule for the critical events
+            threshold: 0
+          alert:
+            # -- enable the high rate rule for the alert events
+            enabled: true
+            # -- rate interval for the high rate rule for the alert events
+            rate_interval: "5m"
+            # -- threshold for the high rate rule for the alert events
+            threshold: 1
+          emergency:
+            # -- enable the high rate rule for the emergency events
+            enabled: true
+            # -- rate interval for the high rate rule for the emergency events
+            rate_interval: "5m"
+            # -- threshold for the high rate rule for the emergency events
+            threshold: 0
+          output:
+            # -- enable the high rate rule for the errors with the outputs
+            enabled: false
+            # -- rate interval for the high rate rule for the errors with the outputs
+            rate_interval: "5m" 
+            # -- threshold for the high rate rule for the errors with the outputs
+            threshold: 5
+          additionalAlerts: {}
+      webui:
+        enabled: true
+      grafana:
+        dashboards:
+          enabled: true
+      serviceMonitor:
+        enabled: true
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: dedicated
+        value: infra
+        effect: NoSchedule
+
 %{ if modules.falco.event-generator.enabled ~}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
