@@ -43,6 +43,26 @@ kubelet_csr_approver_values:
   bypassDnsResolution: true
   # number of DNS SAN names allowed in a certificate request. defaults to 1
   allowedDnsNames: 3
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+          - key: node-role.kubernetes.io/infra
+            operator: Exists
+      - weight: 90
+        preference:
+          matchExpressions:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+  tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Equal
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/infra
+    operator: Equal
 
 additional_sysctl:
 ## File-system related

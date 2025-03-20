@@ -24,4 +24,16 @@ spec:
   releaseName: csr-auto-approver
   storageNamespace: kube-system
   targetNamespace: kube-system
-  values: {}
+  values:
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: node-role.kubernetes.io/infra
+              operator: Exists
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+
