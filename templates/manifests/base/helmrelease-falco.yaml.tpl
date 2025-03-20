@@ -58,7 +58,6 @@ spec:
         enabled: true
 
     k8s-metacollector:
-      replicaCount: 3
       grafana:
         dashboards:
           enabled: true
