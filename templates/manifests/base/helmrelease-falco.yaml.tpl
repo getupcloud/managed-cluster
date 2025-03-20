@@ -27,6 +27,14 @@ spec:
   targetNamespace: falco-system
   values:
     tty: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 250m
+        memory: 1Gi
+
     driver:
       enabled: true
       kind: auto
