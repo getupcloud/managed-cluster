@@ -56,18 +56,21 @@ spec:
     collectors:
       kubernetes:
         enabled: true
-        grafana:
-          dashboards:
-            enabled: true
-        serviceMonitor:
-          create: true
-          interval: 30s
-        nodeSelector:
-          node-role.kubernetes.io/infra: ""
-        tolerations:
-        - key: dedicated
-          value: infra
-          effect: NoSchedule
+
+    k8s-metacollector:
+      replicaCount: 3
+      grafana:
+        dashboards:
+          enabled: true
+      serviceMonitor:
+        create: true
+        interval: 30s
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        value: infra
 
     falcosidekick:
       enabled: true
@@ -119,6 +122,12 @@ spec:
           additionalAlerts: {}
       webui:
         enabled: true
+        nodeSelector:
+          node-role.kubernetes.io/infra: ""
+        tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          value: infra
       grafana:
         dashboards:
           enabled: true
