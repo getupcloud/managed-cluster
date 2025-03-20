@@ -32,3 +32,21 @@ spec:
       enabled: true
     serviceMonitor:
       enabled: true
+    addonResizer:
+      enabled: true
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: node-role.kubernetes.io/infra
+              operator: Exists
+        - weight: 90
+          preference:
+            matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
