@@ -127,6 +127,13 @@ spec:
         - effect: NoSchedule
           key: dedicated
           value: infra
+        redis:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: dedicated
+            value: infra
       grafana:
         dashboards:
           enabled: true
