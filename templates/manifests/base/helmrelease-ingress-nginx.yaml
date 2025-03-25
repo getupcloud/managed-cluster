@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: ingress-nginx
-      version: "4.12.x"
+      version: "~> 4.12"
   dependsOn:
   - name: monitoring
   install:
@@ -79,6 +79,9 @@ spec:
 
         # Use custom error pages - Must set defaultBackend.[image,extraConfigMaps,extraVolumeMounts,extraVolumes]
         #custom-http-errors: 404,503
+        strict-validate-path-type: "false"
+        annotations-risk-level: Critical
+
 
       kind: Deployment
 
