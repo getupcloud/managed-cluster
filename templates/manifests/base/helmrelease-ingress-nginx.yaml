@@ -29,7 +29,7 @@ spec:
   values:
     controller:
       allowSnippetAnnotations: true
-      enableAnnotationValidations: true
+      enableAnnotationValidations: false
 
       admissionWebhooks:
         # enable after install in order to avoid ingress deadlock
