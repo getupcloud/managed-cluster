@@ -17,7 +17,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: istio
-      version: "~> 1.23"
+      version: "~> 1.25"
   install:
     createNamespace: true
     disableWait: false
@@ -45,7 +45,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: istio
-      version: "~> 1.23"
+      version: "~> 1.25"
   install:
     createNamespace: false
     disableWait: false
@@ -61,6 +61,13 @@ spec:
   dependsOn:
   - name: istio-base
   values:
+    autoscaleMax: 6
+    autoscaleMin: 2
+    cpu:
+      targetAverageUtilization: 95
+    memory:
+      targetAverageUtilization: 90
+
     meshConfig:
       accessLogFile: /dev/stdout
       accessLogEncoding: TEXT
@@ -100,7 +107,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: istio
-      version: "~> 1.23"
+      version: "~> 1.25"
   install:
     createNamespace: false
     disableWait: false
@@ -116,6 +123,13 @@ spec:
   dependsOn:
   - name: istio-istiod
   values:
+    autoscaling:
+      enabled: true
+      maxReplicas: 6
+      minReplicas: 2
+      targetCPUUtilizationPercentage: 95
+      targetMemoryUtilizationPercentage: 90
+
     nodeSelector:
       node-role.kubernetes.io/infra: ""
 
