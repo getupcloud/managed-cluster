@@ -28,4 +28,5 @@ resources:
 - helmrelease-velero.yaml
 - helmrelease-weave-gitops.yaml
 - helmrelease-x509-exporter.yaml
+- helmrelease-vap.yaml
 - helmrepository.yaml
