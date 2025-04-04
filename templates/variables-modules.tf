@@ -27,7 +27,6 @@ variable "modules_defaults" {
     falco = object({
       enabled         = bool
       event-generator = object({ enabled = bool })
-      falco-exporter  = object({ enabled = bool })
       node-setup      = object({ enabled = bool })
     })
     istio = object({
