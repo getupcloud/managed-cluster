@@ -11,4 +11,4 @@ gh
 helm
 openshift-install*
 terraform.log
-/cluster/.pyenv
+.pyenv

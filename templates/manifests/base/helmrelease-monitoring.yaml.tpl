@@ -406,17 +406,17 @@ spec:
           # Ignore alerts and/or namespaces
           - receiver: blackhole
             continue: false
-            match_re:
+            matchers:
 %{~ if alertmanager_ignore_alerts != [] }
-              alertname: "(${ join("|", alertmanager_ignore_alerts) })"
+              alertname =~ ${ join("|", alertmanager_ignore_alerts) }
 %{~ endif }
 %{~ if alertmanager_ignore_namespaces != [] }
-              namespace: "(${ join("|", alertmanager_ignore_namespaces) })"
+              namespace =~ ${ join("|", alertmanager_ignore_namespaces) }
 %{~ endif }
 %{~ endif }
 
           - receiver: blackhole
-            match:
+            matchers:
             - alertname = KubeJobFailed
             - namespace = zora-system
             continue: false
