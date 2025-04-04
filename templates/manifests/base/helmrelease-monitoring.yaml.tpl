@@ -408,10 +408,10 @@ spec:
             continue: false
             matchers:
 %{~ if alertmanager_ignore_alerts != [] }
-              alertname =~ ${ join("|", alertmanager_ignore_alerts) }
+            - alertname =~ ${ join("|", alertmanager_ignore_alerts) }
 %{~ endif }
 %{~ if alertmanager_ignore_namespaces != [] }
-              namespace =~ ${ join("|", alertmanager_ignore_namespaces) }
+            - namespace =~ ${ join("|", alertmanager_ignore_namespaces) }
 %{~ endif }
 %{~ endif }
 
