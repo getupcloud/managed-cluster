@@ -191,6 +191,7 @@ spec:
       sleep: "5m"
 %{~ endif }
 %{ if modules.falco.node-setup.enabled ~}
+%{~ if contains(["aks", "eks", "oke"], cluster_type) }
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -217,10 +218,7 @@ spec:
         - /bin/sh
         - -xc
         - |-
-%{~ if contains(["aks", "eks", "oke"], cluster_type) }
           yum -y install kernel-devel kernel-headers
-%{~ endif }
-          sleep inf
         image: alpine
         imagePullPolicy: Always
         name: setup
@@ -252,6 +250,7 @@ spec:
       maxSurge: 0
       maxUnavailable: 20%
     type: RollingUpdate
+%{~ endif }
 %{~ endif }
 
 %{~ endif }

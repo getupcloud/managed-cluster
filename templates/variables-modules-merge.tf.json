@@ -33,9 +33,6 @@
         "event-generator": {
           "enabled": "${try(var.modules.falco.event-generator.enabled, var.modules_defaults.falco.event-generator.enabled)}"
         },
-        "falco-exporter": {
-          "enabled": "${try(var.modules.falco.falco-exporter.enabled, var.modules_defaults.falco.falco-exporter.enabled)}"
-        },
         "node-setup": {
           "enabled": "${try(var.modules.falco.node-setup.enabled, var.modules_defaults.falco.node-setup.enabled)}"
         }

@@ -165,10 +165,7 @@ variable "modules_defaults" {
     falco = {
       enabled = false
       event-generator = {
-        enabled = true
-      }
-      falco-exporter = {
-        enabled = true
+        enabled = false
       }
       node-setup = {
         enabled = true

@@ -14,10 +14,12 @@ spec:
       version: "~> 33.1"
   install:
     createNamespace: true
+    crds: CreateReplace
     disableWait: false
     remediation:
       retries: -1
   upgrade:
+    crds: CreateReplace
     disableWait: false
     remediation:
       retries: -1
