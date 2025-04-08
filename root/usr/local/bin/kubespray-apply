@@ -16,8 +16,8 @@ playbook=$KUBESPRAY_DIR/cluster.yml
 
 serial_opt=""
 if [ ${0##*/} == "kubespray-upgrade" ]; then
-    if [[ "$1" =~ --serial=[0-9]+ ]]; then
-        serial_opt="-e serial=${1:#*=}"
+    if [[ "${1:-}" =~ --serial=[0-9]+ ]]; then
+        serial_opt="-e serial=${1#*=}"
         shift
     fi
     playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
