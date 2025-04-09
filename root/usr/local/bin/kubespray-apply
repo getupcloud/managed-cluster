@@ -16,18 +16,28 @@ playbook=$KUBESPRAY_DIR/cluster.yml
 
 serial_opt=""
 if [ ${0##*/} == "kubespray-upgrade" ]; then
+    playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
     if [[ "${1:-}" =~ --serial=[0-9]+ ]]; then
         serial_opt="-e serial=${1#*=}"
         shift
     fi
-    playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
     ask_execute_command kubespray-exec kube_control_plane -- /root/etcd-backup/etcd-backup.sh
 elif [ ${0##*/} == "kubespray-scale" ]; then
     playbook=$KUBESPRAY_DIR/scale.yml
+    kube_nodes=$(yq e '.all.children.kube_node.hosts | keys |.[]' $CLUSTER_DIR/hosts.yaml)
+    new_nodes=$(printf "%s\n" $kube_nodes |
+      fzf -0 --ansi --reverse --multi --disabled \
+      --header='---[ Select nodes to add (ctrl+a to select all) ]---' \
+      --bind 'ctrl-a:select-all')
+    if [ -z "$new_nodes" ]; then
+      echo "No new nodes selected."
+      exit 1
+    fi
+    ansible_opts="--limit $(printf "%s," $new_nodes)"
 fi
 
 echo Kubernetes Version: $kube_version
-ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ $playbook $serial_opt
+ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $ansible_opts $@ $playbook $serial_opt
 terraform-mode terraform-install
 
 ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $@ /cluster/playbook-install-backup.yml
