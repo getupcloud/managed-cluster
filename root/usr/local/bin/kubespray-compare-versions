@@ -1,0 +1,200 @@
+#!/bin/bash
+
+set -eo pipefail
+
+# Configurações
+REPO_URL="https://github.com/kubernetes-sigs/kubespray.git"
+TMP_DIR=$(mktemp -d)
+OUTPUT_DIR="$PWD/kubespray_analysis"
+KUBE_VERSIONS_FILE="$OUTPUT_DIR/kubespray_supported_kubernetes_versions.txt"
+COMPARE_DIR="inventory/sample/group_vars"
+
+# Validação dos parâmetros
+if [ "$#" -lt 1 ]; then
+    echo "Uso: $0 <versão-inicial> [versão-final]"
+    echo "Exemplo 1: $0 v2.22       # Analisa da v2.22.0 até a última versão"
+    echo "Exemplo 2: $0 v2.22.1     # Formato completo também funciona"
+    echo "Exemplo 3: $0 v2.22 v2.24 # Intervalo específico"
+    exit 1
+fi
+
+VERSION_START="$1"
+VERSION_END="$2"
+
+# Pré-requisitos
+mkdir -p "$OUTPUT_DIR"
+echo "▶ Diretório de saída: $OUTPUT_DIR"
+echo "📋 Versões do Kubernetes serão salvas em: $KUBE_VERSIONS_FILE"
+
+# Clone
+echo "⏬ Clonando repositório..."
+git clone --quiet "$REPO_URL" "$TMP_DIR"
+cd "$TMP_DIR"
+
+# Normaliza versões (adiciona .0 se necessário)
+normalize_version() {
+    local version=$1
+    if [[ "$version" =~ ^v[0-9]+\.[0-9]+$ ]]; then
+        echo "${version}.0"
+    else
+        echo "$version"
+    fi
+}
+
+NORMALIZED_START=$(normalize_version "$VERSION_START")
+NORMALIZED_END=$(normalize_version "$VERSION_END")
+
+# Encontra arquivos que contêm kubelet_checksums
+find_kubelet_checksums_files() {
+    local tag=$1
+    git ls-tree -r "$tag" --name-only roles | \
+        grep -E 'roles/.*/defaults/(.*/|)(main|checksums)\.ya?ml$' | \
+        while read file; do
+            if git show "$tag:$file" | grep -q 'kubelet_checksums:'; then
+                echo "$file"
+            fi
+        done
+}
+
+# Extrai versões do Kubernetes dos checksums
+extract_kube_versions() {
+    local tag=$1
+    local checksum_files=$(find_kubelet_checksums_files "$tag")
+
+    echo "  Versões suportadas:" >> "$KUBE_VERSIONS_FILE"
+
+    for file in $checksum_files; do
+        echo "    Arquivo: $file" >> "$KUBE_VERSIONS_FILE"
+        git show "$tag:$file" | \
+            awk '/^kubelet_checksums:/ {flag=1; next} /^[^ ]/ {flag=0} flag' | \
+            tr -d ' ' | \
+            grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | \
+            awk -F: '{print "      - " $1}' | \
+            sort -V | \
+            uniq >> "$KUBE_VERSIONS_FILE"
+    done
+}
+
+# Obtém todas as versões estáveis (último patch de cada X.Y)
+ALL_VERSIONS=($(
+    git tag -l "v*" |
+    grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+    sort -V |
+    awk -F. '{
+        key = $1"."$2;
+        if (versions[key]) {
+            if ($3 > versions[key]) {
+                versions[key] = $3
+                full_versions[key] = $0
+            }
+        } else {
+            versions[key] = $3
+            full_versions[key] = $0
+        }
+    } END {
+        for (key in full_versions) {
+            print full_versions[key]
+        }
+    }' |
+    sort -V
+))
+
+# Filtra versões dentro do intervalo solicitado
+FILTERED_VERSIONS=()
+START_FOUND=0
+END_FOUND=0
+
+for version in "${ALL_VERSIONS[@]}"; do
+    # Encontra o ponto de início
+    if [ "$version" == "$NORMALIZED_START" ] || [[ "$version" =~ ^"$VERSION_START"\. ]]; then
+        START_FOUND=1
+    fi
+
+    # Adiciona versões após o início
+    if [ $START_FOUND -eq 1 ]; then
+        FILTERED_VERSIONS+=("$version")
+    fi
+
+    # Verifica se atingiu o final (se especificado)
+    if [ -n "$VERSION_END" ] && 
+       ([ "$version" == "$NORMALIZED_END" ] || [[ "$version" =~ ^"$VERSION_END"\. ]]); then
+        END_FOUND=1
+        break
+    fi
+done
+
+# Verifica se encontrou as versões solicitadas
+if [ $START_FOUND -eq 0 ]; then
+    echo "❌ Versão inicial $VERSION_START não encontrada"
+    echo "   Versões disponíveis:"
+    printf "   - %s\n" "${ALL_VERSIONS[@]}"
+    exit 1
+fi
+
+if [ -n "$VERSION_END" ] && [ $END_FOUND -eq 0 ]; then
+    echo "⚠️ Aviso: Versão final $VERSION_END não encontrada, usando até a última versão disponível"
+fi
+
+if [ ${#FILTERED_VERSIONS[@]} -lt 1 ]; then
+    echo "❌ Nenhuma versão encontrada no intervalo especificado"
+    exit 1
+fi
+
+# Gera arquivo com as versões do Kubernetes
+echo "📊 Versões do Kubernetes suportadas por versão do Kubespray:" > "$KUBE_VERSIONS_FILE"
+
+for version in "${FILTERED_VERSIONS[@]}"; do
+    echo -e "\nVersion: $version" >> "$KUBE_VERSIONS_FILE"
+
+    # Extrai versões do Kubernetes
+    extract_kube_versions "$version"
+
+    # Adiciona outras informações relevantes
+    echo "  Componentes:" >> "$KUBE_VERSIONS_FILE"
+    git ls-tree -r "$version" --name-only roles | \
+        grep -E '/(defaults|vars)/.*\.ya?ml$' | \
+        while read file; do
+            git show "$version:$file" | \
+              grep -E '^(calico|cilium|containerd|coredns|cri|crio|docker|etcd|flannel|helm|kube|kube_vip|metallb|metrics_server|runc)_version:' | \
+              sed 's/^/    /' >> "$KUBE_VERSIONS_FILE" || true
+        done
+
+#    git show "$version:roles/" 2>/dev/null | \
+#        grep -E '^(kube_version|docker_version|containerd_version|calico_version|cilium_version):' | \
+#        sed 's/^/    /' >> "$KUBE_VERSIONS_FILE" || true
+done
+
+# Comparação entre versões consecutivas
+if [ ${#FILTERED_VERSIONS[@]} -gt 1 ]; then
+    echo -e "\n🔍 Comparando alterações em $COMPARE_DIR entre versões consecutivas:"
+    for ((i=0; i<${#FILTERED_VERSIONS[@]}-1; i++)); do
+        CURRENT="${FILTERED_VERSIONS[$i]}"
+        NEXT="${FILTERED_VERSIONS[$i+1]}"
+        PATCH_FILE="$OUTPUT_DIR/kubespray-compare-${CURRENT}_${NEXT}.patch"
+
+        echo "  Comparando $CURRENT → $NEXT..."
+
+        git diff --unified=5 --patch \
+            "$CURRENT" "$NEXT" -- \
+            "$COMPARE_DIR" \
+            > "$PATCH_FILE" || true
+
+        if [ ! -s "$PATCH_FILE" ]; then
+            echo "    ✅ Sem alterações (arquivo removido)"
+            rm -f "$PATCH_FILE"
+        else
+            echo "    💾 Diferenças salvas em: $(basename "$PATCH_FILE")"
+        fi
+    done
+else
+    echo "ℹ️ Apenas uma versão encontrada, nenhuma comparação possível"
+fi
+
+# Finalização
+echo -e "\n✔ Concluído! Resultados em:"
+echo "  - Análise de versões: $KUBE_VERSIONS_FILE"
+if [ ${#FILTERED_VERSIONS[@]} -gt 1 ]; then
+    echo "  - Comparações entre versões: $OUTPUT_DIR/kubespray-compare-*.patch"
+fi
+cd - >/dev/null
+rm -rf "$TMP_DIR"

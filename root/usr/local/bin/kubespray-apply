@@ -22,6 +22,8 @@ if [ ${0##*/} == "kubespray-upgrade" ]; then
     fi
     playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
     ask_execute_command kubespray-exec kube_control_plane -- /root/etcd-backup/etcd-backup.sh
+elif [ ${0##*/} == "kubespray-scale" ]; then
+    playbook=$KUBESPRAY_DIR/scale.yml
 fi
 
 echo Kubernetes Version: $kube_version
