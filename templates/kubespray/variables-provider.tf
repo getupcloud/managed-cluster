@@ -55,25 +55,25 @@ variable "master_nodes" {
   type        = list(any)
   default = [
     {
-      address : "10.0.0.1",
-      hostname : "master-0",
+      address : "1.1.1.1",
+      hostname : "master-0-change-me",
       ssh_private_key : "~/.ssh/id_rsa",
 
       disks : {
         containers : {
-          device : "/dev/sdb",
+          device : "/dev/sdX",
           mountpoint : "/var/lib/containers",
           filesystem : "ext4",
           format : false
         },
         kubelet : {
-          device : "/dev/sdc",
-          mountpoint : "/var/lib/kubelet"
+          device : "/dev/sdY",
+          mountpoint : "/var/lib/kubelet",
           filesystem : "ext4",
           format : false
         }
         etcd : {
-          device : "/dev/sdd",
+          device : "/dev/sdZ",
           mountpoint : "/var/lib/etcd",
           filesystem : "ext4",
           format : false
@@ -87,18 +87,18 @@ variable "infra_nodes" {
   type        = list(any)
   default = [
     {
-      address : "10.0.0.10",
-      hostname : "infra-0"
+      address : "1.1.1.2",
+      hostname : "infra-0-change-me",
 
       disks : {
         kubelet : {
-          device : "/dev/sdb",
+          device : "/dev/sdX",
           mountpoint : "/var/lib/kubelet",
           filesystem : "ext4",
           format : false
         }
         containers : {
-          device : "/dev/sdc",
+          device : "/dev/sdY",
           mountpoint : "/var/lib/containers",
           filesystem : "ext4",
           format : false
@@ -106,18 +106,18 @@ variable "infra_nodes" {
       }
     },
     {
-      address : "10.0.0.11",
-      hostname : "infra-1",
+      address : "1.1.1.3",
+      hostname : "infra-1-change-me",
 
       disks : {
         kubelet : {
-          device : "/dev/sdb",
+          device : "/dev/sdX",
           mountpoint : "/var/lib/kubelet",
           filesystem : "ext4",
           format : false
         }
         containers : {
-          device : "/dev/sdc",
+          device : "/dev/sdY",
           mountpoint : "/var/lib/containers",
           filesystem : "ext4",
           format : false
@@ -132,18 +132,18 @@ variable "app_nodes" {
   type        = list(any)
   default = [
     {
-      address : "10.0.0.20",
-      hostname : "app-0"
+      address : "1.1.1.4",
+      hostname : "app-0-change-me",
 
       disks : {
         kubelet : {
-          device : "/dev/sdb",
+          device : "/dev/sdX",
           mountpoint : "/var/lib/kubelet",
           filesystem : "ext4",
           format : false
         }
         containers : {
-          device : "/dev/sdc",
+          device : "/dev/sdY",
           mountpoint : "/var/lib/containers",
           filesystem : "ext4",
           format : false
@@ -151,18 +151,18 @@ variable "app_nodes" {
       }
     },
     {
-      address : "10.0.0.21",
-      hostname : "app-1",
+      address : "1.1.1.5",
+      hostname : "app-1-change-me",
 
       disks : {
         kubelet : {
-          device : "/dev/sdb",
+          device : "/dev/sdX",
           mountpoint : "/var/lib/kubelet",
           filesystem : "ext4",
           format : false
         }
         containers : {
-          device : "/dev/sdc",
+          device : "/dev/sdY",
           mountpoint : "/var/lib/containers",
           filesystem : "ext4",
           format : false
