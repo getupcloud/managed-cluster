@@ -15,6 +15,7 @@ kube_version=$(ansible-inventory -i $INVENTORY_FILE --list |  jq -r '._meta.host
 playbook=$KUBESPRAY_DIR/cluster.yml
 
 serial_opt=""
+ansible_opts=""
 if [ ${0##*/} == "kubespray-upgrade" ]; then
     playbook=$KUBESPRAY_DIR/upgrade-cluster.yml
     if [[ "${1:-}" =~ --serial=[0-9]+ ]]; then
