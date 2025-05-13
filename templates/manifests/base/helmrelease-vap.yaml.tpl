@@ -26,25 +26,11 @@ spec:
   targetNamespace: vap-system
   releaseName: vap
   values:
+    enforce: %{ modules.vap.enforce }
+
     %{~ if modules.vap.enforce }
     defaultFailurePolicy: Fail
     %{~ else }
     defaultFailurePolicy: Ignore
     %{~ endif }
-
-    bindingSpec:
-      matchResources:
-        # matchPolicy: Equivalent
-        namespaceSelector:
-          matchLabels:
-            vap.getup.io/enabled: "true"
-        objectSelector: {}
-      policyName: '{{ .policyName }}'
-      validationActions:
-      %{~ if modules.vap.enforce ~}
-      - Deny
-      - Audit
-      %{~ else }
-      - Warn
-      %{~ endif }
 %{~ endif }
