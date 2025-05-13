@@ -1,0 +1,22 @@
+#!/bin/bash
+
+host=${1:-127.0.0.1:443}
+[[ "$host" =~ :.* ]] || host=$host:443
+
+echo Checking TLS versions for $(tput bold)$host$(tput sgr0)
+echo
+for version in 1 1_1 1_2 1_3; do
+  V=TLSv${version/_/.}
+  cmd="openssl s_client -connect ${host} -tls${version} </dev/null"
+  #echo $cmd
+  echo -n "Checking ${V} support: "
+  if res=$(eval $cmd 2>&1 |grep -i "$V"); then
+    tput setaf 2 bold
+    echo YES
+    echo $res
+  else
+    tput setaf 1 bold
+    echo NO
+  fi
+  tput sgr0
+done
