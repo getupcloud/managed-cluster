@@ -26,7 +26,7 @@ spec:
   targetNamespace: vap-system
   releaseName: vap
   values:
-    enforce: %{ modules.vap.enforce }
+    enforce: ${ modules.vap.enforce }
 
     %{~ if modules.vap.enforce }
     defaultFailurePolicy: Fail
