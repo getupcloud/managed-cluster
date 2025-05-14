@@ -12,6 +12,11 @@ fi
 user=$(get_tf_config SSH_USER ssh_user centos)
 kube_version=$(ansible-inventory -i $INVENTORY_FILE --list |  jq -r '._meta.hostvars[._meta.hostvars|keys[0]].kube_version')
 
+if [ -e $CLUSTER_DIR/kubespray-patches.diff ]; then
+  GIT_DIR=$KUBESPRAY_DIR/.git git reset --hard
+  patch -p1 -d $KUBESPRAY_DIR < /cluster/kubespray-patches.diff
+fi
+
 playbook=$KUBESPRAY_DIR/cluster.yml
 
 serial_opt=""
