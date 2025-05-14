@@ -1,0 +1,75 @@
+diff --git a/roles/kubernetes-apps/ansible/templates/coredns-deployment.yml.j2 b/roles/kubernetes-apps/ansible/templates/coredns-deployment.yml.j2
+index e929dba62..9accf1ed1 100644
+--- a/roles/kubernetes-apps/ansible/templates/coredns-deployment.yml.j2
++++ b/roles/kubernetes-apps/ansible/templates/coredns-deployment.yml.j2
+@@ -39,12 +39,19 @@ spec:
+ {% endif %}
+       affinity:
+         podAntiAffinity:
++{% if dns_pod_anti_affinity is defined %}
++          {{ dns_pod_anti_affinity | to_nice_yaml(indent=2) | indent(10) }}
++{% else %}
+           requiredDuringSchedulingIgnoredDuringExecution:
+           - topologyKey: "kubernetes.io/hostname"
+             labelSelector:
+               matchLabels:
+                 k8s-app: kube-dns{{ coredns_ordinal_suffix }}
++{% endif %}
+         nodeAffinity:
++{% if dns_node_affinity is defined %}
++          {{ dns_node_affinity | to_nice_yaml(indent=2) | indent(10) }}
++{% else %}
+           preferredDuringSchedulingIgnoredDuringExecution:
+           - weight: 100
+             preference:
+@@ -53,6 +60,7 @@ spec:
+                 operator: In
+                 values:
+                 - ""
++{% endif %}
+       containers:
+       - name: coredns
+         image: "{{ coredns_image_repo }}:{{ coredns_image_tag }}"
+diff --git a/roles/kubernetes-apps/csi_driver/vsphere/templates/vsphere-csi-controller-deployment.yml.j2 b/roles/kubernetes-apps/csi_driver/vsphere/templates/vsphere-csi-controller-deployment.yml.j2
+index 6a1f31963..a7e2fc50e 100644
+--- a/roles/kubernetes-apps/csi_driver/vsphere/templates/vsphere-csi-controller-deployment.yml.j2
++++ b/roles/kubernetes-apps/csi_driver/vsphere/templates/vsphere-csi-controller-deployment.yml.j2
+@@ -22,6 +22,9 @@ spec:
+       priorityClassName: system-cluster-critical # Guarantees scheduling for critical system pods
+       affinity:
+         podAntiAffinity:
++{% if vsphere_csi_controller_pod_anti_affinity is defined %}
++          {{ vsphere_csi_controller_pod_anti_affinity | to_nice_yaml(indent=2) | indent(10) }}
++{% else %}
+           requiredDuringSchedulingIgnoredDuringExecution:
+             - labelSelector:
+                 matchExpressions:
+@@ -30,9 +33,18 @@ spec:
+                     values:
+                       - vsphere-csi-controller
+               topologyKey: "kubernetes.io/hostname"
++{% endif %}
++{% if vsphere_csi_controller_node_affinity is defined %}
++        nodeAffinity:
++          {{ vsphere_csi_controller_node_affinity | to_nice_yaml(indent=2) | indent(10) }}
++{% endif %}
+       serviceAccountName: vsphere-csi-controller
+       nodeSelector:
++{% if vsphere_csi_controller_node_selector is defined %}
++        {{ vsphere_csi_controller_node_selector | to_nice_yaml(indent=2) | indent(8) }}
++{% else %}
+         node-role.kubernetes.io/control-plane: ""
++{% endif %}
+       tolerations:
+         - operator: "Exists"
+           key: node-role.kubernetes.io/control-plane
+@@ -48,6 +60,9 @@ spec:
+           operator: Exists
+           effect: NoExecute
+           tolerationSeconds: {{ vsphere_csi_aggressive_node_unreachable_timeout }}
++{% endif %}
++{% if vsphere_csi_controller_extra_tolerations is defined %}
++        {{ vsphere_csi_controller_extra_tolerations | to_nice_yaml(indent=2) | indent(8) }}
+ {% endif %}
+       dnsPolicy: "Default"
+       containers:

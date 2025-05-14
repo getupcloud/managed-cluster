@@ -18,12 +18,81 @@ tls_cipher_suites:
 #- TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
 #- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 
+## Needs to apply patch /cluster/kubespray-patches.diff
+# $ GIT_DIR=$KUBESPRAY_DIR/.git git reset --hard
+# $ patch -p1 -d $KUBESPRAY_DIR < /cluster/kubespray-patches.diff
+dns_extra_tolerations:
+- key: node-role.kubernetes.io/infra
+  effect: NoSchedule
+- key: dedicated
+  value: infra
+  effect: NoSchedule
+dns_pod_anti_affinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+  - weight: 100
+    podAffinityTerm:
+      topologyKey: kubernetes.io/hostname
+      labelSelector:
+        matchLabels:
+          k8s-app: kube-dns{{ coredns_ordinal_suffix }}
+dns_node_affinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+  - weight: 100
+    preference:
+      matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: In
+        values:
+        - ""
+  - weight: 100
+    preference:
+      matchExpressions:
+      - key: node-role.kubernetes.io/infra
+        operator: In
+        values:
+        - ""
+vsphere_csi_controller_extra_tolerations:
+- key: node-role.kubernetes.io/infra
+  effect: NoSchedule
+- key: dedicated
+  value: infra
+  effect: NoSchedule
+vsphere_csi_controller_pod_anti_affinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+  - weight: 100
+    podAffinityTerm:
+      topologyKey: kubernetes.io/hostname
+      labelSelector:
+        matchLabels:
+          app: vsphere-csi-controller
+vsphere_csi_controller_node_selector: {}
+vsphere_csi_controller_node_affinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+  - weight: 90
+    preference:
+      matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: In
+        values:
+        - ""
+  - weight: 100
+    preference:
+      matchExpressions:
+      - key: node-role.kubernetes.io/infra
+        operator: In
+        values:
+        - ""
+
 #searchdomains:
 #- example.com
 
 #nameservers:
 #- 8.8.8.8
 #- 1.1.1.1
+
+dns_min_replicas: 4
+#dns_nodes_per_replica: 16  # default=16
+#dns_cores_per_replica: 100 # default=256
 
 ## ETCD-BACKUP
 #etcd_backup_s3_bucket: 'bucket-name'
