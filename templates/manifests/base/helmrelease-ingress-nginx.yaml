@@ -97,7 +97,34 @@ spec:
       metrics:
         enabled: true
         serviceMonitor:
+          additionalLabels:
+            release: monitoring
           enabled: true
+        prometheusRule:
+          additionalLabels:
+            release: monitoring
+          enabled: true
+          namespace: ingress-nginx
+          rules:
+          - alert: NGINXConfigFailed
+            annotations:
+              description: bad ingress config - nginx config test failed
+              summary: uninstall the latest ingress changes to allow config reloads to
+                resume
+            expr: count(nginx_ingress_controller_config_last_reload_successful == 0) >
+              0
+            for: 1s
+            labels:
+              severity: critical
+          - alert: NGINXCertificateExpiry
+            annotations:
+              description: ssl certificate(s) will expire in less then a week
+              summary: renew expiring certificates to avoid downtime
+            expr: (avg(nginx_ingress_controller_ssl_expire_time_seconds) by (host) - time())
+              < 1728000
+            for: 1s
+            labels:
+              severity: critical
 
       service:
         enabled: true
