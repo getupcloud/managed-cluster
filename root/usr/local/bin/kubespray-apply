@@ -18,6 +18,7 @@ if [ -e $CLUSTER_DIR/kubespray-patches.diff ]; then
 fi
 
 playbook=$KUBESPRAY_DIR/cluster.yml
+playbook_facts=$KUBESPRAY_DIR/playbooks/facts.yml
 
 serial_opt=""
 ansible_opts=""
@@ -40,6 +41,8 @@ elif [ ${0##*/} == "kubespray-scale" ]; then
       exit 1
     fi
     ansible_opts="--limit $(printf "%s," $new_nodes)"
+    info "In order to add nodes you must first run the playbook $playbook_facts"
+    ask_execute_command ansible-playbook -i $INVENTORY_FILE --become --user $user $ansible_opts $@ $playbook_facts
 fi
 
 echo Kubernetes Version: $kube_version
