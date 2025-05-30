@@ -151,6 +151,16 @@ kubelet_csr_approver_values:
     key: node-role.kubernetes.io/infra
     operator: Equal
 
+limits:
+- domain: '*'
+  limit_type: hard
+  limit_item: nofile
+  value: 32768
+- domain: '*'
+  limit_type: soft
+  limit_item: nofile
+  value: 32768
+
 additional_sysctl:
 ## File-system related
 - name: fs.aio-max-nr

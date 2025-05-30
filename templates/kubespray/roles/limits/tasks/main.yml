@@ -1,0 +1,8 @@
+---
+- name: Setting OS limits
+  community.general.pam_limits:
+    domain: "{{ item.domain | default('*') }}"
+    limit_type: "{{ item.limit_type | default('soft') }}"
+    limit_item: "{{ item.limit_item }}"
+    value: "{{ item.value }}"
+  loop: "{{ limits }}"

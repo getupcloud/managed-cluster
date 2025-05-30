@@ -1,0 +1,10 @@
+---
+limits:
+- domain: '*'
+  limit_type: hard
+  limit_item: nofile
+  value: 16384
+- domain: '*'
+  limit_type: soft
+  limit_item: nofile
+  value: 8192

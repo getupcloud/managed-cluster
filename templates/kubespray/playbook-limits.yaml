@@ -1,0 +1,7 @@
+---
+- name: Update OS limits
+  hosts: all
+  gather_facts: false
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  roles:
+    - { role: limits }
