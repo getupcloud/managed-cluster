@@ -4,7 +4,7 @@ moved {
 }
 
 module "cluster" {
-  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.4.0"
+  source = "github.com/getupcloud/terraform-cluster-eks?ref=v2.4.1"
 
   # cluster basics
   customer_name       = var.customer_name
