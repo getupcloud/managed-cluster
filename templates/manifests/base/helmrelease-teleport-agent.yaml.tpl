@@ -80,7 +80,7 @@ spec:
       namespaces:
       - monitoring
       labels:
-        teleport.io/app: grafana
+        teleport.io/app: none
 
     labels:
       ${indent(6, yamlencode(teleport_labels))}
