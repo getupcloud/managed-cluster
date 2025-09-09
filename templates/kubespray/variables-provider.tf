@@ -11,7 +11,7 @@ variable "kubernetes_version" {
   description = "Kubernetes rersion"
   type        = string
   validation {
-    condition     = can(regex("^v[0-9]\\.[0-9]+\\.[0-9]+", var.kubernetes_version))
+    condition     = can(regex("^v?[0-9]\\.[0-9]+\\.[0-9]+", var.kubernetes_version))
     error_message = "Kubernetes version must match format `v{MAJOR}.{MINOR}.{PATCH}`."
   }
 }
@@ -35,7 +35,7 @@ variable "terraform_mode" {
 variable "kubespray_git_ref" {
   description = "Kubespray ref name"
   type        = string
-  default     = "refs/tags/v2.26.0"
+  default     = "refs/tags/v2.28.1"
 }
 
 variable "kubespray_dir" {
