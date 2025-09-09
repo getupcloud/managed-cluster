@@ -48,7 +48,7 @@ NORMALIZED_END=$(normalize_version "$VERSION_END")
 find_kubelet_checksums_files() {
     local tag=$1
     git ls-tree -r "$tag" --name-only roles | \
-        grep -E 'roles/.*/defaults/(.*/|)(main|checksums)\.ya?ml$' | \
+        grep -E 'roles/.*/(defaults|vars)/(.*/|)(main|checksums)\.ya?ml$' | \
         while read file; do
             if git show "$tag:$file" | grep -q 'kubelet_checksums:'; then
                 echo "$file"
@@ -68,7 +68,7 @@ extract_kube_versions() {
         git show "$tag:$file" | \
             awk '/^kubelet_checksums:/ {flag=1; next} /^[^ ]/ {flag=0} flag' | \
             tr -d ' ' | \
-            grep -E 'v[0-9]+\.[0-9]+\.[0-9]+' | \
+            grep -E 'v?[0-9]+\.[0-9]+\.[0-9]+' | \
             awk -F: '{print "      - " $1}' | \
             sort -V | \
             uniq >> "$KUBE_VERSIONS_FILE"
