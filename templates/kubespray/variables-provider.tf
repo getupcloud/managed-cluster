@@ -266,6 +266,12 @@ variable "ssh_bastion_private_key" {
   default     = ""
 }
 
+variable "sudo_password" {
+  description = "SUDO password"
+  type        = string
+  default     = ""
+}
+
 variable "install_packages" {
   description = "Extra packages to install on nodes"
   type        = list(string)
