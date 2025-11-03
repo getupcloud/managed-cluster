@@ -47,6 +47,7 @@ module "cluster" {
   ssh_private_key            = var.ssh_private_key
   ssh_user                   = var.ssh_user
   ssh_password               = var.ssh_password
+  sudo_password              = var.sudo_password
   systemctl_enable           = var.systemctl_enable
   systemctl_disable          = var.systemctl_disable
   uninstall_packages         = var.uninstall_packages
