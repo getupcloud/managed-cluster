@@ -6,7 +6,7 @@ terraform {
     }
 
     kubernetes = {
-      version = "~> 2.8"
+      version = "~> 2.38"
     }
 
     kustomization = {
