@@ -36,4 +36,7 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
-
+    image:
+      repository: ghcr.io/getupcloud/kubectl
+      pullPolicy: IfNotPresent
+      tag: "1.33.3"
